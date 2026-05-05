@@ -1,0 +1,14 @@
+{
+  "name": "bulldozer-marketplace",
+  "owner": {
+    "name": "Juliano FRANCHETTO",
+    "email": "juliano@bulldozer-collective.com"
+  },
+  "plugins": [
+    {
+      "name": "bulldozer-claude-plugin",
+      "source": "./plugins/bulldozer-claude-plugin",
+      "description": "Adds MCP servers, skills and agents from Bulldozer"
+    }
+  ]
+}

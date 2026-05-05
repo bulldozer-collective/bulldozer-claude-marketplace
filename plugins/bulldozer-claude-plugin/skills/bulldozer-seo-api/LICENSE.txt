@@ -1,0 +1,24 @@
+PROPRIETARY SOFTWARE LICENSE
+
+Copyright (c) 2026 Bulldozer. All Rights Reserved.
+
+This software and associated documentation files (the "Software") are the
+exclusive property of Bulldozer and are protected by copyright law and
+international treaty provisions.
+
+RESTRICTIONS:
+
+1. This Software is proprietary and confidential to Bulldozer.
+2. Unauthorized copying, modification, distribution, or use of this Software,
+   in whole or in part, is strictly prohibited.
+3. This Software may only be used by Bulldozer and its authorized personnel.
+4. No license, express or implied, to any intellectual property rights in the
+   Software is granted except as expressly set forth herein.
+
+DISCLAIMER:
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED. IN NO EVENT SHALL BULLDOZER BE LIABLE FOR ANY CLAIM, DAMAGES, OR
+OTHER LIABILITY ARISING FROM THE USE OF THIS SOFTWARE.
+
+For licensing inquiries, contact Bulldozer directly.
