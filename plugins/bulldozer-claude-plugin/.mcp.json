@@ -4,7 +4,10 @@
       "type": "http",
       "url": "https://mcp.bulldozer-collective.fr/mcp",
       "oauth": {
-      	"clientId": "claude-code-bulldozer-plugin"
+      	"clientId": "claude-code-bulldozer-plugin",
+      	"authorizationUrl": "https://auth.bulldozer-collective.fr/realms/bdz-saas-dev/protocol/openid-connect/auth",
+        "tokenUrl": "https://auth.bulldozer-collective.fr/realms/bdz-saas-dev/protocol/openid-connect/token",
+        "scopes": ["openid", "profile", "email"]
       }
     }
   }
