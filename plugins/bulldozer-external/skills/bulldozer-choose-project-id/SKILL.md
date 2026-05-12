@@ -7,7 +7,6 @@ allowed-tools:
   - Read
   - Write
   - mcp__plugin_bulldozer_bulldozer__listUserProjectMemberships
-  - mcp__plugin_bulldozer_bulldozer__getProject
 effort: medium
 paths:
   - bulldozer.json
@@ -16,6 +15,7 @@ paths:
 # Bulldozer Project Chooser
 
 Resolve a `projectId` for Bulldozer MCP server calls by checking known sources in order, prompting the user only when necessary, and persisting the choice for future runs.
+DO NOT try to find a project identifier by yourself. Follow the resolution order as defined. This is the only viable strategy to choose a project identifier reliably.
 
 ## Resolution order
 
@@ -31,7 +31,7 @@ When a `projectId` is required, try these sources in order and stop at the first
    ```
 
    (Note: the key is `projectId` at the root of the JSON object — there is no leading dot in the actual key.)
-3. **Ask the user.** If neither source yields a value, call `mcp__plugin_bulldozer_bulldozer__listUserProjectMemberships` and `mcp__plugin_bulldozer_bulldozer__getProject` fro each membership and prompt the user to pick one (see below).
+3. **Ask the user.** If neither source yields a value, call `mcp__plugin_bulldozer_bulldozer__listUserProjectMemberships` and prompt the user to pick one (see below).
 
 ## Handling `bulldozer.json`
 
@@ -49,8 +49,7 @@ If you have time/budget, after reading `projectId` from `bulldozer.json`, call `
 When you must ask the user to choose:
 
 1. Call `mcp__plugin_bulldozer_bulldozer__listUserProjectMemberships`.
-2. For each membership, call `mcp__plugin_bulldozer_bulldozer__getProject`
-3. Present the list with an incrementing number, the project name, and the project ID, e.g.:
+2. Present the list with an incrementing number, the project name, and the project ID, e.g.:
 
    ```
    1. Acme Website (id: prj_abc123)
@@ -58,7 +57,7 @@ When you must ask the user to choose:
    3. Mobile App (id: prj_ghi789)
    ```
 
-4. Ask the user to reply with the number of the project they want to use.
+3. Ask the user to reply with the number of the project they want to use.
 
 ## Persisting the choice
 
