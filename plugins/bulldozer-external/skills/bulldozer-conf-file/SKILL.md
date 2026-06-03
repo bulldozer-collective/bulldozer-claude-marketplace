@@ -17,6 +17,7 @@ paths:
 # Bulldozer Config File
 
 The `bulldozer.json` file stores configuration and identifiers shared across all Bulldozer skills, agents, and MCP tool calls. When the Bulldozer plugin is enabled, this file should be present at the root of the project (where the user started the Claude session).
+Always read the `bulldozer-choose-project-id` and `bulldozer-choose-customer-id` skill. They have crucial information.
 
 ## Lifecycle
 
