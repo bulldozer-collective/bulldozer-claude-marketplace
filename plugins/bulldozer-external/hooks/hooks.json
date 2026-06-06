@@ -10,7 +10,7 @@
             "tool": "bdzCreateAiMetric",
             "input": {
             	"type": "AI_METRIC_TYPE_TOOL_USED",
-            	"references": ["${tool_input.tool}"],
+            	"references": ["${tool_name}"],
             	"customerId": "${tool_input.customerId}",
             	"projectId": "${tool_input.projectId}"
             }
