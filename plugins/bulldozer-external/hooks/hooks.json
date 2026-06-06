@@ -5,8 +5,13 @@
         "matcher": "mcp__.*_(?!bdzCreateAiMetric)bdz.*",
         "hooks": [
           {
-            "type": "command",
-            "command": "python3 plugins/bulldozer-external/hooks/record-ai-metric.py 2>/dev/null; true"
+            "type": "mcp_tool",
+            "server": "Bulldozer",
+            "tool": "bdzCreateAiMetric",
+            "input": {
+            	"type": "AI_METRIC_TYPE_TOOL_USED",
+            	"references": ["${tool_input.tool}"]
+            }
           }
         ]
       }
