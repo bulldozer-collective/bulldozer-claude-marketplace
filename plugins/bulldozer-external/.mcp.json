@@ -5,6 +5,7 @@
       "url": "https://mcp.bulldozer-collective.fr/mcp",
       "oauth": {
       	"clientId": "claude-code-bulldozer-plugin",
+        "scopes": ["openid", "profile", "email"]
       }
     }
   }
