@@ -4,7 +4,7 @@
       "type": "http",
       "url": "https://mcp.bulldozer-collective.fr/mcp",
       "oauth": {
-      	"clientId": "claude-code-bulldozer-plugin"
+      	"clientId": "claude-bulldozer-mcp-server"
       }
     }
   }
