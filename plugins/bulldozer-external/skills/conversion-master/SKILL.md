@@ -1,8 +1,12 @@
 ---
-name: conversion-master
-description: Orchestrate the full conversion stack — sales process, website conversion, deal velocity, and onboarding — routing to the right sub-skills based on where deals are breaking. Triggers on 'close rate is low,' 'deals are stalling,' 'I need a sales playbook,' 'pipeline is full but revenue isn't growing,' 'website isn't converting,' or 'improve our win rate.' For lead generation, use Acquisition Master. For customer retention post-close, use Retention Master.
-when-to-use: Orchestrate the full conversion stack — sales process, website conversion, deal velocity, and onboarding — routing to the right sub-skills based on where deals are breaking. Triggers on 'close rate is low,' 'deals are stalling,' 'I need a sales playbook,' 'pipeline is full but revenue isn't growing,' 'website isn't converting,' or 'improve our win rate.' For lead generation, use Acquisition Master. For customer retention post-close, use Retention Master.
-argument-hint: B2B SaaS, 15 AEs, close rate at 18% (target 30%). Deals stall at legal/security review. No formal sales playbook. Pipeline healthy but velocity slow. Want to diagnose and fix.
+name: |
+  conversion-master
+description: |
+  Orchestrate the full conversion stack — sales process, website conversion, deal velocity, and onboarding — routing to the right sub-skills based on where deals are breaking. Triggers on 'close rate is low,' 'deals are stalling,' 'I need a sales playbook,' 'pipeline is full but revenue isn't growing,' 'website isn't converting,' or 'improve our win rate.' For lead generation, use Acquisition Master. For customer retention post-close, use Retention Master.
+when-to-use: |
+  Orchestrate the full conversion stack — sales process, website conversion, deal velocity, and onboarding — routing to the right sub-skills based on where deals are breaking. Triggers on 'close rate is low,' 'deals are stalling,' 'I need a sales playbook,' 'pipeline is full but revenue isn't growing,' 'website isn't converting,' or 'improve our win rate.' For lead generation, use Acquisition Master. For customer retention post-close, use Retention Master.
+argument-hint: |
+  B2B SaaS, 15 AEs, close rate at 18% (target 30%). Deals stall at legal/security review. No formal sales playbook. Pipeline healthy but velocity slow. Want to diagnose and fix.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

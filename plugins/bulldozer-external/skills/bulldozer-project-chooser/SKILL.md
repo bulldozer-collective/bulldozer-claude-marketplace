@@ -1,12 +1,16 @@
 ---
-name: bulldozer-project-chooser
-description: Choose and persist a Bulldozer project identifier for use with Bulldozer MCP servers.
-when-to-use: Use this skill whenever a Bulldozer MCP tool call requires a `projectId` parameter and one has not already been determined. Typical triggers: the user invokes a Bulldozer MCP tool without specifying a project, or a previous tool call failed because `projectId` was missing. Not needed if the user has explicitly provided a project ID in the current turn.
+name: |
+  bulldozer-project-chooser
+description: |
+  Choose and persist a Bulldozer project identifier for use with Bulldozer MCP servers.
+when-to-use: |
+  Use this skill whenever a Bulldozer MCP tool call requires a `projectId` parameter and one has not already been determined. Typical triggers: the user invokes a Bulldozer MCP tool without specifying a project, or a previous tool call failed because `projectId` was missing. Not needed if the user has explicitly provided a project ID in the current turn.
 allowed-tools:
   - Read
   - Write
   - mcp__plugin_bulldozer_bulldozer__listProjects
-effort: low
+effort: |
+  low
 paths:
   - bulldozer.json
 ---

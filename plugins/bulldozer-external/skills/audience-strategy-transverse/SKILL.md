@@ -1,8 +1,12 @@
 ---
-name: audience-strategy-transverse
-description: Design the cross-channel audience orchestration strategy — channel sequencing by funnel stage, budget allocation by motion type, content-to-channel mapping, unified ICP across paid/organic/outbound/ABM, and the measurement framework that attributes pipeline to the right channel combination. Triggers on 'audience strategy,' 'cross-channel strategy,' 'channel mix,' 'how should our channels work together,' 'demand gen strategy,' 'multi-channel orchestration,' or 'our channels aren't working together.' For audience targeting architecture, see audience-architecture. For paid-only strategy, see audit-paid-ads.
-when-to-use: Design the cross-channel audience orchestration strategy — channel sequencing by funnel stage, budget allocation by motion type, content-to-channel mapping, unified ICP across paid/organic/outbound/ABM, and the measurement framework that attributes pipeline to the right channel combination. Triggers on 'audience strategy,' 'cross-channel strategy,' 'channel mix,' 'how should our channels work together,' 'demand gen strategy,' 'multi-channel orchestration,' or 'our channels aren't working together.' For audience targeting architecture, see audience-architecture. For paid-only strategy, see audit-paid-ads.
-argument-hint: Series B SaaS, €4M ARR. Running LinkedIn + Google Ads + outbound SDR + content blog. Each team reports to a different VP. CPL is dropping but SQL conversion rate is low. Marketing and sales disagree on ICP. Need to redesign how channels work together
+name: |
+  audience-strategy-transverse
+description: |
+  Design the cross-channel audience orchestration strategy — channel sequencing by funnel stage, budget allocation by motion type, content-to-channel mapping, unified ICP across paid/organic/outbound/ABM, and the measurement framework that attributes pipeline to the right channel combination. Triggers on 'audience strategy,' 'cross-channel strategy,' 'channel mix,' 'how should our channels work together,' 'demand gen strategy,' 'multi-channel orchestration,' or 'our channels aren't working together.' For audience targeting architecture, see audience-architecture. For paid-only strategy, see audit-paid-ads.
+when-to-use: |
+  Design the cross-channel audience orchestration strategy — channel sequencing by funnel stage, budget allocation by motion type, content-to-channel mapping, unified ICP across paid/organic/outbound/ABM, and the measurement framework that attributes pipeline to the right channel combination. Triggers on 'audience strategy,' 'cross-channel strategy,' 'channel mix,' 'how should our channels work together,' 'demand gen strategy,' 'multi-channel orchestration,' or 'our channels aren't working together.' For audience targeting architecture, see audience-architecture. For paid-only strategy, see audit-paid-ads.
+argument-hint: |
+  Series B SaaS, €4M ARR. Running LinkedIn + Google Ads + outbound SDR + content blog. Each team reports to a different VP. CPL is dropping but SQL conversion rate is low. Marketing and sales disagree on ICP. Need to redesign how channels work together
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

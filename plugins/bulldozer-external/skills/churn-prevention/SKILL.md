@@ -1,8 +1,12 @@
 ---
-name: churn-prevention
-description: Design cancel flows, save offers, and dunning sequences to reduce voluntary and involuntary churn. Triggers on 'cancel flow,' 'save offer,' 'dunning emails,' 'people keep canceling,' 'failed payment recovery,' or 'churn rate too high.' For win-back sequences, see lifecycle-emails. For in-app upgrade paywalls, see paywalls.
-when-to-use: Design cancel flows, save offers, and dunning sequences to reduce voluntary and involuntary churn. Triggers on 'cancel flow,' 'save offer,' 'dunning emails,' 'people keep canceling,' 'failed payment recovery,' or 'churn rate too high.' For win-back sequences, see lifecycle-emails. For in-app upgrade paywalls, see paywalls.
-argument-hint: B2B SaaS, $49/mo average, primary churn reason is 'not using it enough' — build cancel flow + save offer
+name: |
+  churn-prevention
+description: |
+  Design cancel flows, save offers, and dunning sequences to reduce voluntary and involuntary churn. Triggers on 'cancel flow,' 'save offer,' 'dunning emails,' 'people keep canceling,' 'failed payment recovery,' or 'churn rate too high.' For win-back sequences, see lifecycle-emails. For in-app upgrade paywalls, see paywalls.
+when-to-use: |
+  Design cancel flows, save offers, and dunning sequences to reduce voluntary and involuntary churn. Triggers on 'cancel flow,' 'save offer,' 'dunning emails,' 'people keep canceling,' 'failed payment recovery,' or 'churn rate too high.' For win-back sequences, see lifecycle-emails. For in-app upgrade paywalls, see paywalls.
+argument-hint: |
+  B2B SaaS, $49/mo average, primary churn reason is 'not using it enough' — build cancel flow + save offer
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

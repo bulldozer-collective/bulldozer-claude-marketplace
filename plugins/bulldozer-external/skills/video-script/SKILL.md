@@ -1,8 +1,12 @@
 ---
-name: video-script
-description: Produce marketing videos using AI generation or AI avatar tools — product demos, explainers, social-content clips, and talking-head videos. Triggers on 'AI video,' 'video production,' 'HeyGen,' 'product demo video,' 'explainer video,' 'AI avatar,' or 'talking head video.' For paid video ad creative, see ad-creative. For video content strategy, see social-content.
-when-to-use: Produce marketing videos using AI generation or AI avatar tools — product demos, explainers, social-content clips, and talking-head videos. Triggers on 'AI video,' 'video production,' 'HeyGen,' 'product demo video,' 'explainer video,' 'AI avatar,' or 'talking head video.' For paid video ad creative, see ad-creative. For video content strategy, see social-content.
-argument-hint: 60-second explainer video for a B2B SaaS product — AI avatar presenter, English and French versions
+name: |
+  video-script
+description: |
+  Produce marketing videos using AI generation or AI avatar tools — product demos, explainers, social-content clips, and talking-head videos. Triggers on 'AI video,' 'video production,' 'HeyGen,' 'product demo video,' 'explainer video,' 'AI avatar,' or 'talking head video.' For paid video ad creative, see ad-creative. For video content strategy, see social-content.
+when-to-use: |
+  Produce marketing videos using AI generation or AI avatar tools — product demos, explainers, social-content clips, and talking-head videos. Triggers on 'AI video,' 'video production,' 'HeyGen,' 'product demo video,' 'explainer video,' 'AI avatar,' or 'talking head video.' For paid video ad creative, see ad-creative. For video content strategy, see social-content.
+argument-hint: |
+  60-second explainer video for a B2B SaaS product — AI avatar presenter, English and French versions
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

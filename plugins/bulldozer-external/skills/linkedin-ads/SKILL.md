@@ -1,8 +1,12 @@
 ---
-name: linkedin-ads
-description: Set up and optimize LinkedIn ad campaigns for B2B demand generation, lead generation, and ABM targeting using job title, company, and seniority signals. Triggers on 'LinkedIn ads,' 'LinkedIn campaign,' 'sponsored content,' 'LinkedIn lead gen,' or 'B2B paid social.' For cross-platform strategy, see paid-strategy. For Meta campaigns, see meta-ads.
-when-to-use: Set up and optimize LinkedIn ad campaigns for B2B demand generation, lead generation, and ABM targeting using job title, company, and seniority signals. Triggers on 'LinkedIn ads,' 'LinkedIn campaign,' 'sponsored content,' 'LinkedIn lead gen,' or 'B2B paid social.' For cross-platform strategy, see paid-strategy. For Meta campaigns, see meta-ads.
-argument-hint: Enterprise SaaS targeting VP of Sales at 200-1000 person companies, $15k/mo budget
+name: |
+  linkedin-ads
+description: |
+  Set up and optimize LinkedIn ad campaigns for B2B demand generation, lead generation, and ABM targeting using job title, company, and seniority signals. Triggers on 'LinkedIn ads,' 'LinkedIn campaign,' 'sponsored content,' 'LinkedIn lead gen,' or 'B2B paid social.' For cross-platform strategy, see paid-strategy. For Meta campaigns, see meta-ads.
+when-to-use: |
+  Set up and optimize LinkedIn ad campaigns for B2B demand generation, lead generation, and ABM targeting using job title, company, and seniority signals. Triggers on 'LinkedIn ads,' 'LinkedIn campaign,' 'sponsored content,' 'LinkedIn lead gen,' or 'B2B paid social.' For cross-platform strategy, see paid-strategy. For Meta campaigns, see meta-ads.
+argument-hint: |
+  Enterprise SaaS targeting VP of Sales at 200-1000 person companies, $15k/mo budget
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

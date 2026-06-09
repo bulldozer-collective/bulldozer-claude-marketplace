@@ -1,8 +1,12 @@
 ---
-name: founder-content
-description: Build a founder LinkedIn content system — voice profile, 3-pillar strategy, monthly idea extraction workflow, and a 30-post content calendar. Triggers on 'founder LinkedIn content,' 'personal brand for founders,' 'founder-led content system,' 'build my LinkedIn presence,' 'content calendar for founders,' or 'thought leadership pipeline.' For general social content across channels, see social-content. For brand platform and positioning, see brand-platform.
-when-to-use: Build a founder LinkedIn content system — voice profile, 3-pillar strategy, monthly idea extraction workflow, and a 30-post content calendar. Triggers on 'founder LinkedIn content,' 'personal brand for founders,' 'founder-led content system,' 'build my LinkedIn presence,' 'content calendar for founders,' or 'thought leadership pipeline.' For general social content across channels, see social-content. For brand platform and positioning, see brand-platform.
-argument-hint: B2B SaaS founder, Series A, ICP is VP Marketing and CMO at 50-500 employee companies. Currently posting maybe 2x per month with no system. Want to build an inbound pipeline from LinkedIn. No ghostwriter — I write myself.
+name: |
+  founder-content
+description: |
+  Build a founder LinkedIn content system — voice profile, 3-pillar strategy, monthly idea extraction workflow, and a 30-post content calendar. Triggers on 'founder LinkedIn content,' 'personal brand for founders,' 'founder-led content system,' 'build my LinkedIn presence,' 'content calendar for founders,' or 'thought leadership pipeline.' For general social content across channels, see social-content. For brand platform and positioning, see brand-platform.
+when-to-use: |
+  Build a founder LinkedIn content system — voice profile, 3-pillar strategy, monthly idea extraction workflow, and a 30-post content calendar. Triggers on 'founder LinkedIn content,' 'personal brand for founders,' 'founder-led content system,' 'build my LinkedIn presence,' 'content calendar for founders,' or 'thought leadership pipeline.' For general social content across channels, see social-content. For brand platform and positioning, see brand-platform.
+argument-hint: |
+  B2B SaaS founder, Series A, ICP is VP Marketing and CMO at 50-500 employee companies. Currently posting maybe 2x per month with no system. Want to build an inbound pipeline from LinkedIn. No ghostwriter — I write myself.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

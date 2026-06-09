@@ -1,8 +1,12 @@
 ---
-name: customer-health-expansion
-description: Build a customer health scoring system and expansion revenue playbook — health score formula, RAG thresholds, CSM playbooks per tier, expansion triggers, QBR framework, and NRR improvement roadmap. Triggers on 'customer health score,' 'expansion revenue,' 'NRR improvement,' 'churn prevention,' 'CSM playbook,' 'QBR framework,' 'how do we expand existing accounts,' or 'we don't see churn coming.' For cohort-level retention analysis, see cohort-mmm. For CRM setup to track this, see audit-crm-tracking.
-when-to-use: Build a customer health scoring system and expansion revenue playbook — health score formula, RAG thresholds, CSM playbooks per tier, expansion triggers, QBR framework, and NRR improvement roadmap. Triggers on 'customer health score,' 'expansion revenue,' 'NRR improvement,' 'churn prevention,' 'CSM playbook,' 'QBR framework,' 'how do we expand existing accounts,' or 'we don't see churn coming.' For cohort-level retention analysis, see cohort-mmm. For CRM setup to track this, see audit-crm-tracking.
-argument-hint: B2B SaaS, €12M ARR, NRR at 101% — want to get to 115%. Currently no health scoring, CSMs managing on gut feel, losing 3-4 enterprise accounts per quarter without warning.
+name: |
+  customer-health-expansion
+description: |
+  Build a customer health scoring system and expansion revenue playbook — health score formula, RAG thresholds, CSM playbooks per tier, expansion triggers, QBR framework, and NRR improvement roadmap. Triggers on 'customer health score,' 'expansion revenue,' 'NRR improvement,' 'churn prevention,' 'CSM playbook,' 'QBR framework,' 'how do we expand existing accounts,' or 'we don't see churn coming.' For cohort-level retention analysis, see cohort-mmm. For CRM setup to track this, see audit-crm-tracking.
+when-to-use: |
+  Build a customer health scoring system and expansion revenue playbook — health score formula, RAG thresholds, CSM playbooks per tier, expansion triggers, QBR framework, and NRR improvement roadmap. Triggers on 'customer health score,' 'expansion revenue,' 'NRR improvement,' 'churn prevention,' 'CSM playbook,' 'QBR framework,' 'how do we expand existing accounts,' or 'we don't see churn coming.' For cohort-level retention analysis, see cohort-mmm. For CRM setup to track this, see audit-crm-tracking.
+argument-hint: |
+  B2B SaaS, €12M ARR, NRR at 101% — want to get to 115%. Currently no health scoring, CSMs managing on gut feel, losing 3-4 enterprise accounts per quarter without warning.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

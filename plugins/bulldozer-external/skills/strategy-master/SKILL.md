@@ -1,8 +1,12 @@
 ---
-name: strategy-master
-description: Orchestrate a full GTM strategy session — market intelligence, positioning, ICP, and execution roadmap. Routes to the right strategy sub-skills based on company stage and goals. Triggers on 'I need a strategy,' 'help me think through our GTM,' 'we're about to launch,' 'build our go-to-market plan,' 'strategic review,' or 'where should we focus.' For channel execution, use Acquisition Master. For content and brand, use Content Master.
-when-to-use: Orchestrate a full GTM strategy session — market intelligence, positioning, ICP, and execution roadmap. Routes to the right strategy sub-skills based on company stage and goals. Triggers on 'I need a strategy,' 'help me think through our GTM,' 'we're about to launch,' 'build our go-to-market plan,' 'strategic review,' or 'where should we focus.' For channel execution, use Acquisition Master. For content and brand, use Content Master.
-argument-hint: B2B SaaS, Series A, targeting mid-market CFOs in Europe. Positioning unclear. Want to pressure-test strategy before Q3 planning. Team of 25, 18 months runway.
+name: |
+  strategy-master
+description: |
+  Orchestrate a full GTM strategy session — market intelligence, positioning, ICP, and execution roadmap. Routes to the right strategy sub-skills based on company stage and goals. Triggers on 'I need a strategy,' 'help me think through our GTM,' 'we're about to launch,' 'build our go-to-market plan,' 'strategic review,' or 'where should we focus.' For channel execution, use Acquisition Master. For content and brand, use Content Master.
+when-to-use: |
+  Orchestrate a full GTM strategy session — market intelligence, positioning, ICP, and execution roadmap. Routes to the right strategy sub-skills based on company stage and goals. Triggers on 'I need a strategy,' 'help me think through our GTM,' 'we're about to launch,' 'build our go-to-market plan,' 'strategic review,' or 'where should we focus.' For channel execution, use Acquisition Master. For content and brand, use Content Master.
+argument-hint: |
+  B2B SaaS, Series A, targeting mid-market CFOs in Europe. Positioning unclear. Want to pressure-test strategy before Q3 planning. Team of 25, 18 months runway.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

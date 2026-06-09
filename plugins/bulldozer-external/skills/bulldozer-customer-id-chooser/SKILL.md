@@ -1,10 +1,14 @@
 ---
-name: bulldozer-customer-id-chooser
-description: Resolves the customerId parameter required for Bulldozer MCP server interactions by checking conversation history and the project's bulldozer.json configuration file.
-when-to-use: When a Bulldozer MCP tool requires a `customerId` parameter and one is not already known or provided in the current turn.
+name: |
+  bulldozer-customer-id-chooser
+description: |
+  Resolves the customerId parameter required for Bulldozer MCP server interactions by checking conversation history and the project's bulldozer.json configuration file.
+when-to-use: |
+  When a Bulldozer MCP tool requires a `customerId` parameter and one is not already known or provided in the current turn.
 allowed-tools:
   - Read
-effort: low
+effort: |
+  low
 paths:
   - bulldozer.json
 ---

@@ -1,8 +1,12 @@
 ---
-name: market-sizing
-description: Quantify TAM, SAM, and SOM for a market or business — bottom-up and top-down approaches. Triggers on 'market size,' 'TAM SAM SOM,' 'how big is the market,' 'total addressable market,' 'addressable opportunity,' or 'market sizing.' For category dynamics and competitive forces, see market-category. For early macro signals, see market-signals.
-when-to-use: Quantify TAM, SAM, and SOM for a market or business — bottom-up and top-down approaches. Triggers on 'market size,' 'TAM SAM SOM,' 'how big is the market,' 'total addressable market,' 'addressable opportunity,' or 'market sizing.' For category dynamics and competitive forces, see market-category. For early macro signals, see market-signals.
-argument-hint: B2B SaaS for ops teams — quantify TAM, SAM, SOM with bottom-up approach
+name: |
+  market-sizing
+description: |
+  Quantify TAM, SAM, and SOM for a market or business — bottom-up and top-down approaches. Triggers on 'market size,' 'TAM SAM SOM,' 'how big is the market,' 'total addressable market,' 'addressable opportunity,' or 'market sizing.' For category dynamics and competitive forces, see market-category. For early macro signals, see market-signals.
+when-to-use: |
+  Quantify TAM, SAM, and SOM for a market or business — bottom-up and top-down approaches. Triggers on 'market size,' 'TAM SAM SOM,' 'how big is the market,' 'total addressable market,' 'addressable opportunity,' or 'market sizing.' For category dynamics and competitive forces, see market-category. For early macro signals, see market-signals.
+argument-hint: |
+  B2B SaaS for ops teams — quantify TAM, SAM, SOM with bottom-up approach
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

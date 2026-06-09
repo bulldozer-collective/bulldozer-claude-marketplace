@@ -1,8 +1,12 @@
 ---
-name: retention-master
-description: Orchestrate the full retention and expansion stack — churn prevention, lifecycle automation, customer health, and product-led growth loops — routing to the right sub-skills based on where retention is breaking. Triggers on 'churn is too high,' 'NPS is low,' 'expansion revenue flat,' 'improve customer lifetime value,' 'activation rate broken,' or 'customers aren't sticking.' For acquiring new customers, use Acquisition Master. For sales and close, use Conversion Master.
-when-to-use: Orchestrate the full retention and expansion stack — churn prevention, lifecycle automation, customer health, and product-led growth loops — routing to the right sub-skills based on where retention is breaking. Triggers on 'churn is too high,' 'NPS is low,' 'expansion revenue flat,' 'improve customer lifetime value,' 'activation rate broken,' or 'customers aren't sticking.' For acquiring new customers, use Acquisition Master. For sales and close, use Conversion Master.
-argument-hint: B2B SaaS, 8% monthly churn, 200 customers. NPS 22. Customers churning at month 3. No formal lifecycle automation. CSM team of 2 overwhelmed. LTV:CAC at 2.1, target 3+.
+name: |
+  retention-master
+description: |
+  Orchestrate the full retention and expansion stack — churn prevention, lifecycle automation, customer health, and product-led growth loops — routing to the right sub-skills based on where retention is breaking. Triggers on 'churn is too high,' 'NPS is low,' 'expansion revenue flat,' 'improve customer lifetime value,' 'activation rate broken,' or 'customers aren't sticking.' For acquiring new customers, use Acquisition Master. For sales and close, use Conversion Master.
+when-to-use: |
+  Orchestrate the full retention and expansion stack — churn prevention, lifecycle automation, customer health, and product-led growth loops — routing to the right sub-skills based on where retention is breaking. Triggers on 'churn is too high,' 'NPS is low,' 'expansion revenue flat,' 'improve customer lifetime value,' 'activation rate broken,' or 'customers aren't sticking.' For acquiring new customers, use Acquisition Master. For sales and close, use Conversion Master.
+argument-hint: |
+  B2B SaaS, 8% monthly churn, 200 customers. NPS 22. Customers churning at month 3. No formal lifecycle automation. CSM team of 2 overwhelmed. LTV:CAC at 2.1, target 3+.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

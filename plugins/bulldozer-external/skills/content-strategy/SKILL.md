@@ -1,8 +1,12 @@
 ---
-name: content-strategy
-description: Plan content strategy — topic clusters, editorial calendars, content pillars, and content roadmaps. Triggers on 'content strategy,' 'what should I write about,' 'blog strategy,' 'topic clusters,' 'editorial calendar,' or 'content roadmap.' For writing individual pieces, see copywriting. For SEO audits, see seo-audit. For social content, see social-content.
-when-to-use: Plan content strategy — topic clusters, editorial calendars, content pillars, and content roadmaps. Triggers on 'content strategy,' 'what should I write about,' 'blog strategy,' 'topic clusters,' 'editorial calendar,' or 'content roadmap.' For writing individual pieces, see copywriting. For SEO audits, see seo-audit. For social content, see social-content.
-argument-hint: B2B SaaS project management tool — want a 6-month content strategy targeting ops managers
+name: |
+  content-strategy
+description: |
+  Plan content strategy — topic clusters, editorial calendars, content pillars, and content roadmaps. Triggers on 'content strategy,' 'what should I write about,' 'blog strategy,' 'topic clusters,' 'editorial calendar,' or 'content roadmap.' For writing individual pieces, see copywriting. For SEO audits, see seo-audit. For social content, see social-content.
+when-to-use: |
+  Plan content strategy — topic clusters, editorial calendars, content pillars, and content roadmaps. Triggers on 'content strategy,' 'what should I write about,' 'blog strategy,' 'topic clusters,' 'editorial calendar,' or 'content roadmap.' For writing individual pieces, see copywriting. For SEO audits, see seo-audit. For social content, see social-content.
+argument-hint: |
+  B2B SaaS project management tool — want a 6-month content strategy targeting ops managers
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

@@ -1,8 +1,12 @@
 ---
-name: copywriting
-description: Write or rewrite marketing copy for any page — homepage, landing pages, pricing pages, feature pages, or about pages. Triggers on 'write copy for,' 'rewrite this page,' 'value proposition,' 'hero section copy,' 'this copy is weak,' or 'help me describe my product.' For email copy, see lifecycle-emails. For popup copy, see popups. For editing existing copy, see copy-editing.
-when-to-use: Write or rewrite marketing copy for any page — homepage, landing pages, pricing pages, feature pages, or about pages. Triggers on 'write copy for,' 'rewrite this page,' 'value proposition,' 'hero section copy,' 'this copy is weak,' or 'help me describe my product.' For email copy, see lifecycle-emails. For popup copy, see popups. For editing existing copy, see copy-editing.
-argument-hint: Homepage for B2B analytics SaaS — targeting data teams at Series B+ companies
+name: |
+  copywriting
+description: |
+  Write or rewrite marketing copy for any page — homepage, landing pages, pricing pages, feature pages, or about pages. Triggers on 'write copy for,' 'rewrite this page,' 'value proposition,' 'hero section copy,' 'this copy is weak,' or 'help me describe my product.' For email copy, see lifecycle-emails. For popup copy, see popups. For editing existing copy, see copy-editing.
+when-to-use: |
+  Write or rewrite marketing copy for any page — homepage, landing pages, pricing pages, feature pages, or about pages. Triggers on 'write copy for,' 'rewrite this page,' 'value proposition,' 'hero section copy,' 'this copy is weak,' or 'help me describe my product.' For email copy, see lifecycle-emails. For popup copy, see popups. For editing existing copy, see copy-editing.
+argument-hint: |
+  Homepage for B2B analytics SaaS — targeting data teams at Series B+ companies
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

@@ -1,8 +1,12 @@
 ---
-name: growth-automation
-description: Design and build a GTM automation stack — signal detection, enrichment workflows, lead routing, sequence automation, and CRM hygiene loops. Triggers on 'growth automation,' 'GTM automation,' 'automate outbound,' 'Clay workflow,' 'automate lead enrichment,' 'build an automation stack,' 'we're doing this manually,' or 'scale without headcount.' For signal strategy, see signal-based-outbound. For CRM data quality, see audit-crm-tracking.
-when-to-use: Design and build a GTM automation stack — signal detection, enrichment workflows, lead routing, sequence automation, and CRM hygiene loops. Triggers on 'growth automation,' 'GTM automation,' 'automate outbound,' 'Clay workflow,' 'automate lead enrichment,' 'build an automation stack,' 'we're doing this manually,' or 'scale without headcount.' For signal strategy, see signal-based-outbound. For CRM data quality, see audit-crm-tracking.
-argument-hint: B2B SaaS, 3-person GTM team — currently enriching leads manually in spreadsheets, 200 ICPaccounts per month, using HubSpot + LinkedIn Sales Nav. Want to automate signal detection, enrichment, and sequence enrollment.
+name: |
+  growth-automation
+description: |
+  Design and build a GTM automation stack — signal detection, enrichment workflows, lead routing, sequence automation, and CRM hygiene loops. Triggers on 'growth automation,' 'GTM automation,' 'automate outbound,' 'Clay workflow,' 'automate lead enrichment,' 'build an automation stack,' 'we're doing this manually,' or 'scale without headcount.' For signal strategy, see signal-based-outbound. For CRM data quality, see audit-crm-tracking.
+when-to-use: |
+  Design and build a GTM automation stack — signal detection, enrichment workflows, lead routing, sequence automation, and CRM hygiene loops. Triggers on 'growth automation,' 'GTM automation,' 'automate outbound,' 'Clay workflow,' 'automate lead enrichment,' 'build an automation stack,' 'we're doing this manually,' or 'scale without headcount.' For signal strategy, see signal-based-outbound. For CRM data quality, see audit-crm-tracking.
+argument-hint: |
+  B2B SaaS, 3-person GTM team — currently enriching leads manually in spreadsheets, 200 ICPaccounts per month, using HubSpot + LinkedIn Sales Nav. Want to automate signal detection, enrichment, and sequence enrollment.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

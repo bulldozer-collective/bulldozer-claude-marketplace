@@ -1,8 +1,12 @@
 ---
-name: social-content
-description: Create social media content — posts, threads, carousels, and scripts for LinkedIn, Twitter/X, and Instagram. Triggers on 'LinkedIn post,' 'Twitter thread,' 'what should I post,' 'LinkedIn carousel,' 'social media content,' or 'repurpose this content.' For broader content planning, see content-strategy. For paid social ads, see ad-creative.
-when-to-use: Create social media content — posts, threads, carousels, and scripts for LinkedIn, Twitter/X, and Instagram. Triggers on 'LinkedIn post,' 'Twitter thread,' 'what should I post,' 'LinkedIn carousel,' 'social media content,' or 'repurpose this content.' For broader content planning, see content-strategy. For paid social ads, see ad-creative.
-argument-hint: LinkedIn post about our new API integration feature — targeting developers and technical founders
+name: |
+  social-content
+description: |
+  Create social media content — posts, threads, carousels, and scripts for LinkedIn, Twitter/X, and Instagram. Triggers on 'LinkedIn post,' 'Twitter thread,' 'what should I post,' 'LinkedIn carousel,' 'social media content,' or 'repurpose this content.' For broader content planning, see content-strategy. For paid social ads, see ad-creative.
+when-to-use: |
+  Create social media content — posts, threads, carousels, and scripts for LinkedIn, Twitter/X, and Instagram. Triggers on 'LinkedIn post,' 'Twitter thread,' 'what should I post,' 'LinkedIn carousel,' 'social media content,' or 'repurpose this content.' For broader content planning, see content-strategy. For paid social ads, see ad-creative.
+argument-hint: |
+  LinkedIn post about our new API integration feature — targeting developers and technical founders
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

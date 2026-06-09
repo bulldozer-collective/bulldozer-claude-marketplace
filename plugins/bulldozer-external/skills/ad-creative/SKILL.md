@@ -1,8 +1,12 @@
 ---
-name: ad-creative
-description: Generate, iterate, and scale ad creative — headlines, descriptions, and primary text for any paid platform. Triggers on 'ad copy variations,' 'generate headlines,' 'RSA headlines,' 'write me some ads,' 'Facebook ad copy,' 'Google ad headlines,' or 'I need more ad variations.' For campaign strategy and targeting, see paid-strategy. For landing page copy, see copywriting.
-when-to-use: Generate, iterate, and scale ad creative — headlines, descriptions, and primary text for any paid platform. Triggers on 'ad copy variations,' 'generate headlines,' 'RSA headlines,' 'write me some ads,' 'Facebook ad copy,' 'Google ad headlines,' or 'I need more ad variations.' For campaign strategy and targeting, see paid-strategy. For landing page copy, see copywriting.
-argument-hint: Google RSA campaign for B2B project management software — need 15 headlines and 4 descriptions
+name: |
+  ad-creative
+description: |
+  Generate, iterate, and scale ad creative — headlines, descriptions, and primary text for any paid platform. Triggers on 'ad copy variations,' 'generate headlines,' 'RSA headlines,' 'write me some ads,' 'Facebook ad copy,' 'Google ad headlines,' or 'I need more ad variations.' For campaign strategy and targeting, see paid-strategy. For landing page copy, see copywriting.
+when-to-use: |
+  Generate, iterate, and scale ad creative — headlines, descriptions, and primary text for any paid platform. Triggers on 'ad copy variations,' 'generate headlines,' 'RSA headlines,' 'write me some ads,' 'Facebook ad copy,' 'Google ad headlines,' or 'I need more ad variations.' For campaign strategy and targeting, see paid-strategy. For landing page copy, see copywriting.
+argument-hint: |
+  Google RSA campaign for B2B project management software — need 15 headlines and 4 descriptions
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

@@ -1,8 +1,12 @@
 ---
-name: pipeline-deal-review
-description: Analyze a specific deal: MEDDIC/BANT scoring, red flag identification, stakeholder mapping, and recommended next actions. Triggers on 'review this deal,' 'deal stuck,' 'opportunity review,' 'qualify this deal,' or 'MEDDIC.' For ABM account strategy, see account-based-marketing. For closing tactics, see negotiation-closing.
-when-to-use: Analyze a specific deal: MEDDIC/BANT scoring, red flag identification, stakeholder mapping, and recommended next actions. Triggers on 'review this deal,' 'deal stuck,' 'opportunity review,' 'qualify this deal,' or 'MEDDIC.' For ABM account strategy, see account-based-marketing. For closing tactics, see negotiation-closing.
-argument-hint: Enterprise deal at Acme Corp, $180k ACV, 6 months in pipeline, VP Ops is champion but no economic buyer access
+name: |
+  pipeline-deal-review
+description: |
+  Analyze a specific deal: MEDDIC/BANT scoring, red flag identification, stakeholder mapping, and recommended next actions. Triggers on 'review this deal,' 'deal stuck,' 'opportunity review,' 'qualify this deal,' or 'MEDDIC.' For ABM account strategy, see account-based-marketing. For closing tactics, see negotiation-closing.
+when-to-use: |
+  Analyze a specific deal: MEDDIC/BANT scoring, red flag identification, stakeholder mapping, and recommended next actions. Triggers on 'review this deal,' 'deal stuck,' 'opportunity review,' 'qualify this deal,' or 'MEDDIC.' For ABM account strategy, see account-based-marketing. For closing tactics, see negotiation-closing.
+argument-hint: |
+  Enterprise deal at Acme Corp, $180k ACV, 6 months in pipeline, VP Ops is champion but no economic buyer access
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

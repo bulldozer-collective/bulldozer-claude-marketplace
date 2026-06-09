@@ -1,8 +1,12 @@
 ---
-name: pr-media
-description: Write press releases, journalist pitches, and develop media strategy for announcements and brand coverage. Triggers on 'press release,' 'media pitch,' 'PR,' 'journalist outreach,' or 'press coverage.' For product launch strategy, see launch. For content strategy, see content-strategy.
-when-to-use: Write press releases, journalist pitches, and develop media strategy for announcements and brand coverage. Triggers on 'press release,' 'media pitch,' 'PR,' 'journalist outreach,' or 'press coverage.' For product launch strategy, see launch. For content strategy, see content-strategy.
-argument-hint: New $15M Series A funding round — B2B SaaS, need press release and TechCrunch pitch
+name: |
+  pr-media
+description: |
+  Write press releases, journalist pitches, and develop media strategy for announcements and brand coverage. Triggers on 'press release,' 'media pitch,' 'PR,' 'journalist outreach,' or 'press coverage.' For product launch strategy, see launch. For content strategy, see content-strategy.
+when-to-use: |
+  Write press releases, journalist pitches, and develop media strategy for announcements and brand coverage. Triggers on 'press release,' 'media pitch,' 'PR,' 'journalist outreach,' or 'press coverage.' For product launch strategy, see launch. For content strategy, see content-strategy.
+argument-hint: |
+  New $15M Series A funding round — B2B SaaS, need press release and TechCrunch pitch
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

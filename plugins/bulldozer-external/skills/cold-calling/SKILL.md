@@ -1,8 +1,12 @@
 ---
-name: cold-calling
-description: Write cold call scripts, objection responses, and phone cadence structures for B2B SDR and AE outbound. Triggers on 'cold calling,' 'phone prospecting,' 'call script,' 'SDR calls,' or 'outbound phone.' For cold email outreach, see cold-email. For deal qualification frameworks, see pipeline-deal-review.
-when-to-use: Write cold call scripts, objection responses, and phone cadence structures for B2B SDR and AE outbound. Triggers on 'cold calling,' 'phone prospecting,' 'call script,' 'SDR calls,' or 'outbound phone.' For cold email outreach, see cold-email. For deal qualification frameworks, see pipeline-deal-review.
-argument-hint: Targeting VP Sales at mid-market SaaS, selling revenue forecasting software, SDR team of 3
+name: |
+  cold-calling
+description: |
+  Write cold call scripts, objection responses, and phone cadence structures for B2B SDR and AE outbound. Triggers on 'cold calling,' 'phone prospecting,' 'call script,' 'SDR calls,' or 'outbound phone.' For cold email outreach, see cold-email. For deal qualification frameworks, see pipeline-deal-review.
+when-to-use: |
+  Write cold call scripts, objection responses, and phone cadence structures for B2B SDR and AE outbound. Triggers on 'cold calling,' 'phone prospecting,' 'call script,' 'SDR calls,' or 'outbound phone.' For cold email outreach, see cold-email. For deal qualification frameworks, see pipeline-deal-review.
+argument-hint: |
+  Targeting VP Sales at mid-market SaaS, selling revenue forecasting software, SDR team of 3
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

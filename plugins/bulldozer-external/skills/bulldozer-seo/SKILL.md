@@ -1,7 +1,10 @@
 ---
-name: Bulldozer SEO
-description: Fetch and analyze SEO data — domain overviews, organic keywords, and backlinks — for companies via the Bulldozer SEO MCP, including async analysis orchestration and multi-source result merging.
-when-to-use: When the user asks about SEO metrics, organic traffic, keyword rankings, backlinks, domain authority, or competitive SEO data for a specific company or website tracked in Bulldozer.
+name: |
+  Bulldozer SEO
+description: |
+  Fetch and analyze SEO data — domain overviews, organic keywords, and backlinks — for companies via the Bulldozer SEO MCP, including async analysis orchestration and multi-source result merging.
+when-to-use: |
+  When the user asks about SEO metrics, organic traffic, keyword rankings, backlinks, domain authority, or competitive SEO data for a specific company or website tracked in Bulldozer.
 allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__listCompanies
   - mcp__plugin_bulldozer_bulldozer__getSeoAnalysis
@@ -11,7 +14,8 @@ allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__getSeoDomainOverview
   - mcp__plugin_bulldozer_bulldozer__getSeoDomainKeywords
   - mcp__plugin_bulldozer_bulldozer__getSeoBacklinksOverview
-effort: medium
+effort: |
+  medium
 ---
 
 # SEO Objects

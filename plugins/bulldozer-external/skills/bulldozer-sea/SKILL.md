@@ -1,7 +1,10 @@
 ---
-name: bulldozer-sea
-description: Query Google Ads campaigns, ad groups, keywords, and their metrics (impressions, clicks, cost, conversions, quality score) via the Bulldozer SEA MCP tools.
-when-to-use: Use this skill whenever the user requests data about one of their Google Adwords accounts. Google ads, Google Adwords, and SEA are synonyms. The user may just use the word "keywords" to refer to their Google Adwords keywords. Some examples of requests: "what are my best keywords for last month", "list all the google ads campaigns running at the moment", "show me ad group performance", "which campaigns spent the most this week".
+name: |
+  bulldozer-sea
+description: |
+  Query Google Ads campaigns, ad groups, keywords, and their metrics (impressions, clicks, cost, conversions, quality score) via the Bulldozer SEA MCP tools.
+when-to-use: |
+  Use this skill whenever the user requests data about one of their Google Adwords accounts. Google ads, Google Adwords, and SEA are synonyms. The user may just use the word "keywords" to refer to their Google Adwords keywords. Some examples of requests: "what are my best keywords for last month", "list all the google ads campaigns running at the moment", "show me ad group performance", "which campaigns spent the most this week".
 user-invocable: false
 allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__listGoogleAdwordAccounts
@@ -16,9 +19,10 @@ allowed-tools:
   - Read
   - Write
   - Edit
-effort: high
+effort: |
+  high
 paths:
-  - **/bulldozer.json
+  - "**/bulldozer.json"
 ---
 
 # Bulldozer SEA services

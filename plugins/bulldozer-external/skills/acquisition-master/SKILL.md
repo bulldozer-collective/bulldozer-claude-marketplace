@@ -1,8 +1,12 @@
 ---
-name: acquisition-master
-description: Orchestrate a full acquisition strategy — paid, SEO, outbound, partnerships, community, and PR — routing to the right channel sub-skills based on stage, ICP, and budget. Triggers on 'I need more leads,' 'build my acquisition strategy,' 'which channels should I invest in,' 'CAC is too high,' 'how do I grow faster,' or 'outbound vs inbound.' For positioning and ICP, use Strategy Master. For conversion of acquired leads, use Conversion Master.
-when-to-use: Orchestrate a full acquisition strategy — paid, SEO, outbound, partnerships, community, and PR — routing to the right channel sub-skills based on stage, ICP, and budget. Triggers on 'I need more leads,' 'build my acquisition strategy,' 'which channels should I invest in,' 'CAC is too high,' 'how do I grow faster,' or 'outbound vs inbound.' For positioning and ICP, use Strategy Master. For conversion of acquired leads, use Conversion Master.
-argument-hint: B2B SaaS, $2M ARR, ICP is Head of Ops at 100-500 person companies. CAC too high on paid. Outbound flat. Budget $30K/month. Want to identify the 2-3 channels worth doubling down on.
+name: |
+  acquisition-master
+description: |
+  Orchestrate a full acquisition strategy — paid, SEO, outbound, partnerships, community, and PR — routing to the right channel sub-skills based on stage, ICP, and budget. Triggers on 'I need more leads,' 'build my acquisition strategy,' 'which channels should I invest in,' 'CAC is too high,' 'how do I grow faster,' or 'outbound vs inbound.' For positioning and ICP, use Strategy Master. For conversion of acquired leads, use Conversion Master.
+when-to-use: |
+  Orchestrate a full acquisition strategy — paid, SEO, outbound, partnerships, community, and PR — routing to the right channel sub-skills based on stage, ICP, and budget. Triggers on 'I need more leads,' 'build my acquisition strategy,' 'which channels should I invest in,' 'CAC is too high,' 'how do I grow faster,' or 'outbound vs inbound.' For positioning and ICP, use Strategy Master. For conversion of acquired leads, use Conversion Master.
+argument-hint: |
+  B2B SaaS, $2M ARR, ICP is Head of Ops at 100-500 person companies. CAC too high on paid. Outbound flat. Budget $30K/month. Want to identify the 2-3 channels worth doubling down on.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

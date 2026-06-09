@@ -1,8 +1,12 @@
 ---
-name: budget-resources-planning
-description: Build the annual operating budget and resource allocation plan for a B2B SaaS company — revenue model, headcount plan by quarter, department allocation benchmarks, 3-scenario planning, runway calculation, and signal-based unlock triggers. Triggers on 'budget planning,' 'annual operating plan,' 'AOP,' 'headcount plan,' 'budget allocation,' 'how much to spend on GTM,' 'how many people can I hire,' or 'runway calculation.' For org design, see org-design-hiring-roadmap. For team assessment, see team-assessment.
-when-to-use: Build the annual operating budget and resource allocation plan for a B2B SaaS company — revenue model, headcount plan by quarter, department allocation benchmarks, 3-scenario planning, runway calculation, and signal-based unlock triggers. Triggers on 'budget planning,' 'annual operating plan,' 'AOP,' 'headcount plan,' 'budget allocation,' 'how much to spend on GTM,' 'how many people can I hire,' or 'runway calculation.' For org design, see org-design-hiring-roadmap. For team assessment, see team-assessment.
-argument-hint: Series A, €2.8M ARR. Raised €4M. Need to build a 12-month operating plan — how to allocate the €4M across hiring, marketing, and infrastructure. Board wants to see a hiring plan with runway to 18 months.
+name: |
+  budget-resources-planning
+description: |
+  Build the annual operating budget and resource allocation plan for a B2B SaaS company — revenue model, headcount plan by quarter, department allocation benchmarks, 3-scenario planning, runway calculation, and signal-based unlock triggers. Triggers on 'budget planning,' 'annual operating plan,' 'AOP,' 'headcount plan,' 'budget allocation,' 'how much to spend on GTM,' 'how many people can I hire,' or 'runway calculation.' For org design, see org-design-hiring-roadmap. For team assessment, see team-assessment.
+when-to-use: |
+  Build the annual operating budget and resource allocation plan for a B2B SaaS company — revenue model, headcount plan by quarter, department allocation benchmarks, 3-scenario planning, runway calculation, and signal-based unlock triggers. Triggers on 'budget planning,' 'annual operating plan,' 'AOP,' 'headcount plan,' 'budget allocation,' 'how much to spend on GTM,' 'how many people can I hire,' or 'runway calculation.' For org design, see org-design-hiring-roadmap. For team assessment, see team-assessment.
+argument-hint: |
+  Series A, €2.8M ARR. Raised €4M. Need to build a 12-month operating plan — how to allocate the €4M across hiring, marketing, and infrastructure. Board wants to see a hiring plan with runway to 18 months.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

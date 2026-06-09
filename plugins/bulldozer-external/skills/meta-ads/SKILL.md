@@ -1,8 +1,12 @@
 ---
-name: meta-ads
-description: Set up, structure, and optimize Meta (Facebook + Instagram) ad campaigns for demand generation, lead generation, and DTC conversion. Triggers on 'Meta ads,' 'Facebook campaign,' 'Instagram ads,' 'Meta campaign setup,' or 'Facebook advertising strategy.' For cross-platform strategy, see paid-strategy. For Google Ads, see google-ads.
-when-to-use: Set up, structure, and optimize Meta (Facebook + Instagram) ad campaigns for demand generation, lead generation, and DTC conversion. Triggers on 'Meta ads,' 'Facebook campaign,' 'Instagram ads,' 'Meta campaign setup,' or 'Facebook advertising strategy.' For cross-platform strategy, see paid-strategy. For Google Ads, see google-ads.
-argument-hint: DTC skincare brand, $15k/mo budget, want to scale from awareness to DTC purchase
+name: |
+  meta-ads
+description: |
+  Set up, structure, and optimize Meta (Facebook + Instagram) ad campaigns for demand generation, lead generation, and DTC conversion. Triggers on 'Meta ads,' 'Facebook campaign,' 'Instagram ads,' 'Meta campaign setup,' or 'Facebook advertising strategy.' For cross-platform strategy, see paid-strategy. For Google Ads, see google-ads.
+when-to-use: |
+  Set up, structure, and optimize Meta (Facebook + Instagram) ad campaigns for demand generation, lead generation, and DTC conversion. Triggers on 'Meta ads,' 'Facebook campaign,' 'Instagram ads,' 'Meta campaign setup,' or 'Facebook advertising strategy.' For cross-platform strategy, see paid-strategy. For Google Ads, see google-ads.
+argument-hint: |
+  DTC skincare brand, $15k/mo budget, want to scale from awareness to DTC purchase
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

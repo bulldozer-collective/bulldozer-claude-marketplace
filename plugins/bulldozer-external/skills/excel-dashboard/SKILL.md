@@ -1,8 +1,12 @@
 ---
-name: excel-dashboard
-description: Generate an Excel (.xlsx) file with structured data, formulas, conditional formatting, and charts. Triggers on 'create Excel,' 'generate spreadsheet,' 'export to Excel,' 'build a dashboard in Excel,' 'KPI tracker,' or 'pipeline report in Excel.' For PDF output, see pdf-report. For Word documents, see word-document.
-when-to-use: Generate an Excel (.xlsx) file with structured data, formulas, conditional formatting, and charts. Triggers on 'create Excel,' 'generate spreadsheet,' 'export to Excel,' 'build a dashboard in Excel,' 'KPI tracker,' or 'pipeline report in Excel.' For PDF output, see pdf-report. For Word documents, see word-document.
-argument-hint: Monthly GTM pipeline dashboard — stages: Lead, MQL, SQL, Opp, Closed Won. Input is a CSV of deals. Need conversion rates, revenue by stage, and a waterfall chart.
+name: |
+  excel-dashboard
+description: |
+  Generate an Excel (.xlsx) file with structured data, formulas, conditional formatting, and charts. Triggers on 'create Excel,' 'generate spreadsheet,' 'export to Excel,' 'build a dashboard in Excel,' 'KPI tracker,' or 'pipeline report in Excel.' For PDF output, see pdf-report. For Word documents, see word-document.
+when-to-use: |
+  Generate an Excel (.xlsx) file with structured data, formulas, conditional formatting, and charts. Triggers on 'create Excel,' 'generate spreadsheet,' 'export to Excel,' 'build a dashboard in Excel,' 'KPI tracker,' or 'pipeline report in Excel.' For PDF output, see pdf-report. For Word documents, see word-document.
+argument-hint: |
+  Monthly GTM pipeline dashboard — stages: Lead, MQL, SQL, Opp, Closed Won. Input is a CSV of deals. Need conversion rates, revenue by stage, and a waterfall chart.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

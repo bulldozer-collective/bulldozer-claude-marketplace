@@ -1,8 +1,12 @@
 ---
-name: icp-builder
-description: Build or refine an Ideal Customer Profile from closed-won CRM data — covering firmographics, technographics, buying triggers, and negative ICP — and produce a tiered target account list. Triggers on 'ICP,' 'ideal customer profile,' 'who should we target,' 'build our ICP,' 'refine our ICP,' 'target account list,' or 'we're selling to everyone.' For signal-based targeting, see signal-based-outbound. For full ABM activation, see account-based-marketing.
-when-to-use: Build or refine an Ideal Customer Profile from closed-won CRM data — covering firmographics, technographics, buying triggers, and negative ICP — and produce a tiered target account list. Triggers on 'ICP,' 'ideal customer profile,' 'who should we target,' 'build our ICP,' 'refine our ICP,' 'target account list,' or 'we're selling to everyone.' For signal-based targeting, see signal-based-outbound. For full ABM activation, see account-based-marketing.
-argument-hint: HubSpot export of 80 closed-won deals last 18 months — need to find the ICP pattern and build a Tier 1 target list of 200 accounts
+name: |
+  icp-builder
+description: |
+  Build or refine an Ideal Customer Profile from closed-won CRM data — covering firmographics, technographics, buying triggers, and negative ICP — and produce a tiered target account list. Triggers on 'ICP,' 'ideal customer profile,' 'who should we target,' 'build our ICP,' 'refine our ICP,' 'target account list,' or 'we're selling to everyone.' For signal-based targeting, see signal-based-outbound. For full ABM activation, see account-based-marketing.
+when-to-use: |
+  Build or refine an Ideal Customer Profile from closed-won CRM data — covering firmographics, technographics, buying triggers, and negative ICP — and produce a tiered target account list. Triggers on 'ICP,' 'ideal customer profile,' 'who should we target,' 'build our ICP,' 'refine our ICP,' 'target account list,' or 'we're selling to everyone.' For signal-based targeting, see signal-based-outbound. For full ABM activation, see account-based-marketing.
+argument-hint: |
+  HubSpot export of 80 closed-won deals last 18 months — need to find the ICP pattern and build a Tier 1 target list of 200 accounts
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

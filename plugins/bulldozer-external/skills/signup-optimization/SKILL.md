@@ -1,8 +1,12 @@
 ---
-name: signup-optimization
-description: Optimize signup, registration, and trial activation flows to reduce dropoff and increase completion rates. Triggers on 'signup conversions,' 'signup form optimization,' 'reduce signup dropoff,' 'nobody completes registration,' or 'simplify our signup.' For post-signup activation, see onboarding. For lead capture forms, see conversion-optimization.
-when-to-use: Optimize signup, registration, and trial activation flows to reduce dropoff and increase completion rates. Triggers on 'signup conversions,' 'signup form optimization,' 'reduce signup dropoff,' 'nobody completes registration,' or 'simplify our signup.' For post-signup activation, see onboarding. For lead capture forms, see conversion-optimization.
-argument-hint: B2B SaaS trial signup — currently 4 fields plus email verification, high dropoff
+name: |
+  signup-optimization
+description: |
+  Optimize signup, registration, and trial activation flows to reduce dropoff and increase completion rates. Triggers on 'signup conversions,' 'signup form optimization,' 'reduce signup dropoff,' 'nobody completes registration,' or 'simplify our signup.' For post-signup activation, see onboarding. For lead capture forms, see conversion-optimization.
+when-to-use: |
+  Optimize signup, registration, and trial activation flows to reduce dropoff and increase completion rates. Triggers on 'signup conversions,' 'signup form optimization,' 'reduce signup dropoff,' 'nobody completes registration,' or 'simplify our signup.' For post-signup activation, see onboarding. For lead capture forms, see conversion-optimization.
+argument-hint: |
+  B2B SaaS trial signup — currently 4 fields plus email verification, high dropoff
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

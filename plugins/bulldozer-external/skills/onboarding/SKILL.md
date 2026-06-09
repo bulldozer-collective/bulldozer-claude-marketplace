@@ -1,8 +1,12 @@
 ---
-name: onboarding
-description: Optimize post-signup onboarding, user activation, and time-to-value for SaaS products. Triggers on 'onboarding flow,' 'activation rate,' 'aha moment,' 'users aren't activating,' 'time to value,' or 'first session experience.' For signup funnel optimization, see signup-optimization. For ongoing lifecycle emails, see lifecycle-emails.
-when-to-use: Optimize post-signup onboarding, user activation, and time-to-value for SaaS products. Triggers on 'onboarding flow,' 'activation rate,' 'aha moment,' 'users aren't activating,' 'time to value,' or 'first session experience.' For signup funnel optimization, see signup-optimization. For ongoing lifecycle emails, see lifecycle-emails.
-argument-hint: B2B SaaS project management tool — users sign up but only 30% complete setup and see the aha moment
+name: |
+  onboarding
+description: |
+  Optimize post-signup onboarding, user activation, and time-to-value for SaaS products. Triggers on 'onboarding flow,' 'activation rate,' 'aha moment,' 'users aren't activating,' 'time to value,' or 'first session experience.' For signup funnel optimization, see signup-optimization. For ongoing lifecycle emails, see lifecycle-emails.
+when-to-use: |
+  Optimize post-signup onboarding, user activation, and time-to-value for SaaS products. Triggers on 'onboarding flow,' 'activation rate,' 'aha moment,' 'users aren't activating,' 'time to value,' or 'first session experience.' For signup funnel optimization, see signup-optimization. For ongoing lifecycle emails, see lifecycle-emails.
+argument-hint: |
+  B2B SaaS project management tool — users sign up but only 30% complete setup and see the aha moment
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

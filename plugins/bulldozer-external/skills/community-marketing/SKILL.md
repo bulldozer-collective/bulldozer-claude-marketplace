@@ -1,8 +1,12 @@
 ---
-name: community-marketing
-description: Design, launch, and grow an online community — Discord, Slack, Circle, or forum — for product-led growth and retention. Triggers on 'community strategy,' 'Discord community,' 'Slack community,' 'community-led growth,' 'brand advocates,' or 'community flywheel.' For structured referral programs, see referral-program.
-when-to-use: Design, launch, and grow an online community — Discord, Slack, Circle, or forum — for product-led growth and retention. Triggers on 'community strategy,' 'Discord community,' 'Slack community,' 'community-led growth,' 'brand advocates,' or 'community flywheel.' For structured referral programs, see referral-program.
-argument-hint: B2B SaaS data tool, 3k users, want to launch a Slack community for data practitioners
+name: |
+  community-marketing
+description: |
+  Design, launch, and grow an online community — Discord, Slack, Circle, or forum — for product-led growth and retention. Triggers on 'community strategy,' 'Discord community,' 'Slack community,' 'community-led growth,' 'brand advocates,' or 'community flywheel.' For structured referral programs, see referral-program.
+when-to-use: |
+  Design, launch, and grow an online community — Discord, Slack, Circle, or forum — for product-led growth and retention. Triggers on 'community strategy,' 'Discord community,' 'Slack community,' 'community-led growth,' 'brand advocates,' or 'community flywheel.' For structured referral programs, see referral-program.
+argument-hint: |
+  B2B SaaS data tool, 3k users, want to launch a Slack community for data practitioners
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

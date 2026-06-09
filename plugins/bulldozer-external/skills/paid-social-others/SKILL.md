@@ -1,8 +1,12 @@
 ---
-name: paid-social-others
-description: Run paid advertising on non-primary platforms — Reddit, TikTok, and Pinterest — with platform-specific creative strategy, targeting approach, budget allocation, and success benchmarks calibrated to each platform's audience and buying mode. Triggers on 'Reddit ads,' 'TikTok ads for B2B,' 'Pinterest advertising,' 'paid social beyond LinkedIn,' 'alternative paid channels,' 'we want to test TikTok,' or 'our Meta/LinkedIn costs are too high.' For LinkedIn or Google Ads, see audit-paid-ads. For audience architecture across platforms, see audience-architecture.
-when-to-use: Run paid advertising on non-primary platforms — Reddit, TikTok, and Pinterest — with platform-specific creative strategy, targeting approach, budget allocation, and success benchmarks calibrated to each platform's audience and buying mode. Triggers on 'Reddit ads,' 'TikTok ads for B2B,' 'Pinterest advertising,' 'paid social beyond LinkedIn,' 'alternative paid channels,' 'we want to test TikTok,' or 'our Meta/LinkedIn costs are too high.' For LinkedIn or Google Ads, see audit-paid-ads. For audience architecture across platforms, see audience-architecture.
-argument-hint: B2B SaaS tool targeting marketers and growth teams, €50K/quarter paid budget, currently only on LinkedIn. CPLs rising. Want to test Reddit and TikTok with €5K/month each and understand what 'success' looks like before committing.
+name: |
+  paid-social-others
+description: |
+  Run paid advertising on non-primary platforms — Reddit, TikTok, and Pinterest — with platform-specific creative strategy, targeting approach, budget allocation, and success benchmarks calibrated to each platform's audience and buying mode. Triggers on 'Reddit ads,' 'TikTok ads for B2B,' 'Pinterest advertising,' 'paid social beyond LinkedIn,' 'alternative paid channels,' 'we want to test TikTok,' or 'our Meta/LinkedIn costs are too high.' For LinkedIn or Google Ads, see audit-paid-ads. For audience architecture across platforms, see audience-architecture.
+when-to-use: |
+  Run paid advertising on non-primary platforms — Reddit, TikTok, and Pinterest — with platform-specific creative strategy, targeting approach, budget allocation, and success benchmarks calibrated to each platform's audience and buying mode. Triggers on 'Reddit ads,' 'TikTok ads for B2B,' 'Pinterest advertising,' 'paid social beyond LinkedIn,' 'alternative paid channels,' 'we want to test TikTok,' or 'our Meta/LinkedIn costs are too high.' For LinkedIn or Google Ads, see audit-paid-ads. For audience architecture across platforms, see audience-architecture.
+argument-hint: |
+  B2B SaaS tool targeting marketers and growth teams, €50K/quarter paid budget, currently only on LinkedIn. CPLs rising. Want to test Reddit and TikTok with €5K/month each and understand what 'success' looks like before committing.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

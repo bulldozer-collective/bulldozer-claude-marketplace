@@ -1,8 +1,12 @@
 ---
-name: signal-based-outbound
-description: Build a signal-based outbound system — identify buying signals, score and tier them, write signal-specific message angles, and launch sequences timed to signal decay windows. Triggers on 'signal-based outbound,' 'trigger-based outreach,' 'buying signals,' 'intent-based prospecting,' 'outreach based on signals,' or 'when to reach out to a prospect.' For LinkedIn sequences specifically, see outbound-linkedin. For cold email, see cold-email.
-when-to-use: Build a signal-based outbound system — identify buying signals, score and tier them, write signal-specific message angles, and launch sequences timed to signal decay windows. Triggers on 'signal-based outbound,' 'trigger-based outreach,' 'buying signals,' 'intent-based prospecting,' 'outreach based on signals,' or 'when to reach out to a prospect.' For LinkedIn sequences specifically, see outbound-linkedin. For cold email, see cold-email.
-argument-hint: B2B SaaS selling sales coaching software — want to trigger outreach on new VP Sales hires, funding rounds, and job postings for SDR roles
+name: |
+  signal-based-outbound
+description: |
+  Build a signal-based outbound system — identify buying signals, score and tier them, write signal-specific message angles, and launch sequences timed to signal decay windows. Triggers on 'signal-based outbound,' 'trigger-based outreach,' 'buying signals,' 'intent-based prospecting,' 'outreach based on signals,' or 'when to reach out to a prospect.' For LinkedIn sequences specifically, see outbound-linkedin. For cold email, see cold-email.
+when-to-use: |
+  Build a signal-based outbound system — identify buying signals, score and tier them, write signal-specific message angles, and launch sequences timed to signal decay windows. Triggers on 'signal-based outbound,' 'trigger-based outreach,' 'buying signals,' 'intent-based prospecting,' 'outreach based on signals,' or 'when to reach out to a prospect.' For LinkedIn sequences specifically, see outbound-linkedin. For cold email, see cold-email.
+argument-hint: |
+  B2B SaaS selling sales coaching software — want to trigger outreach on new VP Sales hires, funding rounds, and job postings for SDR roles
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

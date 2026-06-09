@@ -1,8 +1,12 @@
 ---
-name: market-signals
-description: Scan for early macro signals — regulatory shifts, technology inflection points, and behavioral changes that will reshape a market before they're obvious. Triggers on 'weak signals,' 'early signals,' 'macro trends,' 'what's coming,' 'horizon scanning,' 'strategic foresight,' or 'emerging threats.' For current market category dynamics, see market-category. For market size, see market-sizing.
-when-to-use: Scan for early macro signals — regulatory shifts, technology inflection points, and behavioral changes that will reshape a market before they're obvious. Triggers on 'weak signals,' 'early signals,' 'macro trends,' 'what's coming,' 'horizon scanning,' 'strategic foresight,' or 'emerging threats.' For current market category dynamics, see market-category. For market size, see market-sizing.
-argument-hint: B2B SaaS in HR tech — scan for weak signals that could reshape the market in 12-24 months
+name: |
+  market-signals
+description: |
+  Scan for early macro signals — regulatory shifts, technology inflection points, and behavioral changes that will reshape a market before they're obvious. Triggers on 'weak signals,' 'early signals,' 'macro trends,' 'what's coming,' 'horizon scanning,' 'strategic foresight,' or 'emerging threats.' For current market category dynamics, see market-category. For market size, see market-sizing.
+when-to-use: |
+  Scan for early macro signals — regulatory shifts, technology inflection points, and behavioral changes that will reshape a market before they're obvious. Triggers on 'weak signals,' 'early signals,' 'macro trends,' 'what's coming,' 'horizon scanning,' 'strategic foresight,' or 'emerging threats.' For current market category dynamics, see market-category. For market size, see market-sizing.
+argument-hint: |
+  B2B SaaS in HR tech — scan for weak signals that could reshape the market in 12-24 months
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

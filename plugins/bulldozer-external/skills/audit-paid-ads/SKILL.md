@@ -1,8 +1,12 @@
 ---
-name: audit-paid-ads
-description: Full audit of a paid advertising account across Meta, Google, and/or LinkedIn. Triggers on 'audit my ads,' 'paid audit,' 'my ROAS dropped,' 'ad account review,' 'why is my CPA going up,' 'Meta audit,' 'Google Ads audit,' or 'paid media diagnostic.' For SEO audits, see seo-audit. For CRO, see audit-website-cro.
-when-to-use: Full audit of a paid advertising account across Meta, Google, and/or LinkedIn. Triggers on 'audit my ads,' 'paid audit,' 'my ROAS dropped,' 'ad account review,' 'why is my CPA going up,' 'Meta audit,' 'Google Ads audit,' or 'paid media diagnostic.' For SEO audits, see seo-audit. For CRO, see audit-website-cro.
-argument-hint: Meta + Google Ads for Acme — €40k/month spend, ROAS dropped from 4.2 to 2.8 over 90 days, mostly DTC e-commerce
+name: |
+  audit-paid-ads
+description: |
+  Full audit of a paid advertising account across Meta, Google, and/or LinkedIn. Triggers on 'audit my ads,' 'paid audit,' 'my ROAS dropped,' 'ad account review,' 'why is my CPA going up,' 'Meta audit,' 'Google Ads audit,' or 'paid media diagnostic.' For SEO audits, see seo-audit. For CRO, see audit-website-cro.
+when-to-use: |
+  Full audit of a paid advertising account across Meta, Google, and/or LinkedIn. Triggers on 'audit my ads,' 'paid audit,' 'my ROAS dropped,' 'ad account review,' 'why is my CPA going up,' 'Meta audit,' 'Google Ads audit,' or 'paid media diagnostic.' For SEO audits, see seo-audit. For CRO, see audit-website-cro.
+argument-hint: |
+  Meta + Google Ads for Acme — €40k/month spend, ROAS dropped from 4.2 to 2.8 over 90 days, mostly DTC e-commerce
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

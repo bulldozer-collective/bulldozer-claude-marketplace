@@ -1,8 +1,12 @@
 ---
-name: audit-content
-description: Full audit of a content library — blog, resources, case studies — against traffic, conversion, and pipeline contribution. Triggers on 'content audit,' 'audit our blog,' 'which content is working,' 'content is not converting,' 'what to do with old content,' or 'content strategy audit.' For SEO specifically, see seo-audit. For editorial production, see content-strategy.
-when-to-use: Full audit of a content library — blog, resources, case studies — against traffic, conversion, and pipeline contribution. Triggers on 'content audit,' 'audit our blog,' 'which content is working,' 'content is not converting,' 'what to do with old content,' or 'content strategy audit.' For SEO specifically, see seo-audit. For editorial production, see content-strategy.
-argument-hint: Acme SaaS blog — 340 posts, traffic flat for 6 months, only 5% of posts drive 80% of leads
+name: |
+  audit-content
+description: |
+  Full audit of a content library — blog, resources, case studies — against traffic, conversion, and pipeline contribution. Triggers on 'content audit,' 'audit our blog,' 'which content is working,' 'content is not converting,' 'what to do with old content,' or 'content strategy audit.' For SEO specifically, see seo-audit. For editorial production, see content-strategy.
+when-to-use: |
+  Full audit of a content library — blog, resources, case studies — against traffic, conversion, and pipeline contribution. Triggers on 'content audit,' 'audit our blog,' 'which content is working,' 'content is not converting,' 'what to do with old content,' or 'content strategy audit.' For SEO specifically, see seo-audit. For editorial production, see content-strategy.
+argument-hint: |
+  Acme SaaS blog — 340 posts, traffic flat for 6 months, only 5% of posts drive 80% of leads
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

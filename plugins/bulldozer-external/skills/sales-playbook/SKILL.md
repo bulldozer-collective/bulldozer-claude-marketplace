@@ -1,8 +1,12 @@
 ---
-name: sales-playbook
-description: Build a B2B sales playbook — ICP and persona definitions, stage-by-stage process with entry/exit criteria, discovery framework, objection handling, demo structure, handoff to CS, and rep onboarding path. Triggers on 'sales playbook,' 'build our sales playbook,' 'document the sales process,' 'rep onboarding,' 'how should reps sell,' or 'our sales process is inconsistent.' For competitive positioning specifically, see battlecards. For ICP definition, see icp-builder.
-when-to-use: Build a B2B sales playbook — ICP and persona definitions, stage-by-stage process with entry/exit criteria, discovery framework, objection handling, demo structure, handoff to CS, and rep onboarding path. Triggers on 'sales playbook,' 'build our sales playbook,' 'document the sales process,' 'rep onboarding,' 'how should reps sell,' or 'our sales process is inconsistent.' For competitive positioning specifically, see battlecards. For ICP definition, see icp-builder.
-argument-hint: B2B SaaS, 5-rep sales team, no current playbook — ACV €20k, sales cycle ~60 days, two personas (VP Sales + Head of RevOps), using HubSpot
+name: |
+  sales-playbook
+description: |
+  Build a B2B sales playbook — ICP and persona definitions, stage-by-stage process with entry/exit criteria, discovery framework, objection handling, demo structure, handoff to CS, and rep onboarding path. Triggers on 'sales playbook,' 'build our sales playbook,' 'document the sales process,' 'rep onboarding,' 'how should reps sell,' or 'our sales process is inconsistent.' For competitive positioning specifically, see battlecards. For ICP definition, see icp-builder.
+when-to-use: |
+  Build a B2B sales playbook — ICP and persona definitions, stage-by-stage process with entry/exit criteria, discovery framework, objection handling, demo structure, handoff to CS, and rep onboarding path. Triggers on 'sales playbook,' 'build our sales playbook,' 'document the sales process,' 'rep onboarding,' 'how should reps sell,' or 'our sales process is inconsistent.' For competitive positioning specifically, see battlecards. For ICP definition, see icp-builder.
+argument-hint: |
+  B2B SaaS, 5-rep sales team, no current playbook — ACV €20k, sales cycle ~60 days, two personas (VP Sales + Head of RevOps), using HubSpot
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

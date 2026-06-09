@@ -1,8 +1,12 @@
 ---
-name: referral-program
-description: Design and optimize customer referral programs, affiliate programs, and word-of-mouth growth loops. Triggers on 'referral program,' 'affiliate program,' 'viral loop,' 'refer a friend,' 'customers referring customers,' or 'referral incentive design.' For product launch virality, see launch.
-when-to-use: Design and optimize customer referral programs, affiliate programs, and word-of-mouth growth loops. Triggers on 'referral program,' 'affiliate program,' 'viral loop,' 'refer a friend,' 'customers referring customers,' or 'referral incentive design.' For product launch virality, see launch.
-argument-hint: B2B SaaS, $99/mo ACV, want double-sided referral for existing customers
+name: |
+  referral-program
+description: |
+  Design and optimize customer referral programs, affiliate programs, and word-of-mouth growth loops. Triggers on 'referral program,' 'affiliate program,' 'viral loop,' 'refer a friend,' 'customers referring customers,' or 'referral incentive design.' For product launch virality, see launch.
+when-to-use: |
+  Design and optimize customer referral programs, affiliate programs, and word-of-mouth growth loops. Triggers on 'referral program,' 'affiliate program,' 'viral loop,' 'refer a friend,' 'customers referring customers,' or 'referral incentive design.' For product launch virality, see launch.
+argument-hint: |
+  B2B SaaS, $99/mo ACV, want double-sided referral for existing customers
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

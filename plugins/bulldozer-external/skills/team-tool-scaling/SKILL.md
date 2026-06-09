@@ -1,8 +1,12 @@
 ---
-name: team-tool-scaling
-description: Audit and rationalize the GTM tech stack as the team scales — tool inventory, overlap detection, adoption scoring, cost-per-outcome calculation, keep/cut/consolidate decision framework, and migration sequencing. Triggers on 'tool audit,' 'tech stack review,' 'too many tools,' 'tool consolidation,' 'stack rationalization,' 'we have tool sprawl,' 'our tools don't talk to each other,' or 'we're renewing contracts, what should we cut.' For CRM configuration, see crm-setup. For org design, see org-design-hiring-roadmap.
-when-to-use: Audit and rationalize the GTM tech stack as the team scales — tool inventory, overlap detection, adoption scoring, cost-per-outcome calculation, keep/cut/consolidate decision framework, and migration sequencing. Triggers on 'tool audit,' 'tech stack review,' 'too many tools,' 'tool consolidation,' 'stack rationalization,' 'we have tool sprawl,' 'our tools don't talk to each other,' or 'we're renewing contracts, what should we cut.' For CRM configuration, see crm-setup. For org design, see org-design-hiring-roadmap.
-argument-hint: Series B, 30-person GTM team. €180K/year on 14 tools. LinkedIn Sales Nav, Apollo, ZoomInfo, Outreach, Salesloft, HubSpot, Salesforce, Gong, Chorus, Calendly, Chili Piper, Looker Studio, Tableau, and 2 content tools. Half the team uses 3-4 tools, the 
+name: |
+  team-tool-scaling
+description: |
+  Audit and rationalize the GTM tech stack as the team scales — tool inventory, overlap detection, adoption scoring, cost-per-outcome calculation, keep/cut/consolidate decision framework, and migration sequencing. Triggers on 'tool audit,' 'tech stack review,' 'too many tools,' 'tool consolidation,' 'stack rationalization,' 'we have tool sprawl,' 'our tools don't talk to each other,' or 'we're renewing contracts, what should we cut.' For CRM configuration, see crm-setup. For org design, see org-design-hiring-roadmap.
+when-to-use: |
+  Audit and rationalize the GTM tech stack as the team scales — tool inventory, overlap detection, adoption scoring, cost-per-outcome calculation, keep/cut/consolidate decision framework, and migration sequencing. Triggers on 'tool audit,' 'tech stack review,' 'too many tools,' 'tool consolidation,' 'stack rationalization,' 'we have tool sprawl,' 'our tools don't talk to each other,' or 'we're renewing contracts, what should we cut.' For CRM configuration, see crm-setup. For org design, see org-design-hiring-roadmap.
+argument-hint: |
+  Series B, 30-person GTM team. €180K/year on 14 tools. LinkedIn Sales Nav, Apollo, ZoomInfo, Outreach, Salesloft, HubSpot, Salesforce, Gong, Chorus, Calendly, Chili Piper, Looker Studio, Tableau, and 2 content tools. Half the team uses 3-4 tools, the 
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

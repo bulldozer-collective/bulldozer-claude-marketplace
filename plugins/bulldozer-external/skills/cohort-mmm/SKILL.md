@@ -1,8 +1,12 @@
 ---
-name: cohort-mmm
-description: Build cohort analysis and unit economics models — logo retention cohorts, revenue cohorts, CAC payback by channel and segment, LTV calculation, and media mix modeling interpretation. Triggers on 'cohort analysis,' 'retention cohorts,' 'LTV by cohort,' 'CAC payback,' 'unit economics,' 'media mix model,' 'which cohorts perform best,' or 'our blended metrics are hiding problems.' For attribution model setup, see attribution-funnel. For weekly tracking, see weekly-growth-review.
-when-to-use: Build cohort analysis and unit economics models — logo retention cohorts, revenue cohorts, CAC payback by channel and segment, LTV calculation, and media mix modeling interpretation. Triggers on 'cohort analysis,' 'retention cohorts,' 'LTV by cohort,' 'CAC payback,' 'unit economics,' 'media mix model,' 'which cohorts perform best,' or 'our blended metrics are hiding problems.' For attribution model setup, see attribution-funnel. For weekly tracking, see weekly-growth-review.
-argument-hint: B2B SaaS, 18 months of customer data, 3 acquisition channels (outbound, content, paid) — want to know which cohorts and channels have the best unit economics and where payback is trending
+name: |
+  cohort-mmm
+description: |
+  Build cohort analysis and unit economics models — logo retention cohorts, revenue cohorts, CAC payback by channel and segment, LTV calculation, and media mix modeling interpretation. Triggers on 'cohort analysis,' 'retention cohorts,' 'LTV by cohort,' 'CAC payback,' 'unit economics,' 'media mix model,' 'which cohorts perform best,' or 'our blended metrics are hiding problems.' For attribution model setup, see attribution-funnel. For weekly tracking, see weekly-growth-review.
+when-to-use: |
+  Build cohort analysis and unit economics models — logo retention cohorts, revenue cohorts, CAC payback by channel and segment, LTV calculation, and media mix modeling interpretation. Triggers on 'cohort analysis,' 'retention cohorts,' 'LTV by cohort,' 'CAC payback,' 'unit economics,' 'media mix model,' 'which cohorts perform best,' or 'our blended metrics are hiding problems.' For attribution model setup, see attribution-funnel. For weekly tracking, see weekly-growth-review.
+argument-hint: |
+  B2B SaaS, 18 months of customer data, 3 acquisition channels (outbound, content, paid) — want to know which cohorts and channels have the best unit economics and where payback is trending
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

@@ -1,8 +1,12 @@
 ---
-name: crm-setup
-description: Configure a B2B CRM from scratch — HubSpot or Salesforce setup, data import, workflow automation, lifecycle stage configuration, deal pipeline, reporting dashboards, and team onboarding. Triggers on 'CRM setup,' 'set up HubSpot,' 'configure our CRM,' 'CRM implementation,' 'migrate to HubSpot,' 'build our CRM from scratch,' or 'we just got HubSpot, what do we do.' For CRM architecture design, see crm-strategy. For data quality and hygiene, see audit-crm-tracking.
-when-to-use: Configure a B2B CRM from scratch — HubSpot or Salesforce setup, data import, workflow automation, lifecycle stage configuration, deal pipeline, reporting dashboards, and team onboarding. Triggers on 'CRM setup,' 'set up HubSpot,' 'configure our CRM,' 'CRM implementation,' 'migrate to HubSpot,' 'build our CRM from scratch,' or 'we just got HubSpot, what do we do.' For CRM architecture design, see crm-strategy. For data quality and hygiene, see audit-crm-tracking.
-argument-hint: Series A, 5-rep sales team — just purchased HubSpot Sales Hub Pro. No prior CRM. Need to configure lifecycle stages, pipeline, email sequences, and reporting from scratch in 2 weeks.
+name: |
+  crm-setup
+description: |
+  Configure a B2B CRM from scratch — HubSpot or Salesforce setup, data import, workflow automation, lifecycle stage configuration, deal pipeline, reporting dashboards, and team onboarding. Triggers on 'CRM setup,' 'set up HubSpot,' 'configure our CRM,' 'CRM implementation,' 'migrate to HubSpot,' 'build our CRM from scratch,' or 'we just got HubSpot, what do we do.' For CRM architecture design, see crm-strategy. For data quality and hygiene, see audit-crm-tracking.
+when-to-use: |
+  Configure a B2B CRM from scratch — HubSpot or Salesforce setup, data import, workflow automation, lifecycle stage configuration, deal pipeline, reporting dashboards, and team onboarding. Triggers on 'CRM setup,' 'set up HubSpot,' 'configure our CRM,' 'CRM implementation,' 'migrate to HubSpot,' 'build our CRM from scratch,' or 'we just got HubSpot, what do we do.' For CRM architecture design, see crm-strategy. For data quality and hygiene, see audit-crm-tracking.
+argument-hint: |
+  Series A, 5-rep sales team — just purchased HubSpot Sales Hub Pro. No prior CRM. Need to configure lifecycle stages, pipeline, email sequences, and reporting from scratch in 2 weeks.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

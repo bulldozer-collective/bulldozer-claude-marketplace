@@ -1,8 +1,12 @@
 ---
-name: brand-platform
-description: Build a brand platform — positioning statement, messaging architecture with 3 pillars and proof points, brand voice and tone, stakeholder messaging map, and executional principles. Triggers on 'brand platform,' 'brand strategy,' 'messaging architecture,' 'brand voice,' 'brand house,' 'we need to define our brand,' 'our messaging is all over the place,' or 'what do we stand for.' For brand audit and diagnosis, see audit-brand-positioning. For content strategy execution, see content-strategy.
-when-to-use: Build a brand platform — positioning statement, messaging architecture with 3 pillars and proof points, brand voice and tone, stakeholder messaging map, and executional principles. Triggers on 'brand platform,' 'brand strategy,' 'messaging architecture,' 'brand voice,' 'brand house,' 'we need to define our brand,' 'our messaging is all over the place,' or 'what do we stand for.' For brand audit and diagnosis, see audit-brand-positioning. For content strategy execution, see content-strategy.
-argument-hint: B2B SaaS, Series B, repositioning from SMB to mid-market — need a full brand platform before the website redesign and demand gen scale-up
+name: |
+  brand-platform
+description: |
+  Build a brand platform — positioning statement, messaging architecture with 3 pillars and proof points, brand voice and tone, stakeholder messaging map, and executional principles. Triggers on 'brand platform,' 'brand strategy,' 'messaging architecture,' 'brand voice,' 'brand house,' 'we need to define our brand,' 'our messaging is all over the place,' or 'what do we stand for.' For brand audit and diagnosis, see audit-brand-positioning. For content strategy execution, see content-strategy.
+when-to-use: |
+  Build a brand platform — positioning statement, messaging architecture with 3 pillars and proof points, brand voice and tone, stakeholder messaging map, and executional principles. Triggers on 'brand platform,' 'brand strategy,' 'messaging architecture,' 'brand voice,' 'brand house,' 'we need to define our brand,' 'our messaging is all over the place,' or 'what do we stand for.' For brand audit and diagnosis, see audit-brand-positioning. For content strategy execution, see content-strategy.
+argument-hint: |
+  B2B SaaS, Series B, repositioning from SMB to mid-market — need a full brand platform before the website redesign and demand gen scale-up
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

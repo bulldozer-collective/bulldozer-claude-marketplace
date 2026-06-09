@@ -1,8 +1,12 @@
 ---
-name: content-master
-description: Orchestrate a full content and brand strategy — from brand platform to content calendar, social, video, case studies, and design — routing to the right sub-skills based on content goals and stage. Triggers on 'we need a content strategy,' 'build our brand,' 'content calendar,' 'what content should we create,' 'social media strategy,' or 'content not driving results.' For distribution via paid, use Acquisition Master. For founder-specific LinkedIn, use founder-content directly.
-when-to-use: Orchestrate a full content and brand strategy — from brand platform to content calendar, social, video, case studies, and design — routing to the right sub-skills based on content goals and stage. Triggers on 'we need a content strategy,' 'build our brand,' 'content calendar,' 'what content should we create,' 'social media strategy,' or 'content not driving results.' For distribution via paid, use Acquisition Master. For founder-specific LinkedIn, use founder-content directly.
-argument-hint: B2B SaaS, post-PMF, ICP is VP Operations. Brand undefined. Blog exists but drives no pipeline. No social presence. Want a content engine that generates inbound over 6-12 months.
+name: |
+  content-master
+description: |
+  Orchestrate a full content and brand strategy — from brand platform to content calendar, social, video, case studies, and design — routing to the right sub-skills based on content goals and stage. Triggers on 'we need a content strategy,' 'build our brand,' 'content calendar,' 'what content should we create,' 'social media strategy,' or 'content not driving results.' For distribution via paid, use Acquisition Master. For founder-specific LinkedIn, use founder-content directly.
+when-to-use: |
+  Orchestrate a full content and brand strategy — from brand platform to content calendar, social, video, case studies, and design — routing to the right sub-skills based on content goals and stage. Triggers on 'we need a content strategy,' 'build our brand,' 'content calendar,' 'what content should we create,' 'social media strategy,' or 'content not driving results.' For distribution via paid, use Acquisition Master. For founder-specific LinkedIn, use founder-content directly.
+argument-hint: |
+  B2B SaaS, post-PMF, ICP is VP Operations. Brand undefined. Blog exists but drives no pipeline. No social presence. Want a content engine that generates inbound over 6-12 months.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

@@ -1,8 +1,12 @@
 ---
-name: launch
-description: Plan and execute product launches, feature releases, and announcements across all channels. Triggers on 'Product Hunt launch,' 'feature release,' 'beta launch,' 'waitlist launch,' 'launch checklist,' or 'we are about to ship.' For ongoing content and update cadence after launch, see content-strategy.
-when-to-use: Plan and execute product launches, feature releases, and announcements across all channels. Triggers on 'Product Hunt launch,' 'feature release,' 'beta launch,' 'waitlist launch,' 'launch checklist,' or 'we are about to ship.' For ongoing content and update cadence after launch, see content-strategy.
-argument-hint: New AI writing feature — targeting B2B content teams, want Product Hunt + email launch
+name: |
+  launch
+description: |
+  Plan and execute product launches, feature releases, and announcements across all channels. Triggers on 'Product Hunt launch,' 'feature release,' 'beta launch,' 'waitlist launch,' 'launch checklist,' or 'we are about to ship.' For ongoing content and update cadence after launch, see content-strategy.
+when-to-use: |
+  Plan and execute product launches, feature releases, and announcements across all channels. Triggers on 'Product Hunt launch,' 'feature release,' 'beta launch,' 'waitlist launch,' 'launch checklist,' or 'we are about to ship.' For ongoing content and update cadence after launch, see content-strategy.
+argument-hint: |
+  New AI writing feature — targeting B2B content teams, want Product Hunt + email launch
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

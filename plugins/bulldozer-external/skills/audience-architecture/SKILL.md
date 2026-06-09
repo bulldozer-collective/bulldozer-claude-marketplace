@@ -1,8 +1,12 @@
 ---
-name: audience-architecture
-description: Build the paid advertising audience system for a B2B GTM team — ICP translation into ad platform segments, lookalike seed construction, suppression list design, account-level scoring upload, and cross-platform audience synchronization. Triggers on 'audience architecture,' 'build our ad audiences,' 'LinkedIn audience setup,' 'lookalike audiences,' 'suppression lists,' 'our ads are reaching the wrong people,' or 'connect our CRM to ad targeting.' For paid campaign execution, see audit-paid-ads. For ICP definition, see icp-builder.
-when-to-use: Build the paid advertising audience system for a B2B GTM team — ICP translation into ad platform segments, lookalike seed construction, suppression list design, account-level scoring upload, and cross-platform audience synchronization. Triggers on 'audience architecture,' 'build our ad audiences,' 'LinkedIn audience setup,' 'lookalike audiences,' 'suppression lists,' 'our ads are reaching the wrong people,' or 'connect our CRM to ad targeting.' For paid campaign execution, see audit-paid-ads. For ICP definition, see icp-builder.
-argument-hint: Series B SaaS, €3M+ ARR, HubSpot CRM — LinkedIn + Google Ads. ICP defined but not connected to ad platforms. Reps say MQLs from paid are too small. Need to rebuild audiences from closed-won data and kill waste from non-ICP traffic.
+name: |
+  audience-architecture
+description: |
+  Build the paid advertising audience system for a B2B GTM team — ICP translation into ad platform segments, lookalike seed construction, suppression list design, account-level scoring upload, and cross-platform audience synchronization. Triggers on 'audience architecture,' 'build our ad audiences,' 'LinkedIn audience setup,' 'lookalike audiences,' 'suppression lists,' 'our ads are reaching the wrong people,' or 'connect our CRM to ad targeting.' For paid campaign execution, see audit-paid-ads. For ICP definition, see icp-builder.
+when-to-use: |
+  Build the paid advertising audience system for a B2B GTM team — ICP translation into ad platform segments, lookalike seed construction, suppression list design, account-level scoring upload, and cross-platform audience synchronization. Triggers on 'audience architecture,' 'build our ad audiences,' 'LinkedIn audience setup,' 'lookalike audiences,' 'suppression lists,' 'our ads are reaching the wrong people,' or 'connect our CRM to ad targeting.' For paid campaign execution, see audit-paid-ads. For ICP definition, see icp-builder.
+argument-hint: |
+  Series B SaaS, €3M+ ARR, HubSpot CRM — LinkedIn + Google Ads. ICP defined but not connected to ad platforms. Reps say MQLs from paid are too small. Need to rebuild audiences from closed-won data and kill waste from non-ICP traffic.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

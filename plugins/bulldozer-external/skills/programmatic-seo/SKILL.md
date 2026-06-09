@@ -1,8 +1,12 @@
 ---
-name: programmatic-seo
-description: Build SEO-optimized pages at scale using templates and data — location pages, integration pages, comparison pages, glossary terms, and persona pages. Triggers on 'programmatic SEO,' 'pages at scale,' 'location pages,' 'integration pages,' or 'generate 100 pages.' For auditing existing SEO, see seo-audit. For content planning, see content-strategy.
-when-to-use: Build SEO-optimized pages at scale using templates and data — location pages, integration pages, comparison pages, glossary terms, and persona pages. Triggers on 'programmatic SEO,' 'pages at scale,' 'location pages,' 'integration pages,' or 'generate 100 pages.' For auditing existing SEO, see seo-audit. For content planning, see content-strategy.
-argument-hint: Build integration pages for our Zapier, Slack, and HubSpot integrations — B2B SaaS
+name: |
+  programmatic-seo
+description: |
+  Build SEO-optimized pages at scale using templates and data — location pages, integration pages, comparison pages, glossary terms, and persona pages. Triggers on 'programmatic SEO,' 'pages at scale,' 'location pages,' 'integration pages,' or 'generate 100 pages.' For auditing existing SEO, see seo-audit. For content planning, see content-strategy.
+when-to-use: |
+  Build SEO-optimized pages at scale using templates and data — location pages, integration pages, comparison pages, glossary terms, and persona pages. Triggers on 'programmatic SEO,' 'pages at scale,' 'location pages,' 'integration pages,' or 'generate 100 pages.' For auditing existing SEO, see seo-audit. For content planning, see content-strategy.
+argument-hint: |
+  Build integration pages for our Zapier, Slack, and HubSpot integrations — B2B SaaS
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

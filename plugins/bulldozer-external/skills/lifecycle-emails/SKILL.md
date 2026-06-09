@@ -1,8 +1,12 @@
 ---
-name: lifecycle-emails
-description: Build and optimize automated email flows — welcome series, drip, lifecycle, and nurture sequences. Triggers on 'email sequence,' 'drip campaign,' 'nurture sequence,' 'welcome sequence,' 're-engagement emails,' or 'trigger-based emails.' For cold outreach, see cold-email. For in-app onboarding, see onboarding.
-when-to-use: Build and optimize automated email flows — welcome series, drip, lifecycle, and nurture sequences. Triggers on 'email sequence,' 'drip campaign,' 'nurture sequence,' 'welcome sequence,' 're-engagement emails,' or 'trigger-based emails.' For cold outreach, see cold-email. For in-app onboarding, see onboarding.
-argument-hint: Welcome sequence for B2B SaaS trial users — 7-email flow over 14 days
+name: |
+  lifecycle-emails
+description: |
+  Build and optimize automated email flows — welcome series, drip, lifecycle, and nurture sequences. Triggers on 'email sequence,' 'drip campaign,' 'nurture sequence,' 'welcome sequence,' 're-engagement emails,' or 'trigger-based emails.' For cold outreach, see cold-email. For in-app onboarding, see onboarding.
+when-to-use: |
+  Build and optimize automated email flows — welcome series, drip, lifecycle, and nurture sequences. Triggers on 'email sequence,' 'drip campaign,' 'nurture sequence,' 'welcome sequence,' 're-engagement emails,' or 'trigger-based emails.' For cold outreach, see cold-email. For in-app onboarding, see onboarding.
+argument-hint: |
+  Welcome sequence for B2B SaaS trial users — 7-email flow over 14 days
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

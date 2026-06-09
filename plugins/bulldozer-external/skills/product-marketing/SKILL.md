@@ -1,8 +1,12 @@
 ---
-name: product-marketing
-description: Create or update the product marketing context document — positioning, ICP, messaging, and differentiation. Triggers on 'product context,' 'marketing context,' 'positioning,' 'who is my target audience,' 'ideal customer profile,' 'ICP,' or 'describe my product.' Run this first — all other skills reference this context.
-when-to-use: Create or update the product marketing context document — positioning, ICP, messaging, and differentiation. Triggers on 'product context,' 'marketing context,' 'positioning,' 'who is my target audience,' 'ideal customer profile,' 'ICP,' or 'describe my product.' Run this first — all other skills reference this context.
-argument-hint: B2B SaaS for ops teams — help me capture positioning, ICP, and key messaging
+name: |
+  product-marketing
+description: |
+  Create or update the product marketing context document — positioning, ICP, messaging, and differentiation. Triggers on 'product context,' 'marketing context,' 'positioning,' 'who is my target audience,' 'ideal customer profile,' 'ICP,' or 'describe my product.' Run this first — all other skills reference this context.
+when-to-use: |
+  Create or update the product marketing context document — positioning, ICP, messaging, and differentiation. Triggers on 'product context,' 'marketing context,' 'positioning,' 'who is my target audience,' 'ideal customer profile,' 'ICP,' or 'describe my product.' Run this first — all other skills reference this context.
+argument-hint: |
+  B2B SaaS for ops teams — help me capture positioning, ICP, and key messaging
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

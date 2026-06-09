@@ -1,8 +1,12 @@
 ---
-name: crm-strategy
-description: Design CRM architecture for a B2B GTM team — lifecycle stage map, deal pipeline design, custom property schema, lead scoring model, and team ownership rules. Triggers on 'CRM strategy,' 'CRM architecture,' 'design our CRM,' 'lifecycle stages,' 'how should we structure our pipeline,' 'lead scoring model,' 'our CRM is a mess,' or 'we need to redesign HubSpot.' For CRM setup and configuration, see crm-setup. For data quality audit, see audit-crm-tracking.
-when-to-use: Design CRM architecture for a B2B GTM team — lifecycle stage map, deal pipeline design, custom property schema, lead scoring model, and team ownership rules. Triggers on 'CRM strategy,' 'CRM architecture,' 'design our CRM,' 'lifecycle stages,' 'how should we structure our pipeline,' 'lead scoring model,' 'our CRM is a mess,' or 'we need to redesign HubSpot.' For CRM setup and configuration, see crm-setup. For data quality audit, see audit-crm-tracking.
-argument-hint: Series A SaaS, sales-led, 6-rep team — HubSpot. No real lifecycle stage logic, 4 ad-hoc pipelines, lead scoring doesn't exist. Redesign before scaling to 12 reps.
+name: |
+  crm-strategy
+description: |
+  Design CRM architecture for a B2B GTM team — lifecycle stage map, deal pipeline design, custom property schema, lead scoring model, and team ownership rules. Triggers on 'CRM strategy,' 'CRM architecture,' 'design our CRM,' 'lifecycle stages,' 'how should we structure our pipeline,' 'lead scoring model,' 'our CRM is a mess,' or 'we need to redesign HubSpot.' For CRM setup and configuration, see crm-setup. For data quality audit, see audit-crm-tracking.
+when-to-use: |
+  Design CRM architecture for a B2B GTM team — lifecycle stage map, deal pipeline design, custom property schema, lead scoring model, and team ownership rules. Triggers on 'CRM strategy,' 'CRM architecture,' 'design our CRM,' 'lifecycle stages,' 'how should we structure our pipeline,' 'lead scoring model,' 'our CRM is a mess,' or 'we need to redesign HubSpot.' For CRM setup and configuration, see crm-setup. For data quality audit, see audit-crm-tracking.
+argument-hint: |
+  Series A SaaS, sales-led, 6-rep team — HubSpot. No real lifecycle stage logic, 4 ad-hoc pipelines, lead scoring doesn't exist. Redesign before scaling to 12 reps.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

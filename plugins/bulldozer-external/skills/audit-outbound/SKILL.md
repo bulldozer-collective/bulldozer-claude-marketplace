@@ -1,8 +1,12 @@
 ---
-name: audit-outbound
-description: Full diagnostic of a B2B outbound system — cold email, LinkedIn sequences, cold calling, and multi-channel cadences. Triggers on 'outbound audit,' 'why are my reply rates dropping,' 'cold email not working,' 'diagnose my outbound,' 'sequence audit,' or 'outbound is broken.' For ABM-specific audits, see account-based-marketing. For email deliverability only, see cold-email.
-when-to-use: Full diagnostic of a B2B outbound system — cold email, LinkedIn sequences, cold calling, and multi-channel cadences. Triggers on 'outbound audit,' 'why are my reply rates dropping,' 'cold email not working,' 'diagnose my outbound,' 'sequence audit,' or 'outbound is broken.' For ABM-specific audits, see account-based-marketing. For email deliverability only, see cold-email.
-argument-hint: Cold email to mid-market HR SaaS — reply rate dropped from 4% to 1.2% over 8 weeks, sending 200 emails/day across 3 domains
+name: |
+  audit-outbound
+description: |
+  Full diagnostic of a B2B outbound system — cold email, LinkedIn sequences, cold calling, and multi-channel cadences. Triggers on 'outbound audit,' 'why are my reply rates dropping,' 'cold email not working,' 'diagnose my outbound,' 'sequence audit,' or 'outbound is broken.' For ABM-specific audits, see account-based-marketing. For email deliverability only, see cold-email.
+when-to-use: |
+  Full diagnostic of a B2B outbound system — cold email, LinkedIn sequences, cold calling, and multi-channel cadences. Triggers on 'outbound audit,' 'why are my reply rates dropping,' 'cold email not working,' 'diagnose my outbound,' 'sequence audit,' or 'outbound is broken.' For ABM-specific audits, see account-based-marketing. For email deliverability only, see cold-email.
+argument-hint: |
+  Cold email to mid-market HR SaaS — reply rate dropped from 4% to 1.2% over 8 weeks, sending 200 emails/day across 3 domains
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

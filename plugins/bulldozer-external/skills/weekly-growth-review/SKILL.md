@@ -1,8 +1,12 @@
 ---
-name: weekly-growth-review
-description: Build a weekly growth review system — north star metric, leading indicator KPI tree, 60-minute meeting structure, red/amber/green threshold system, and IDS issue resolution protocol. Triggers on 'weekly growth review,' 'weekly metrics review,' 'growth meeting,' 'weekly KPIs,' 'growth dashboard,' 'how do we track growth weekly,' or 'we're always surprised at month end.' For attribution methodology, see attribution-funnel. For cohort analysis, see cohort-mmm.
-when-to-use: Build a weekly growth review system — north star metric, leading indicator KPI tree, 60-minute meeting structure, red/amber/green threshold system, and IDS issue resolution protocol. Triggers on 'weekly growth review,' 'weekly metrics review,' 'growth meeting,' 'weekly KPIs,' 'growth dashboard,' 'how do we track growth weekly,' or 'we're always surprised at month end.' For attribution methodology, see attribution-funnel. For cohort analysis, see cohort-mmm.
-argument-hint: B2B SaaS, sales-led motion, 4-person growth team, currently doing ad-hoc monthly reporting — want a weekly rhythm that surfaces issues before month-end surprises
+name: |
+  weekly-growth-review
+description: |
+  Build a weekly growth review system — north star metric, leading indicator KPI tree, 60-minute meeting structure, red/amber/green threshold system, and IDS issue resolution protocol. Triggers on 'weekly growth review,' 'weekly metrics review,' 'growth meeting,' 'weekly KPIs,' 'growth dashboard,' 'how do we track growth weekly,' or 'we're always surprised at month end.' For attribution methodology, see attribution-funnel. For cohort analysis, see cohort-mmm.
+when-to-use: |
+  Build a weekly growth review system — north star metric, leading indicator KPI tree, 60-minute meeting structure, red/amber/green threshold system, and IDS issue resolution protocol. Triggers on 'weekly growth review,' 'weekly metrics review,' 'growth meeting,' 'weekly KPIs,' 'growth dashboard,' 'how do we track growth weekly,' or 'we're always surprised at month end.' For attribution methodology, see attribution-funnel. For cohort analysis, see cohort-mmm.
+argument-hint: |
+  B2B SaaS, sales-led motion, 4-person growth team, currently doing ad-hoc monthly reporting — want a weekly rhythm that surfaces issues before month-end surprises
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

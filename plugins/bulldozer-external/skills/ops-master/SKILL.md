@@ -1,8 +1,12 @@
 ---
-name: ops-master
-description: Orchestrate the full revenue operations and team ops stack — CRM, data hygiene, automation, RevOps, hiring, and budget — routing to the right sub-skills based on operational gaps. Triggers on 'RevOps is broken,' 'CRM is a mess,' 'I need to hire,' 'team scaling,' 'budget planning,' 'deliverability issues,' or 'operations falling apart.' For analytics and dashboards, use Analytics Master. For customer lifecycle ops, use Retention Master.
-when-to-use: Orchestrate the full revenue operations and team ops stack — CRM, data hygiene, automation, RevOps, hiring, and budget — routing to the right sub-skills based on operational gaps. Triggers on 'RevOps is broken,' 'CRM is a mess,' 'I need to hire,' 'team scaling,' 'budget planning,' 'deliverability issues,' or 'operations falling apart.' For analytics and dashboards, use Analytics Master. For customer lifecycle ops, use Retention Master.
-argument-hint: Series B, 45 people. HubSpot CRM with 40% bad data. SDR team burning leads. RevOps person just left. Need to stabilize CRM, fix deliverability, and build a hiring plan for Q3.
+name: |
+  ops-master
+description: |
+  Orchestrate the full revenue operations and team ops stack — CRM, data hygiene, automation, RevOps, hiring, and budget — routing to the right sub-skills based on operational gaps. Triggers on 'RevOps is broken,' 'CRM is a mess,' 'I need to hire,' 'team scaling,' 'budget planning,' 'deliverability issues,' or 'operations falling apart.' For analytics and dashboards, use Analytics Master. For customer lifecycle ops, use Retention Master.
+when-to-use: |
+  Orchestrate the full revenue operations and team ops stack — CRM, data hygiene, automation, RevOps, hiring, and budget — routing to the right sub-skills based on operational gaps. Triggers on 'RevOps is broken,' 'CRM is a mess,' 'I need to hire,' 'team scaling,' 'budget planning,' 'deliverability issues,' or 'operations falling apart.' For analytics and dashboards, use Analytics Master. For customer lifecycle ops, use Retention Master.
+argument-hint: |
+  Series B, 45 people. HubSpot CRM with 40% bad data. SDR team burning leads. RevOps person just left. Need to stabilize CRM, fix deliverability, and build a hiring plan for Q3.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

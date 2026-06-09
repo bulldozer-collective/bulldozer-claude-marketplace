@@ -1,8 +1,12 @@
 ---
-name: market-category
-description: Analyze market category dynamics — competitive forces, buyer maturity, category creation vs. entry, and positioning strategy. Triggers on 'category analysis,' 'market category,' 'category creation,' 'competitive landscape,' 'where does our product fit,' or 'blue ocean.' For market size quantification, see market-sizing. For competitor profiles, see competitor-profiling.
-when-to-use: Analyze market category dynamics — competitive forces, buyer maturity, category creation vs. entry, and positioning strategy. Triggers on 'category analysis,' 'market category,' 'category creation,' 'competitive landscape,' 'where does our product fit,' or 'blue ocean.' For market size quantification, see market-sizing. For competitor profiles, see competitor-profiling.
-argument-hint: AI-powered recruiting automation — analyze the category, competitive forces, and whether we should create a new category or compete in existing ones
+name: |
+  market-category
+description: |
+  Analyze market category dynamics — competitive forces, buyer maturity, category creation vs. entry, and positioning strategy. Triggers on 'category analysis,' 'market category,' 'category creation,' 'competitive landscape,' 'where does our product fit,' or 'blue ocean.' For market size quantification, see market-sizing. For competitor profiles, see competitor-profiling.
+when-to-use: |
+  Analyze market category dynamics — competitive forces, buyer maturity, category creation vs. entry, and positioning strategy. Triggers on 'category analysis,' 'market category,' 'category creation,' 'competitive landscape,' 'where does our product fit,' or 'blue ocean.' For market size quantification, see market-sizing. For competitor profiles, see competitor-profiling.
+argument-hint: |
+  AI-powered recruiting automation — analyze the category, competitive forces, and whether we should create a new category or compete in existing ones
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

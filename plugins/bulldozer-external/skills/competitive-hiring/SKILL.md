@@ -1,8 +1,12 @@
 ---
-name: competitive-hiring
-description: Produce a monthly Competitive Hiring Signal Brief — track GTM headcount spikes, role distribution shifts, and geographic expansion signals across named competitors to anticipate strategic moves 3-6 months in advance. Triggers on 'competitive hiring signals,' 'what are competitors hiring for,' 'monitor competitor jobs,' 'hiring intelligence report,' 'competitive headcount analysis,' or 'what is competitor X building.' For full competitor profiling including product and messaging, see competitor-profiling. For battlecard creation, see battlecards.
-when-to-use: Produce a monthly Competitive Hiring Signal Brief — track GTM headcount spikes, role distribution shifts, and geographic expansion signals across named competitors to anticipate strategic moves 3-6 months in advance. Triggers on 'competitive hiring signals,' 'what are competitors hiring for,' 'monitor competitor jobs,' 'hiring intelligence report,' 'competitive headcount analysis,' or 'what is competitor X building.' For full competitor profiling including product and messaging, see competitor-profiling. For battlecard creation, see battlecards.
-argument-hint: Competitors to track: Notion, Coda, Confluence. Want a monthly brief on GTM and product hiring signals — are they investing in sales, support, engineering? Any new geographies? 3 competitors, pull from LinkedIn job postings.
+name: |
+  competitive-hiring
+description: |
+  Produce a monthly Competitive Hiring Signal Brief — track GTM headcount spikes, role distribution shifts, and geographic expansion signals across named competitors to anticipate strategic moves 3-6 months in advance. Triggers on 'competitive hiring signals,' 'what are competitors hiring for,' 'monitor competitor jobs,' 'hiring intelligence report,' 'competitive headcount analysis,' or 'what is competitor X building.' For full competitor profiling including product and messaging, see competitor-profiling. For battlecard creation, see battlecards.
+when-to-use: |
+  Produce a monthly Competitive Hiring Signal Brief — track GTM headcount spikes, role distribution shifts, and geographic expansion signals across named competitors to anticipate strategic moves 3-6 months in advance. Triggers on 'competitive hiring signals,' 'what are competitors hiring for,' 'monitor competitor jobs,' 'hiring intelligence report,' 'competitive headcount analysis,' or 'what is competitor X building.' For full competitor profiling including product and messaging, see competitor-profiling. For battlecard creation, see battlecards.
+argument-hint: |
+  Competitors to track: Notion, Coda, Confluence. Want a monthly brief on GTM and product hiring signals — are they investing in sales, support, engineering? Any new geographies? 3 competitors, pull from LinkedIn job postings.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

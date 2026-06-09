@@ -1,8 +1,12 @@
 ---
-name: popups
-description: Build and optimize popups, modals, overlays, slide-ins, and banners for lead capture and conversion. Triggers on 'exit intent popup,' 'popup conversions,' 'modal optimization,' 'lead capture popup,' 'announcement banner,' or 'scroll trigger popup.' For forms outside of popups or general page optimization, see conversion-optimization.
-when-to-use: Build and optimize popups, modals, overlays, slide-ins, and banners for lead capture and conversion. Triggers on 'exit intent popup,' 'popup conversions,' 'modal optimization,' 'lead capture popup,' 'announcement banner,' or 'scroll trigger popup.' For forms outside of popups or general page optimization, see conversion-optimization.
-argument-hint: Exit intent popup for SaaS pricing page — trying to capture emails before visitors leave
+name: |
+  popups
+description: |
+  Build and optimize popups, modals, overlays, slide-ins, and banners for lead capture and conversion. Triggers on 'exit intent popup,' 'popup conversions,' 'modal optimization,' 'lead capture popup,' 'announcement banner,' or 'scroll trigger popup.' For forms outside of popups or general page optimization, see conversion-optimization.
+when-to-use: |
+  Build and optimize popups, modals, overlays, slide-ins, and banners for lead capture and conversion. Triggers on 'exit intent popup,' 'popup conversions,' 'modal optimization,' 'lead capture popup,' 'announcement banner,' or 'scroll trigger popup.' For forms outside of popups or general page optimization, see conversion-optimization.
+argument-hint: |
+  Exit intent popup for SaaS pricing page — trying to capture emails before visitors leave
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

@@ -1,8 +1,12 @@
 ---
-name: dtc-shopify-playbook
-description: Build the operating system for a DTC Shopify brand — unit economics baseline, retention stack (email + SMS flows), paid acquisition sequencing, LTV maximization levers, and the 3-operator model for scaling from 7 to 8 figures. Triggers on 'Shopify playbook,' 'DTC strategy,' 'email and SMS for ecommerce,' 'Klaviyo setup,' 'how to scale a DTC brand,' 'our email revenue is low,' 'Shopify retention,' or 'how to improve LTV.' For broader retention strategy, see customer-health-expansion.
-when-to-use: Build the operating system for a DTC Shopify brand — unit economics baseline, retention stack (email + SMS flows), paid acquisition sequencing, LTV maximization levers, and the 3-operator model for scaling from 7 to 8 figures. Triggers on 'Shopify playbook,' 'DTC strategy,' 'email and SMS for ecommerce,' 'Klaviyo setup,' 'how to scale a DTC brand,' 'our email revenue is low,' 'Shopify retention,' or 'how to improve LTV.' For broader retention strategy, see customer-health-expansion.
-argument-hint: DTC skincare brand, €2.1M GMV on Shopify. Klaviyo installed but barely used — only welcome email live. Repeat purchase rate 11%. CAC €38, AOV €62. Email is 14% of revenue. Goal: get to 28% email revenue share and improve repeat rate to 20%.
+name: |
+  dtc-shopify-playbook
+description: |
+  Build the operating system for a DTC Shopify brand — unit economics baseline, retention stack (email + SMS flows), paid acquisition sequencing, LTV maximization levers, and the 3-operator model for scaling from 7 to 8 figures. Triggers on 'Shopify playbook,' 'DTC strategy,' 'email and SMS for ecommerce,' 'Klaviyo setup,' 'how to scale a DTC brand,' 'our email revenue is low,' 'Shopify retention,' or 'how to improve LTV.' For broader retention strategy, see customer-health-expansion.
+when-to-use: |
+  Build the operating system for a DTC Shopify brand — unit economics baseline, retention stack (email + SMS flows), paid acquisition sequencing, LTV maximization levers, and the 3-operator model for scaling from 7 to 8 figures. Triggers on 'Shopify playbook,' 'DTC strategy,' 'email and SMS for ecommerce,' 'Klaviyo setup,' 'how to scale a DTC brand,' 'our email revenue is low,' 'Shopify retention,' or 'how to improve LTV.' For broader retention strategy, see customer-health-expansion.
+argument-hint: |
+  DTC skincare brand, €2.1M GMV on Shopify. Klaviyo installed but barely used — only welcome email live. Repeat purchase rate 11%. CAC €38, AOV €62. Email is 14% of revenue. Goal: get to 28% email revenue share and improve repeat rate to 20%.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

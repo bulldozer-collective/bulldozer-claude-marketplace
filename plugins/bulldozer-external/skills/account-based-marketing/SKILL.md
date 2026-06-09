@@ -1,8 +1,12 @@
 ---
-name: account-based-marketing
-description: Build Account-Based Marketing and Account-Based Experience playbooks: target account selection, multi-touch orchestration, account scoring, and personalization at scale. Triggers on 'ABM,' 'account-based marketing,' 'target account strategy,' 'ABX,' or 'named account campaign.' For individual deal review, see pipeline-deal-review. For LinkedIn targeting, see linkedin-ads.
-when-to-use: Build Account-Based Marketing and Account-Based Experience playbooks: target account selection, multi-touch orchestration, account scoring, and personalization at scale. Triggers on 'ABM,' 'account-based marketing,' 'target account strategy,' 'ABX,' or 'named account campaign.' For individual deal review, see pipeline-deal-review. For LinkedIn targeting, see linkedin-ads.
-argument-hint: B2B SaaS, $50k ACV, targeting 200 named enterprise accounts in financial services
+name: |
+  account-based-marketing
+description: |
+  Build Account-Based Marketing and Account-Based Experience playbooks: target account selection, multi-touch orchestration, account scoring, and personalization at scale. Triggers on 'ABM,' 'account-based marketing,' 'target account strategy,' 'ABX,' or 'named account campaign.' For individual deal review, see pipeline-deal-review. For LinkedIn targeting, see linkedin-ads.
+when-to-use: |
+  Build Account-Based Marketing and Account-Based Experience playbooks: target account selection, multi-touch orchestration, account scoring, and personalization at scale. Triggers on 'ABM,' 'account-based marketing,' 'target account strategy,' 'ABX,' or 'named account campaign.' For individual deal review, see pipeline-deal-review. For LinkedIn targeting, see linkedin-ads.
+argument-hint: |
+  B2B SaaS, $50k ACV, targeting 200 named enterprise accounts in financial services
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

@@ -1,13 +1,17 @@
 ---
-name: bulldozer-config
-description: Manages the bulldozer.json configuration file shared across Bulldozer skills, agents, and MCP tools — handling its creation, validation, and lookup.
-when-to-use: Use this skill when the user refers to the bulldozer config file, when bulldozer.json is encountered, or when other Bulldozer skills or MCP tools need configuration values.
+name: |
+  bulldozer-config
+description: |
+  Manages the bulldozer.json configuration file shared across Bulldozer skills, agents, and MCP tools — handling its creation, validation, and lookup.
+when-to-use: |
+  Use this skill when the user refers to the bulldozer config file, when bulldozer.json is encountered, or when other Bulldozer skills or MCP tools need configuration values.
 allowed-tools:
   - Read
   - Write
   - Edit
   - Bash
-effort: low
+effort: |
+  low
 paths:
   - bulldozer.json
   - .gitignore

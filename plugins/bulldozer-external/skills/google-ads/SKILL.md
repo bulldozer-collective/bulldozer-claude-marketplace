@@ -1,8 +1,12 @@
 ---
-name: google-ads
-description: Set up and optimize Google Ads campaigns across Search, Shopping, Performance Max, and YouTube/Demand Gen. Triggers on 'Google Ads,' 'Search campaign,' 'Performance Max,' 'Google shopping,' or 'PPC on Google.' For cross-platform strategy, see paid-strategy. For Meta campaigns, see meta-ads.
-when-to-use: Set up and optimize Google Ads campaigns across Search, Shopping, Performance Max, and YouTube/Demand Gen. Triggers on 'Google Ads,' 'Search campaign,' 'Performance Max,' 'Google shopping,' or 'PPC on Google.' For cross-platform strategy, see paid-strategy. For Meta campaigns, see meta-ads.
-argument-hint: B2B SaaS project management tool, $15k/mo budget, want search campaigns for bottom-funnel keywords
+name: |
+  google-ads
+description: |
+  Set up and optimize Google Ads campaigns across Search, Shopping, Performance Max, and YouTube/Demand Gen. Triggers on 'Google Ads,' 'Search campaign,' 'Performance Max,' 'Google shopping,' or 'PPC on Google.' For cross-platform strategy, see paid-strategy. For Meta campaigns, see meta-ads.
+when-to-use: |
+  Set up and optimize Google Ads campaigns across Search, Shopping, Performance Max, and YouTube/Demand Gen. Triggers on 'Google Ads,' 'Search campaign,' 'Performance Max,' 'Google shopping,' or 'PPC on Google.' For cross-platform strategy, see paid-strategy. For Meta campaigns, see meta-ads.
+argument-hint: |
+  B2B SaaS project management tool, $15k/mo budget, want search campaigns for bottom-funnel keywords
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

@@ -1,8 +1,12 @@
 ---
-name: design-kit
-description: Produce a structured design kit — token system (color, typography, spacing, elevation), component inventory, design file architecture, naming conventions, changelog protocol, and handoff specification. Triggers on 'design kit,' 'design system,' 'component library,' 'Figma setup,' 'brand design tokens,' 'we need a design system,' 'inconsistent UI,' or 'how do we organize Figma.' For brand identity and positioning, see brand-platform. For website design requirements, see website-brief.
-when-to-use: Produce a structured design kit — token system (color, typography, spacing, elevation), component inventory, design file architecture, naming conventions, changelog protocol, and handoff specification. Triggers on 'design kit,' 'design system,' 'component library,' 'Figma setup,' 'brand design tokens,' 'we need a design system,' 'inconsistent UI,' or 'how do we organize Figma.' For brand identity and positioning, see brand-platform. For website design requirements, see website-brief.
-argument-hint: Series A SaaS product, 2 designers + 5 engineers. Figma is used but chaotic — 4 different button styles, no shared colors, designers duplicate components manually. Need a proper design kit before onboarding 2 more engineers.
+name: |
+  design-kit
+description: |
+  Produce a structured design kit — token system (color, typography, spacing, elevation), component inventory, design file architecture, naming conventions, changelog protocol, and handoff specification. Triggers on 'design kit,' 'design system,' 'component library,' 'Figma setup,' 'brand design tokens,' 'we need a design system,' 'inconsistent UI,' or 'how do we organize Figma.' For brand identity and positioning, see brand-platform. For website design requirements, see website-brief.
+when-to-use: |
+  Produce a structured design kit — token system (color, typography, spacing, elevation), component inventory, design file architecture, naming conventions, changelog protocol, and handoff specification. Triggers on 'design kit,' 'design system,' 'component library,' 'Figma setup,' 'brand design tokens,' 'we need a design system,' 'inconsistent UI,' or 'how do we organize Figma.' For brand identity and positioning, see brand-platform. For website design requirements, see website-brief.
+argument-hint: |
+  Series A SaaS product, 2 designers + 5 engineers. Figma is used but chaotic — 4 different button styles, no shared colors, designers duplicate components manually. Need a proper design kit before onboarding 2 more engineers.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

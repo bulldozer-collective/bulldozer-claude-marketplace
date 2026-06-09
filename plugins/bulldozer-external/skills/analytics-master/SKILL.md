@@ -1,8 +1,12 @@
 ---
-name: analytics-master
-description: Orchestrate the full analytics and measurement stack — tracking setup, attribution, cohort analysis, and dashboards — routing to the right sub-skills based on measurement gaps. Triggers on 'our metrics are a mess,' 'attribution is broken,' 'I need a dashboard,' 'we don't know what's driving growth,' 'tracking not working,' or 'weekly review setup.' For channel-specific reporting, use Acquisition Master. For CRM and RevOps data, use Ops Master.
-when-to-use: Orchestrate the full analytics and measurement stack — tracking setup, attribution, cohort analysis, and dashboards — routing to the right sub-skills based on measurement gaps. Triggers on 'our metrics are a mess,' 'attribution is broken,' 'I need a dashboard,' 'we don't know what's driving growth,' 'tracking not working,' or 'weekly review setup.' For channel-specific reporting, use Acquisition Master. For CRM and RevOps data, use Ops Master.
-argument-hint: B2B SaaS, $3M ARR. No attribution model. GA4 misconfigured. 3 separate dashboards that don't agree. CAC unknown. Want a single source of truth for growth metrics by end of quarter.
+name: |
+  analytics-master
+description: |
+  Orchestrate the full analytics and measurement stack — tracking setup, attribution, cohort analysis, and dashboards — routing to the right sub-skills based on measurement gaps. Triggers on 'our metrics are a mess,' 'attribution is broken,' 'I need a dashboard,' 'we don't know what's driving growth,' 'tracking not working,' or 'weekly review setup.' For channel-specific reporting, use Acquisition Master. For CRM and RevOps data, use Ops Master.
+when-to-use: |
+  Orchestrate the full analytics and measurement stack — tracking setup, attribution, cohort analysis, and dashboards — routing to the right sub-skills based on measurement gaps. Triggers on 'our metrics are a mess,' 'attribution is broken,' 'I need a dashboard,' 'we don't know what's driving growth,' 'tracking not working,' or 'weekly review setup.' For channel-specific reporting, use Acquisition Master. For CRM and RevOps data, use Ops Master.
+argument-hint: |
+  B2B SaaS, $3M ARR. No attribution model. GA4 misconfigured. 3 separate dashboards that don't agree. CAC unknown. Want a single source of truth for growth metrics by end of quarter.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

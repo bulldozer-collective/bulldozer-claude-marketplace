@@ -1,8 +1,12 @@
 ---
-name: image-generation
-description: Create marketing images using AI generation tools — blog heroes, social-content graphics, product mockups, and OG images. Triggers on 'AI image generation,' 'generate an image,' 'create a graphic,' 'product mockup,' 'hero image,' or 'social media graphic.' For paid ad image specs, see ad-creative. For AI video, see video-script.
-when-to-use: Create marketing images using AI generation tools — blog heroes, social-content graphics, product mockups, and OG images. Triggers on 'AI image generation,' 'generate an image,' 'create a graphic,' 'product mockup,' 'hero image,' or 'social media graphic.' For paid ad image specs, see ad-creative. For AI video, see video-script.
-argument-hint: Hero image for a blog post about data pipeline automation — professional, tech aesthetic
+name: |
+  image-generation
+description: |
+  Create marketing images using AI generation tools — blog heroes, social-content graphics, product mockups, and OG images. Triggers on 'AI image generation,' 'generate an image,' 'create a graphic,' 'product mockup,' 'hero image,' or 'social media graphic.' For paid ad image specs, see ad-creative. For AI video, see video-script.
+when-to-use: |
+  Create marketing images using AI generation tools — blog heroes, social-content graphics, product mockups, and OG images. Triggers on 'AI image generation,' 'generate an image,' 'create a graphic,' 'product mockup,' 'hero image,' or 'social media graphic.' For paid ad image specs, see ad-creative. For AI video, see video-script.
+argument-hint: |
+  Hero image for a blog post about data pipeline automation — professional, tech aesthetic
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

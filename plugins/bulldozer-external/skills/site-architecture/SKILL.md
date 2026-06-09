@@ -1,8 +1,12 @@
 ---
-name: site-architecture
-description: Plan or restructure website page hierarchy, navigation, URL structure, and internal linking. Triggers on 'site structure,' 'page hierarchy,' 'information architecture,' 'navigation design,' 'URL structure,' 'internal linking strategy,' or 'what pages do I need.' For XML sitemaps and technical SEO, see seo-audit. For structured data, see structured-data-schema.
-when-to-use: Plan or restructure website page hierarchy, navigation, URL structure, and internal linking. Triggers on 'site structure,' 'page hierarchy,' 'information architecture,' 'navigation design,' 'URL structure,' 'internal linking strategy,' or 'what pages do I need.' For XML sitemaps and technical SEO, see seo-audit. For structured data, see structured-data-schema.
-argument-hint: B2B SaaS marketing site — plan full page hierarchy, navigation, and URL structure
+name: |
+  site-architecture
+description: |
+  Plan or restructure website page hierarchy, navigation, URL structure, and internal linking. Triggers on 'site structure,' 'page hierarchy,' 'information architecture,' 'navigation design,' 'URL structure,' 'internal linking strategy,' or 'what pages do I need.' For XML sitemaps and technical SEO, see seo-audit. For structured data, see structured-data-schema.
+when-to-use: |
+  Plan or restructure website page hierarchy, navigation, URL structure, and internal linking. Triggers on 'site structure,' 'page hierarchy,' 'information architecture,' 'navigation design,' 'URL structure,' 'internal linking strategy,' or 'what pages do I need.' For XML sitemaps and technical SEO, see seo-audit. For structured data, see structured-data-schema.
+argument-hint: |
+  B2B SaaS marketing site — plan full page hierarchy, navigation, and URL structure
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

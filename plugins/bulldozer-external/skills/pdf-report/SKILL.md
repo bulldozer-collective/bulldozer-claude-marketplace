@@ -1,8 +1,12 @@
 ---
-name: pdf-report
-description: Generate a professionally styled, print-ready PDF report from any content — competitive analysis, client audit, market research, GTM plan. Triggers on 'generate PDF,' 'export as PDF,' 'create a PDF report,' 'client deliverable PDF,' or 'format this as a report.' For Excel output, see excel-dashboard. For Word documents, see word-document. For slide decks, see slides-deck.
-when-to-use: Generate a professionally styled, print-ready PDF report from any content — competitive analysis, client audit, market research, GTM plan. Triggers on 'generate PDF,' 'export as PDF,' 'create a PDF report,' 'client deliverable PDF,' or 'format this as a report.' For Excel output, see excel-dashboard. For Word documents, see word-document. For slide decks, see slides-deck.
-argument-hint: Client competitive analysis for Acme — 8 competitors, need PDF with executive summary, positioning map, and recommendations
+name: |
+  pdf-report
+description: |
+  Generate a professionally styled, print-ready PDF report from any content — competitive analysis, client audit, market research, GTM plan. Triggers on 'generate PDF,' 'export as PDF,' 'create a PDF report,' 'client deliverable PDF,' or 'format this as a report.' For Excel output, see excel-dashboard. For Word documents, see word-document. For slide decks, see slides-deck.
+when-to-use: |
+  Generate a professionally styled, print-ready PDF report from any content — competitive analysis, client audit, market research, GTM plan. Triggers on 'generate PDF,' 'export as PDF,' 'create a PDF report,' 'client deliverable PDF,' or 'format this as a report.' For Excel output, see excel-dashboard. For Word documents, see word-document. For slide decks, see slides-deck.
+argument-hint: |
+  Client competitive analysis for Acme — 8 competitors, need PDF with executive summary, positioning map, and recommendations
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

@@ -1,8 +1,12 @@
 ---
-name: audit-website-cro
-description: Full conversion rate optimization audit of a website or landing page — funnel drop-off, copy and value proposition, UX friction, forms, mobile, and trust signals. Triggers on 'CRO audit,' 'website audit,' 'why isn't my website converting,' 'landing page audit,' 'my conversion rate dropped,' 'funnel audit,' or 'website is not working.' For SEO specifically, see seo-audit. For paid landing pages only, see audit-paid-ads.
-when-to-use: Full conversion rate optimization audit of a website or landing page — funnel drop-off, copy and value proposition, UX friction, forms, mobile, and trust signals. Triggers on 'CRO audit,' 'website audit,' 'why isn't my website converting,' 'landing page audit,' 'my conversion rate dropped,' 'funnel audit,' or 'website is not working.' For SEO specifically, see seo-audit. For paid landing pages only, see audit-paid-ads.
-argument-hint: SaaS homepage + pricing page — free trial CVR at 1.2%, benchmark is 3–5% for the category, mobile traffic is 60% of total
+name: |
+  audit-website-cro
+description: |
+  Full conversion rate optimization audit of a website or landing page — funnel drop-off, copy and value proposition, UX friction, forms, mobile, and trust signals. Triggers on 'CRO audit,' 'website audit,' 'why isn't my website converting,' 'landing page audit,' 'my conversion rate dropped,' 'funnel audit,' or 'website is not working.' For SEO specifically, see seo-audit. For paid landing pages only, see audit-paid-ads.
+when-to-use: |
+  Full conversion rate optimization audit of a website or landing page — funnel drop-off, copy and value proposition, UX friction, forms, mobile, and trust signals. Triggers on 'CRO audit,' 'website audit,' 'why isn't my website converting,' 'landing page audit,' 'my conversion rate dropped,' 'funnel audit,' or 'website is not working.' For SEO specifically, see seo-audit. For paid landing pages only, see audit-paid-ads.
+argument-hint: |
+  SaaS homepage + pricing page — free trial CVR at 1.2%, benchmark is 3–5% for the category, mobile traffic is 60% of total
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:

@@ -1,8 +1,12 @@
 ---
-name: affiliate-program
-description: Design and launch a B2B SaaS affiliate program — commission model selection, attribution window calibration to sales cycle length, partner type segmentation (content / consulting / agency / customer advocates), tracking platform requirements, launch sequencing, and governance rules. Triggers on 'affiliate program,' 'referral program,' 'build an affiliate channel,' 'partner commissions,' 'affiliate tracking,' 'how should we pay affiliates,' or 'we want to add affiliates.' For broader partnership strategy, see partnerships-program.
-when-to-use: Design and launch a B2B SaaS affiliate program — commission model selection, attribution window calibration to sales cycle length, partner type segmentation (content / consulting / agency / customer advocates), tracking platform requirements, launch sequencing, and governance rules. Triggers on 'affiliate program,' 'referral program,' 'build an affiliate channel,' 'partner commissions,' 'affiliate tracking,' 'how should we pay affiliates,' or 'we want to add affiliates.' For broader partnership strategy, see partnerships-program.
-argument-hint: Series A SaaS, €8K ACV, 3-month average sales cycle, no existing affiliate program. Target: 10–15% of new ARR from affiliate channel within 12 months. ICP: RevOps and sales leaders. Best partners: consultants and agencies who serve those buyers.
+name: |
+  affiliate-program
+description: |
+  Design and launch a B2B SaaS affiliate program — commission model selection, attribution window calibration to sales cycle length, partner type segmentation (content / consulting / agency / customer advocates), tracking platform requirements, launch sequencing, and governance rules. Triggers on 'affiliate program,' 'referral program,' 'build an affiliate channel,' 'partner commissions,' 'affiliate tracking,' 'how should we pay affiliates,' or 'we want to add affiliates.' For broader partnership strategy, see partnerships-program.
+when-to-use: |
+  Design and launch a B2B SaaS affiliate program — commission model selection, attribution window calibration to sales cycle length, partner type segmentation (content / consulting / agency / customer advocates), tracking platform requirements, launch sequencing, and governance rules. Triggers on 'affiliate program,' 'referral program,' 'build an affiliate channel,' 'partner commissions,' 'affiliate tracking,' 'how should we pay affiliates,' or 'we want to add affiliates.' For broader partnership strategy, see partnerships-program.
+argument-hint: |
+  Series A SaaS, €8K ACV, 3-month average sales cycle, no existing affiliate program. Target: 10–15% of new ARR from affiliate channel within 12 months. ICP: RevOps and sales leaders. Best partners: consultants and agencies who serve those buyers.
 disable-model-invocation: false
 user-invocable: true
 allowed-tools:
