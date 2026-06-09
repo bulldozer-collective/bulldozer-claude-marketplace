@@ -8,11 +8,11 @@ when-to-use: |
 allowed-tools:
   - Read
   - Write
-  - mcp__plugin_bulldozer_bulldozer__listProjects
+  - mcp__plugin_bulldozer_bulldozer__bdzListProjects
 effort: |
   low
 paths:
-  - bulldozer.json
+  - "bulldozer.json"
 ---
 
 # Bulldozer Project Chooser
@@ -33,7 +33,7 @@ When a `projectId` is required, try these sources in order and stop at the first
    ```
 
    (Note: the key is `projectId` at the root of the JSON object — there is no leading dot in the actual key.)
-3. **Ask the user.** If neither source yields a value, call `mcp__plugin_bulldozer_bulldozer__listProjects` and prompt the user to pick one (see below).
+3. **Ask the user.** If neither source yields a value, call `mcp__plugin_bulldozer_bulldozer__bdzListProjects` and prompt the user to pick one (see below).
 
 ## Handling `bulldozer.json`
 
@@ -44,13 +44,13 @@ When a `projectId` is required, try these sources in order and stop at the first
 
 ## Validating a cached `projectId` (recommended)
 
-If you have time/budget, after reading `projectId` from `bulldozer.json`, call `mcp__plugin_bulldozer_bulldozer__listProjects` once and confirm the cached ID still appears. If it does not, treat it as missing and proceed to step 3.
+If you have time/budget, after reading `projectId` from `bulldozer.json`, call `mcp__plugin_bulldozer_bulldozer__bdzListProjects` once and confirm the cached ID still appears. If it does not, treat it as missing and proceed to step 3.
 
 ## Prompting the user
 
 When you must ask the user to choose:
 
-1. Call `mcp__plugin_bulldozer_bulldozer__listProjects`.
+1. Call `mcp__plugin_bulldozer_bulldozer__bdzListProjects`.
 2. Present the list with an incrementing number, the project name, and the project ID, e.g.:
 
    ```

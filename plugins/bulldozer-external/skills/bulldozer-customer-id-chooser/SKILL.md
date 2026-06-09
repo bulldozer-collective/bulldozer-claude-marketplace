@@ -10,7 +10,7 @@ allowed-tools:
 effort: |
   low
 paths:
-  - bulldozer.json
+  - "bulldozer.json"
 ---
 
 # Bulldozer Customer ID Chooser

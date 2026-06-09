@@ -13,8 +13,8 @@ allowed-tools:
 effort: |
   low
 paths:
-  - bulldozer.json
-  - .gitignore
+  - "bulldozer.json"
+  - ".gitignore"
 ---
 
 # Bulldozer Config File

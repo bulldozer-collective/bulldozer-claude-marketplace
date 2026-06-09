@@ -7,15 +7,15 @@ when-to-use: |
   Use this skill whenever the user requests data about one of their Google Adwords accounts. Google ads, Google Adwords, and SEA are synonyms. The user may just use the word "keywords" to refer to their Google Adwords keywords. Some examples of requests: "what are my best keywords for last month", "list all the google ads campaigns running at the moment", "show me ad group performance", "which campaigns spent the most this week".
 user-invocable: false
 allowed-tools:
-  - mcp__plugin_bulldozer_bulldozer__listGoogleAdwordAccounts
-  - mcp__plugin_bulldozer_bulldozer__searchAvailableGoogleAdwordAccounts
-  - mcp__plugin_bulldozer_bulldozer__addGoogleAdwordAccount
-  - mcp__plugin_bulldozer_bulldozer__listSeaL1s
-  - mcp__plugin_bulldozer_bulldozer__listSeaL2s
-  - mcp__plugin_bulldozer_bulldozer__listSeaL3s
-  - mcp__plugin_bulldozer_bulldozer__getSeaL1Metrics
-  - mcp__plugin_bulldozer_bulldozer__getSeaL2Metrics
-  - mcp__plugin_bulldozer_bulldozer__getSeaL3Metrics
+  - mcp__plugin_bulldozer_bulldozer__bdzListGoogleAdwordAccounts
+  - mcp__plugin_bulldozer_bulldozer__bdzSearchAvailableGoogleAdwordAccounts
+  - mcp__plugin_bulldozer_bulldozer__bdzAddGoogleAdwordAccount
+  - mcp__plugin_bulldozer_bulldozer__bdzListSeaL1s
+  - mcp__plugin_bulldozer_bulldozer__bdzListSeaL2s
+  - mcp__plugin_bulldozer_bulldozer__bdzListSeaL3s
+  - mcp__plugin_bulldozer_bulldozer__bdzGetSeaL1Metrics
+  - mcp__plugin_bulldozer_bulldozer__bdzGetSeaL2Metrics
+  - mcp__plugin_bulldozer_bulldozer__bdzGetSeaL3Metrics
   - Read
   - Write
   - Edit
@@ -99,12 +99,12 @@ GoogleAdwordAccount          <- registered account (adwordCustomerId, optional a
 
 When `.sea.adAccount` is missing or incomplete in `bulldozer.json`:
 
-1. **List registered accounts** with `mcp__plugin_bulldozer_bulldozer__listGoogleAdwordAccounts`.
+1. **List registered accounts** with `mcp__plugin_bulldozer_bulldozer__bdzListGoogleAdwordAccounts`.
    - If it returns one or more accounts, present a **numbered list** showing for each entry the index, `adwordLoginId`, `adwordCustomerId`, and any human-readable label, then ask the user to pick one by number.
    - If it returns zero accounts:
-     - Call `mcp__plugin_bulldozer_bulldozer__searchAvailableGoogleAdwordAccounts`.
+     - Call `mcp__plugin_bulldozer_bulldozer__bdzSearchAvailableGoogleAdwordAccounts`.
      - Present the results as a numbered list (index, `adwordLoginId`, `adwordCustomerId`, label) and ask the user to pick one.
-     - Register it with `mcp__plugin_bulldozer_bulldozer__addGoogleAdwordAccount`.
+     - Register it with `mcp__plugin_bulldozer_bulldozer__bdzAddGoogleAdwordAccount`.
      - If the search also returns nothing, abort and explain that no Google Ad accounts are accessible.
 2. **Persist the choice** by writing `.sea.adAccount = { adwordLoginId, adwordCustomerId }` into `bulldozer.json`. Read the existing JSON, merge the new key, and write it back. Preserve every other key (including `customerId`, `projectId`, and any non-SEA sections). Create the `sea` object if it does not exist.
 3. **Return** the resolved `{ adwordLoginId, adwordCustomerId }` and continue with the user's original request.
@@ -115,9 +115,9 @@ All operations require `customerId`, `projectId`, `adwordLoginId`, and `adwordCu
 
 ### Listing entities
 
-- `mcp__plugin_bulldozer_bulldozer__listSeaL1s` — campaigns
-- `mcp__plugin_bulldozer_bulldozer__listSeaL2s` — ad groups (filter by `l1Id` when possible)
-- `mcp__plugin_bulldozer_bulldozer__listSeaL3s` — keywords (filter by `l1Id` and/or `l2Id` when possible)
+- `mcp__plugin_bulldozer_bulldozer__bdzListSeaL1s` — campaigns
+- `mcp__plugin_bulldozer_bulldozer__bdzListSeaL2s` — ad groups (filter by `l1Id` when possible)
+- `mcp__plugin_bulldozer_bulldozer__bdzListSeaL3s` — keywords (filter by `l1Id` and/or `l2Id` when possible)
 
 **Volume guidance:** L3 (keyword) lists can be very large. Always prefer to:
 - Filter by `l1Id` or `l2Id` before listing L3s.
@@ -126,9 +126,9 @@ All operations require `customerId`, `projectId`, `adwordLoginId`, and `adwordCu
 
 ### Getting metrics
 
-- `mcp__plugin_bulldozer_bulldozer__getSeaL1Metrics`
-- `mcp__plugin_bulldozer_bulldozer__getSeaL2Metrics`
-- `mcp__plugin_bulldozer_bulldozer__getSeaL3Metrics`
+- `mcp__plugin_bulldozer_bulldozer__bdzGetSeaL1Metrics`
+- `mcp__plugin_bulldozer_bulldozer__bdzGetSeaL2Metrics`
+- `mcp__plugin_bulldozer_bulldozer__bdzGetSeaL3Metrics`
 
 **Date range guidance:** Metrics tools require an explicit date range. Translate natural-language ranges into explicit `from`/`to` ISO dates (`YYYY-MM-DD`) before calling:
 - "last month" → first to last day of the previous calendar month.

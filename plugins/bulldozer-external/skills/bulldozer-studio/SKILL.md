@@ -1,16 +1,16 @@
 ---
-name: Bulldozer Studio
-description: Generate images and videos via the Bulldozer Studio using prompts and optional imported assets.
+name: |
+  Bulldozer Studio
+description: |
+  Generate images and videos via the Bulldozer Studio using prompts and optional imported assets.
 when-to-use: |
   Use when the user wants to produce visual creative assets via Bulldozer — e.g., requests to generate, create, make, render, or produce images, videos, creatives, visuals, or ads.
 user-invocable: false
 allowed-tools:
-  - mcp__plugin_bulldozer_bulldozer__createStudioJob
-  - mcp__plugin_bulldozer_bulldozer__importStudioAsset
-  - mcp__plugin_bulldozer_bulldozer__getStudioJob
-  - mcp__plugin_bulldozer_bulldozer__listStudioJobs
-  - mcp__plugin_bulldozer_bulldozer__listStudioAgents
-effort: low
+  - mcp__plugin_bulldozer_bulldozer__bdzCreateStudioJob
+  - mcp__plugin_bulldozer_bulldozer__bdzImportStudioAsset
+effort: |
+  low
 ---
 
 # Bulldozer Studio
@@ -19,7 +19,7 @@ The Bulldozer Studio generates images and videos from a text prompt and zero or 
 
 ## Core Rules
 
-- The prompt **cannot** reference an image by its URL. Any asset must first be imported via `mcp__plugin_bulldozer_bulldozer__importStudioAsset` to obtain an `asset_id`.
+- The prompt **cannot** reference an image by its URL. Any asset must first be imported via `mcp__plugin_bulldozer_bulldozer__bdzImportStudioAsset` to obtain an `asset_id`.
 - Inside the prompt, an asset can **only** be referred to by its `asset-uuid` (see example below).
 - Phrases like *"based on the provided images"* or *"use the provided asset as inspiration"* are silently ignored by the Studio. Always reference assets by uuid instead.
 - Do **not** add styling rules to the prompt on your own. Only include styling guidance if the user explicitly stated it.
@@ -27,10 +27,10 @@ The Bulldozer Studio generates images and videos from a text prompt and zero or 
 ## End-to-End Workflow
 
 1. **Detect intent**: Confirm the user wants an image or a video, and clarify which one if ambiguous.
-2. **Collect assets**: If the user references any external image/URL/file, import each one via `mcp__plugin_bulldozer_bulldozer__importStudioAsset` and keep the returned `asset_id`.
+2. **Collect assets**: If the user references any external image/URL/file, import each one via `mcp__plugin_bulldozer_bulldozer__bdzImportStudioAsset` and keep the returned `asset_id`.
 3. **Ask about Tone of Voice**: Ask the user whether to apply the project's tone of voice, unless they have already stated a preference in the current conversation. Use the answer as the `useTov` argument (boolean).
 4. **Build the prompt**: Use the user's wording. Reference any imported asset by its uuid inside the prompt (e.g., `{{asset:<asset-uuid>}}`). Do not inject styling unless the user asked for it.
-5. **Create the job**: Call `mcp__plugin_bulldozer_bulldozer__createStudioJob` with the prompt, `useTov`, the asset ids (if any), and the desired output type (image or video).
+5. **Create the job**: Call `mcp__plugin_bulldozer_bulldozer__bdzCreateStudioJob` with the prompt, `useTov`, the asset ids (if any), and the desired output type (image or video).
 6. **Set expectations**: Tell the user the expected wait time:
    - Image: ~20 seconds
    - Video: ~60 seconds
