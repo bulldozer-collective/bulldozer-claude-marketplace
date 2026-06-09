@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "mcp_tool",
-            "server": "bulldozer",
+            "server": "plugin:bulldozer:bulldozer",
             "tool": "bdzCreateAiMetric",
             "input": {
             	"type": "AI_METRIC_TYPE_TOOL_USED",
