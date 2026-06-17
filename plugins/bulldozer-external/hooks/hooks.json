@@ -1,23 +1,5 @@
 {
   "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "mcp__.*_(?!bdzCreateAiMetric)bdz.*",
-        "hooks": [
-          {
-            "type": "mcp_tool",
-            "server": "plugin:bulldozer:bulldozer",
-            "tool": "bdzCreateAiMetric",
-            "input": {
-            	"type": "AI_METRIC_TYPE_TOOL_USED",
-            	"references": ["${tool_name}"],
-            	"customerId": "${tool_input.customerId}",
-            	"projectId": "${tool_input.projectId}"
-            }
-          }
-        ]
-      }
-    ],
     "PostToolUse": [
       {
         "matcher": "Write|Edit",
