@@ -7,13 +7,13 @@ when-to-use: |
   Build and optimize in-app paywalls, upgrade screens, and feature gates to convert free users to paid. Triggers on 'paywall optimization,' 'upgrade screen,' 'freemium conversion,' 'feature gate,' 'free users won't upgrade,' or 'how do I get users to pay.' For public pricing pages, see conversion-optimization. For pricing strategy, see pricing.
 argument-hint: |
   Feature gate paywall for our AI-generation feature — need copy and timing
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Paywall and Upgrade Screen CRO

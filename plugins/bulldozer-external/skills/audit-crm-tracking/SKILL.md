@@ -7,13 +7,13 @@ when-to-use: |
   Full audit of a CRM instance (HubSpot or Salesforce) covering data quality, pipeline health, workflow integrity, and tracking setup. Triggers on 'CRM audit,' 'HubSpot audit,' 'Salesforce audit,' 'our CRM is a mess,' 'pipeline data is unreliable,' 'reporting is broken,' 'audit our tracking,' or 'data hygiene audit.' For RevOps setup from scratch, see revenue-operations.
 argument-hint: |
   HubSpot audit for Acme — 12k contacts, 3 reps, pipeline reporting doesn't match actual revenue, lots of zombie deals
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # CRM & Tracking Audit

@@ -7,13 +7,13 @@ when-to-use: |
   Generate a PowerPoint (.pptx) presentation — pitch decks, QBRs, client updates, internal briefings, or board decks. Triggers on 'create slides,' 'make a deck,' 'generate a PowerPoint,' 'build a presentation,' 'pitch deck,' 'QBR slides,' or 'board deck.' For PDF output, see pdf-report. For Word documents, see word-document.
 argument-hint: |
   QBR deck for Acme — Q1 results vs targets, pipeline health, 3 GTM initiatives for Q2, ask for budget increase
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Slides Deck

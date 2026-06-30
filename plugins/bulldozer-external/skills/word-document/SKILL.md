@@ -7,13 +7,13 @@ when-to-use: |
   Generate a formatted Word (.docx) document — proposals, statements of work, contracts, client reports, or internal documentation. Triggers on 'create a Word doc,' 'generate a .docx,' 'write a proposal,' 'draft an SOW,' 'make a contract,' or 'client documentation.' For PDF output, see pdf-report. For presentations, see slides-deck.
 argument-hint: |
   Statement of work for a 3-month GTM engagement with Acme — deliverables, timeline, pricing, payment terms
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Word Document

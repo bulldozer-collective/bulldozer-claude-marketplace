@@ -7,13 +7,13 @@ when-to-use: |
   Find co-marketing partners and plan joint campaigns — webinars, content, integrations, and cross-promotion. Triggers on 'co-marketing partner,' 'joint campaign,' 'partner marketing,' 'cross-promotion,' 'integration marketing,' or 'who should we partner with.' For customer referral programs, see referral-program. For launch partnerships, see launch.
 argument-hint: |
   B2B SaaS ops tool — find co-marketing partners and plan a joint webinar campaign
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Co-Marketing

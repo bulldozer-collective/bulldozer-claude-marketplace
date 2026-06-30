@@ -2,18 +2,18 @@
 name: |
   competitive-hiring
 description: |
-  Produce a monthly Competitive Hiring Signal Brief — track GTM headcount spikes, role distribution shifts, and geographic expansion signals across named competitors to anticipate strategic moves 3-6 months in advance. Triggers on 'competitive hiring signals,' 'what are competitors hiring for,' 'monitor competitor jobs,' 'hiring intelligence report,' 'competitive headcount analysis,' or 'what is competitor X building.' For full competitor profiling including product and messaging, see competitor-profiling. For battlecard creation, see battlecards.
+  Produces a Competitive Hiring Signal Brief: tracks competitor headcount growth, role distribution shifts, geographic expansion, and hiring spikes to anticipate strategic moves 3-6 months in advance.
 when-to-use: |
-  Produce a monthly Competitive Hiring Signal Brief — track GTM headcount spikes, role distribution shifts, and geographic expansion signals across named competitors to anticipate strategic moves 3-6 months in advance. Triggers on 'competitive hiring signals,' 'what are competitors hiring for,' 'monitor competitor jobs,' 'hiring intelligence report,' 'competitive headcount analysis,' or 'what is competitor X building.' For full competitor profiling including product and messaging, see competitor-profiling. For battlecard creation, see battlecards.
+  Trigger when the user asks: 'what are our competitors hiring for?', 'monitor competitor job postings', 'detect competitor hiring spikes', 'competitive headcount analysis', 'what is [competitor] building based on their hiring?', 'track competitor team expansion'. Not for full competitor profiling → use competitor-profiling. Not for battlecard creation → use battlecards. Not for our own hiring plan → use org-design-hiring-roadmap.
 argument-hint: |
   Competitors to track: Notion, Coda, Confluence. Want a monthly brief on GTM and product hiring signals — are they investing in sales, support, engineering? Any new geographies? 3 competitors, pull from LinkedIn job postings.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Competitive Hiring Signals

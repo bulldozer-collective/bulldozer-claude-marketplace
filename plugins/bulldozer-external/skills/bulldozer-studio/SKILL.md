@@ -1,6 +1,6 @@
 ---
 name: |
-  Bulldozer Studio
+  bulldozer-studio
 description: |
   Generate images and videos via the Bulldozer Studio using prompts and optional imported assets.
 when-to-use: |

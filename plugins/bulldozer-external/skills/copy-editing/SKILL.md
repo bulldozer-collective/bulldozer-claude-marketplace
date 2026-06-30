@@ -7,13 +7,13 @@ when-to-use: |
   Improve and tighten existing marketing copy without rewriting from scratch. Triggers on 'edit this copy,' 'copy sweep,' 'tighten this up,' 'this reads awkwardly,' 'sharpen the messaging,' or 'refresh this content.' For writing new copy from scratch, see copywriting.
 argument-hint: |
   Homepage hero section copy — paste the current version
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Copy Editing

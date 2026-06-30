@@ -7,13 +7,13 @@ when-to-use: |
   Build a winning B2B sales proposal — executive summary, problem statement, solution framing, ROI calculation, pricing presentation, social proof, and next steps. Triggers on 'proposal,' 'build a proposal,' 'write our sales proposal,' 'proposal template,' 'our proposals don't convert,' 'how to present pricing,' or 'proposal-to-close rate is low.' For sales process context, see sales-playbook. For competitive positioning in proposals, see battlecards.
 argument-hint: |
   €35K ACV SaaS deal — prospect is Head of RevOps at a Series B. Discovery confirmed: their CRM data is broken, attribution is missing, outbound volume is dropping. Need a proposal that justifies the €35K and closes in 2 weeks.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Proposal Builder

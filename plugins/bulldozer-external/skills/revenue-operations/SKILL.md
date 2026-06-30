@@ -7,13 +7,13 @@ when-to-use: |
   Design CRM lifecycle stages, lead scoring, routing rules, and marketing-to-sales handoff processes. Triggers on 'lead scoring,' 'lead routing,' 'MQL to SQL,' 'marketing-to-sales handoff,' 'pipeline stages,' or 'CRM automation.' For cold outreach, see cold-email. For email campaigns, see lifecycle-emails.
 argument-hint: |
   B2B SaaS, HubSpot CRM, SDR team of 5, need to define MQL criteria and routing rules
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # RevOps — CRM & Lifecycle

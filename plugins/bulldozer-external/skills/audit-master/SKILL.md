@@ -7,13 +7,13 @@ when-to-use: |
   Orchestrate a full GTM audit — SEO, paid, content, outbound, CRM tracking, website CRO, and brand positioning — routing to the right audit sub-skills based on what needs diagnosis. Triggers on 'full audit,' 'something isn't working, let's diagnose,' 'before we scale we need to audit,' 'find what's broken,' 'performance review,' or 'pre-investment audit.' For strategy after the audit, use Strategy Master. For channel execution, use Acquisition Master.
 argument-hint: |
   B2B SaaS, new CMO starting. Want a full 30-day GTM audit before setting strategy: SEO health, paid efficiency, outbound quality, CRM integrity, website conversion, and brand perception.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Audit Master

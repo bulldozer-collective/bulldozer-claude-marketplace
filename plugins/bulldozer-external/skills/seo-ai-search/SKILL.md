@@ -7,13 +7,13 @@ when-to-use: |
   Optimize content to get cited in AI-generated answers from ChatGPT, Perplexity, Google AI Overviews, Gemini, and Claude. Triggers on 'AI SEO,' 'answer engine optimization,' 'optimize for ChatGPT,' 'get cited by AI,' 'AI Overviews visibility,' or 'LLM citations.' For traditional SEO audits, see seo-audit. For structured data markup, see structured-data-schema.
 argument-hint: |
   saas-analytics-tool.com — want to appear in 'best analytics for startups' AI answers
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # AI SEO

@@ -7,13 +7,13 @@ when-to-use: |
   Build competitive battlecards — one page per competitor, covering when you win, when you lose, competitor strengths and weaknesses, head-to-head comparison, landmine questions, objection handlers, and a live-call talk track. Triggers on 'battlecard,' 'competitive battlecard,' 'how do we position against [competitor],' 'build competitive cards,' 'how to handle [competitor] in a deal,' or 'our reps don't know how to compete.' For deeper competitive research, see competitor-profiling. For win/loss data to feed battlecards, see win-loss-analysis.
 argument-hint: |
   Selling sales enablement software — main competitors are Highspot, Showpad, and Seismic. Our reps keep losing to Highspot on 'integrations' objection but we actually have better Salesforce depth.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Battlecards Generator

@@ -7,13 +7,13 @@ when-to-use: |
   Build a B2B event playbook — pre-event intelligence and outreach, on-site execution, lead qualification protocol, post-event follow-up cadence, and pipeline attribution. Triggers on 'event playbook,' 'conference strategy,' 'field event,' 'how to get ROI from events,' 'trade show playbook,' 'pre-event outreach,' 'post-event follow-up,' or 'we go to events but get no pipeline.' For broader content and demand gen, see content-strategy. For ABM account targeting at events, see account-based-marketing.
 argument-hint: |
   Attending SaaStr Europe (600 target attendees in ICP). 3-person team. Budget €15K. Goal: 25 pre-booked meetings, 8 opportunities created within 30 days.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Event Playbook

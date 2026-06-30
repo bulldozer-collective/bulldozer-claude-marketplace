@@ -7,13 +7,13 @@ when-to-use: |
   Build a complete recruitment package for a GTM or ops hire — role scorecard, job description (200–350 words), structured interview kit with stage-specific questions and scoring rubrics, offer decision framework, and 30/60/90-day onboarding plan. Triggers on 'recruitment package,' 'job description,' 'interview kit,' 'hiring for,' 'write a JD,' 'scorecard for,' 'we're hiring a,' or 'how should we interview for.' For org design context, see org-design-hiring-roadmap. For headcount planning, see budget-resources-planning.
 argument-hint: |
   Hiring a mid-market AE for a Series B SaaS company. €700K quota, 3–6 month sales cycle, HubSpot, 5-stage pipeline. ICP is RevOps and Head of Sales at 100–500 person companies. Looking for someone who can run a full cycle and multi-thread.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Recruitment Package

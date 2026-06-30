@@ -7,13 +7,13 @@ when-to-use: |
   Define the North Star Metric and map growth loops that compound user acquisition and retention. Triggers on 'north star metric,' 'growth loops,' 'define our key metric,' 'growth flywheel,' or 'retention loop.' For paid acquisition strategy, see paid-strategy. For referral loops specifically, see referral-program.
 argument-hint: |
   B2B project management SaaS, PLG motion, 500 teams, want to find our NSM and growth loops
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # North Star Metric & Growth Loops

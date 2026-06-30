@@ -7,13 +7,13 @@ when-to-use: |
   Design or audit sales compensation plans — OTE, quota, accelerators, and commission structure for AEs and SDRs. Triggers on 'sales comp plan,' 'OTE,' 'commission structure,' 'quota setting,' 'accelerator,' 'sales rep compensation,' or 'how should I pay my sales team.' For CRM and pipeline operations, see revenue-operations. For deal review and close strategy, see pipeline-deal-review.
 argument-hint: |
   Early-stage B2B SaaS, first AE hire, $30K ACV, need to design first comp plan with OTE and quota
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Sales Compensation

@@ -7,13 +7,13 @@ when-to-use: |
   Design, run, and systematize A/B tests and experimentation programs. Triggers on 'A/B test,' 'split test,' 'run an experiment,' 'test this change,' 'statistical significance,' 'ICE score,' or 'experiment backlog.' For tracking implementation, see analytics-tracking. For page-level conversion optimization, see conversion-optimization.
 argument-hint: |
   Homepage CTA button copy — want to test urgency vs. benefit framing
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # A/B Testing

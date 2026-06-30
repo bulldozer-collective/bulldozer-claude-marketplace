@@ -7,13 +7,13 @@ when-to-use: |
   Develop closing tactics, handle final objections, and build negotiation strategies for specific deals at contract stage. Triggers on 'closing tactics,' 'negotiation,' 'deal stuck at contract,' 'final objection,' or 'how to close.' For deal qualification and red flags, see pipeline-deal-review. For initial objection handling, see sales-enablement.
 argument-hint: |
   Deal at $180k ACV, procurement wants 25% discount, legal wants unusual IP clause, decision by end of quarter
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Negotiation & Closing

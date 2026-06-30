@@ -7,13 +7,13 @@ when-to-use: |
   Audit a website's SEO and produce a prioritized action plan. Triggers on 'SEO audit,' 'technical SEO,' 'why am I not ranking,' 'my traffic dropped,' 'lost rankings,' or 'crawl errors.' Also triggers on vague 'my SEO is bad.' For pages at scale, see programmatic-seo. For structured data, see structured-data-schema. For AI search optimization, see seo-ai-search.
 argument-hint: |
   https://example.com — traffic dropped 40% last month
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # SEO Audit

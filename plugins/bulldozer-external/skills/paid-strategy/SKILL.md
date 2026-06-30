@@ -7,13 +7,13 @@ when-to-use: |
   Select paid channels, allocate budget across platforms, and define measurement framework for a paid acquisition strategy. Triggers on 'which paid channel should I use,' 'media mix,' 'paid acquisition strategy,' 'how to allocate ad budget,' or 'paid growth strategy.' For platform-specific execution, see meta-ads, google-ads, or linkedin-ads.
 argument-hint: |
   B2B SaaS $200/mo ACV, $20k/mo budget, trying to scale beyond content
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Paid Acquisition Strategy

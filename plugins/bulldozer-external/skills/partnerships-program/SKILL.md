@@ -7,13 +7,13 @@ when-to-use: |
   Design and launch a B2B partnerships program — partner type selection, deal economics, standard terms, deal registration, enablement, operating cadence, and 12-month ramp. Triggers on 'partnerships program,' 'partner channel,' 'build a partner program,' 'reseller program,' 'referral program,' 'co-sell motion,' 'channel partners,' or 'we want partnerships to drive revenue.' For affiliate programs specifically, see affiliate-program. For co-marketing motions, see co-marketing.
 argument-hint: |
   B2B SaaS, €8M ARR, proven repeatable sales playbook — want to launch a referral + co-sell partner motion targeting digital agencies and complementary SaaS vendors, targeting 20% of ARR from partners in 18 months
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Partnerships Program

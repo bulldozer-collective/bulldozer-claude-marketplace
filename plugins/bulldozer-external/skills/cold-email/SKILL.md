@@ -7,13 +7,13 @@ when-to-use: |
   Write B2B cold emails and multi-touch follow-up sequences that get replies from prospects. Triggers on 'cold outreach,' 'prospecting email,' 'outbound email,' 'SDR emails,' 'follow-up email sequence,' or 'nobody's replying to my emails.' For warm/lifecycle emails, see lifecycle-emails. For sales collateral, see sales-enablement.
 argument-hint: |
   Targeting VP of Ops at Series A-B SaaS companies, selling process automation, want a 5-email sequence
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Cold Email Writing

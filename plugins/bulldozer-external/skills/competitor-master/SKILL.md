@@ -7,13 +7,13 @@ when-to-use: |
   Orchestrate competitive intelligence — profiling, hiring signals, positioning matrix, and monitoring — routing to the right sub-skills based on the competitive question. Triggers on 'I need competitive intelligence,' 'how do we position against X,' 'we lost a deal to a competitor,' 'build competitive battlecards,' 'help me understand the landscape,' or 'set up competitor monitoring.' For brand positioning strategy, use Strategy Master. For sales battlecard use, see battlecards directly.
 argument-hint: |
   B2B SaaS, losing deals to Competitor A (2x/month). Sales team has no battlecards. 3 main competitors to track. Want: battlecards, hiring signals brief, and a monitoring dashboard.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Competitor Master

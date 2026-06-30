@@ -7,13 +7,13 @@ when-to-use: |
   Produce a complete website project brief — business context, conversion goals, sitemap, audience and messaging requirements, design references, technical constraints, content ownership, timeline, and approval process. Triggers on 'website brief,' 'website redesign brief,' 'brief for our agency,' 'brief for website build,' 'write our web brief,' 'we need to brief a developer,' or 'how do we kick off a website project.' For brand positioning, see brand-platform. For conversion rate analysis, see audit-website-cro.
 argument-hint: |
   Series A SaaS, redesigning the website to support a new positioning. Existing Webflow site, 6 pages, needs to be redesigned with a new homepage, product page, pricing page, and 2 case study pages. Agency kick-off in 2 weeks, budget €25K.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Website Brief

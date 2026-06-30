@@ -2,18 +2,18 @@
 name: |
   paid-reporting-dashboard
 description: |
-  Build the paid advertising reporting system for a B2B GTM team — UTM taxonomy, offline conversion upload, CRM attribution integration, dashboard structure connecting ad spend to pipeline and closed revenue, and benchmark scorecards with 30/90/180-day ROAS windows. Triggers on 'paid reporting,' 'ad performance dashboard,' 'connect ads to revenue,' 'paid attribution setup,' 'what campaigns are working,' 'ad spend to pipeline,' or 'our paid reporting only shows impressions.' For audience architecture, see audience-architecture. For attribution model selection, see attribution-funnel.
+  Builds the paid advertising reporting system for a B2B GTM team: UTM taxonomy, offline conversion upload, CRM attribution integration, dashboard connecting ad spend to pipeline and closed revenue, and benchmark scorecards with 30/90/180-day ROAS windows.
 when-to-use: |
-  Build the paid advertising reporting system for a B2B GTM team — UTM taxonomy, offline conversion upload, CRM attribution integration, dashboard structure connecting ad spend to pipeline and closed revenue, and benchmark scorecards with 30/90/180-day ROAS windows. Triggers on 'paid reporting,' 'ad performance dashboard,' 'connect ads to revenue,' 'paid attribution setup,' 'what campaigns are working,' 'ad spend to pipeline,' or 'our paid reporting only shows impressions.' For audience architecture, see audience-architecture. For attribution model selection, see attribution-funnel.
+  Trigger when the user asks: 'set up our paid reporting dashboard', 'connect ad spend to revenue', 'build our UTM taxonomy', 'what campaigns are working?', 'our paid reporting only shows impressions', 'we need a paid attribution setup'. Not for audience segmentation → use audience-architecture. Not for attribution model selection → use attribution-funnel.
 argument-hint: |
   Series B SaaS, €80K/quarter on Google + LinkedIn. GA4 + HubSpot. Reporting only shows impressions and CPL. Leadership wants to see pipeline and closed revenue attribution per campaign before the next budget cycle in 3 weeks.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Paid Reporting Dashboard

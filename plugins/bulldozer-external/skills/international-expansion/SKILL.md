@@ -7,13 +7,13 @@ when-to-use: |
   Plan go-to-market entry into a new geographic market: localization checklist, regulatory considerations, channel adaptation, pricing adjustments, and hiring priorities. Triggers on 'expand to,' 'international expansion,' 'new market,' 'localization,' or 'enter the French market.' For ABM in a new market, see account-based-marketing. For pricing strategy, see pricing.
 argument-hint: |
   B2B SaaS expanding from US to France — currently 50 French trials, no French-language support
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # International Expansion

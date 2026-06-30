@@ -7,13 +7,13 @@ when-to-use: |
   Implement schema markup and structured data to enable rich search results and improve AI content understanding. Triggers on 'schema markup,' 'structured data,' 'JSON-LD,' 'rich snippets,' 'FAQ schema,' or 'star ratings in search.' For broader SEO, see seo-audit. For AI search optimization, see seo-ai-search.
 argument-hint: |
   Blog post pages — want FAQ schema and Article markup
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Schema Markup

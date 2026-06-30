@@ -7,13 +7,13 @@ when-to-use: |
   Research and profile competitors from their URLs — positioning, pricing, SEO strength, and product gaps. Triggers on 'competitor profile,' 'competitive intelligence,' 'competitor analysis,' 'profile this competitor,' 'competitive audit,' or 'competitor dossier.' For comparison landing pages, see competitor-alternatives. For sales battle cards, see sales-enablement.
 argument-hint: |
   https://competitor.com https://competitor2.com — deep profile, focus on pricing and positioning
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Competitor Profiling

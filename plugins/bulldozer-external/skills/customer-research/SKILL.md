@@ -7,13 +7,13 @@ when-to-use: |
   Run, analyze, and synthesize customer research — VOC, interview analysis, review mining, JTBD mapping. Triggers on 'voice of customer,' 'customer interviews,' 'review mining,' 'jobs to be done,' 'G2 reviews,' 'Reddit mining,' or 'find out why customers churn.' For copy informed by research, see copywriting. For page optimization from research, see conversion-optimization.
 argument-hint: |
   Analyze 10 customer interview transcripts — extract JTBD, pain points, and copy-ready quotes
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Customer Research

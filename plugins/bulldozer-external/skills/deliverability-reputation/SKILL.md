@@ -7,13 +7,13 @@ when-to-use: |
   Audit and fix email deliverability — DNS authentication setup (SPF/DKIM/DMARC), domain warming protocol, bounce and spam rate benchmarks, inbox placement testing, and reputation recovery. Triggers on 'deliverability,' 'emails going to spam,' 'inbox placement,' 'domain reputation,' 'email warmup,' 'bounce rate,' 'our emails aren't getting through,' or 'set up DMARC.' For outbound sequence strategy, see audit-outbound. For automation stack, see growth-automation.
 argument-hint: |
   Sales team sending 500 emails/day from primary domain — bounce rate at 4.2%, spam complaints rising, inbox placement dropped to 60%. Need to diagnose and fix before the next campaign.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Deliverability & Reputation

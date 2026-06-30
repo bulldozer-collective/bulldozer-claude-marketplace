@@ -7,13 +7,13 @@ when-to-use: |
   Produce a B2B case study — customer interview guide, before/how/after narrative structure, snapshot metrics box, and a publish-ready 1500-2000 word document with multi-format variants. Triggers on 'write a case study,' 'customer success story,' 'case study template,' 'client proof document,' 'before and after story,' or 'customer story for sales.' For win/loss intelligence from buyers, see win-loss-analysis. For general copywriting, see copywriting.
 argument-hint: |
   SaaS company, customer reduced time-to-publish from 3 weeks to 2 days using our CMS. Customer is happy to be quoted, happy to share metrics, CMO and Head of Content both involved in the decision. Want a case study to use on the website and in sales d
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Case Study Writer

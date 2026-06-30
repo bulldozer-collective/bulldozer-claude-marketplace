@@ -7,13 +7,13 @@ when-to-use: |
   Audit and fix a B2B CRM database — deduplication protocol, field completeness assessment, enrichment waterfall design, data decay prevention, validation rules, and a standing hygiene cadence. Triggers on 'database hygiene,' 'CRM cleanup,' 'our CRM data is bad,' 'data enrichment,' 'deduplicate contacts,' 'bad data in HubSpot,' 'contacts with missing fields,' or 'our outbound bounce rate is high.' For CRM architecture, see crm-strategy. For CRM configuration, see crm-setup.
 argument-hint: |
   Series B SaaS, 45K contacts in HubSpot. Bounce rate at 3.8% on outbound sequences. 40% of contacts missing industry or company size. Lead scoring broken because scoring fields are empty. Need a full audit + enrichment pass before next campaign.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Database Hygiene & Enrichment

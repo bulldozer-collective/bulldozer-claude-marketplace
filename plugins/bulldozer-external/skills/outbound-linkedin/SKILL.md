@@ -7,13 +7,13 @@ when-to-use: |
   Build and run a LinkedIn outbound sequence — connection requests, DM templates, voice note scripts, and multi-channel cadence — anchored to a verifiable buying signal. Triggers on 'LinkedIn outreach,' 'LinkedIn sequence,' 'outbound on LinkedIn,' 'write my LinkedIn messages,' 'LinkedIn prospecting,' or 'cold outreach LinkedIn.' For cold email, see cold-email. For signal identification, see signal-based-outbound. For LinkedIn paid, see linkedin-ads.
 argument-hint: |
   VP Sales at Series B SaaS — just posted about scaling their SDR team. I sell sales enablement tooling. Need a 5-touch LinkedIn + email sequence.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Outbound LinkedIn

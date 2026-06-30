@@ -7,13 +7,13 @@ when-to-use: |
   Increase conversions on marketing pages — homepages, landing pages, pricing pages, and lead capture forms. Triggers on 'CRO,' 'this page isn't converting,' 'improve conversions,' 'my landing page sucks,' 'form abandonment,' or 'this page needs work.' Also triggers when a URL is shared with a request for feedback. For signup flows, see signup-optimization. For popups, see popups.
 argument-hint: |
   https://example.com/pricing — trial signups are low despite high traffic
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Conversion Rate Optimization (CRO)

@@ -7,13 +7,13 @@ when-to-use: |
   Build sales collateral — pitch decks, one-pagers, objection handling docs, demo scripts, and proposals — that reps actually use to close deals. Triggers on 'sales deck,' 'pitch deck,' 'one-pager,' 'objection handling,' 'demo script,' or 'talk track.' For competitor comparison pages and battle cards, see competitor-alternatives. For cold outreach, see cold-email.
 argument-hint: |
   Need a one-pager for VP of Sales at mid-market companies — post-discovery leave-behind
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Sales Enablement

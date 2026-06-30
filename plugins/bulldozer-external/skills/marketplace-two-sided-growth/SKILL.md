@@ -7,13 +7,13 @@ when-to-use: |
   Design the growth strategy for a two-sided marketplace — supply-first cold start sequencing, liquidity threshold definition, demand-side acquisition phasing, take rate calibration, disintermediation defense, and the expansion model from beachhead to market. Triggers on 'marketplace growth,' 'two-sided platform,' 'chicken-and-egg problem,' 'supply and demand balance,' 'marketplace liquidity,' 'how do we grow our marketplace,' or 'we need buyers and sellers at the same time.' For broader retention strategy, see customer-health-expansion.
 argument-hint: |
   B2B marketplace connecting mid-market companies with fractional CFOs. 120 verified CFOs on supply side, 45 active buyer companies. Liquidity ratio is 28% (searches to completed matches). Supply density is too thin to run paid acquisition. Need a stra
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Marketplace Two-Sided Growth

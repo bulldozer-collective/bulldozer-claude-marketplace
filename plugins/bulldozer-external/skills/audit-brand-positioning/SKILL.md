@@ -7,13 +7,13 @@ when-to-use: |
   Diagnostic audit of a brand's positioning, messaging, and competitive differentiation. Triggers on 'brand audit,' 'positioning audit,' 'our messaging is confused,' 'brand is not working,' 'why are we losing deals to competitors,' 'messaging audit,' 'positioning is unclear,' or 'brand positioning review.' For content strategy, see content-strategy. For competitive intelligence, see competitor-profiling.
 argument-hint: |
   Acme B2B SaaS — messaging feels generic, sales keeps discounting, win rate dropped 8 points, 3 competitors launched with similar positioning this year
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Brand & Positioning Audit

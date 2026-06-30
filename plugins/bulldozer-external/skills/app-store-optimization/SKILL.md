@@ -7,13 +7,13 @@ when-to-use: |
   Audit and optimize App Store or Google Play listings to improve ranking and conversion. Triggers on 'ASO audit,' 'app store optimization,' 'optimize my app listing,' 'improve app conversion,' 'why aren't people downloading my app,' or 'keyword optimization for app.' Also triggers when the user shares an App Store or Google Play URL.
 argument-hint: |
   https://apps.apple.com/us/app/myapp/id123456789
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # ASO Audit

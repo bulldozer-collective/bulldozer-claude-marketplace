@@ -7,13 +7,13 @@ when-to-use: |
   Design or optimize SaaS pricing — tiers, value metrics, packaging, and willingness-to-pay research. Triggers on 'pricing tiers,' 'willingness to pay,' 'how much should I charge,' 'my pricing is wrong,' 'freemium vs paid,' 'annual discount strategy,' or 'Van Westendorp.' For in-app upgrade screens, see paywalls. For cancel flows, see churn-prevention.
 argument-hint: |
   B2B SaaS, current pricing $29/$99/$249 per month, high conversion on $29 plan but almost no upgrades — redesign pricing
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Pricing Strategy

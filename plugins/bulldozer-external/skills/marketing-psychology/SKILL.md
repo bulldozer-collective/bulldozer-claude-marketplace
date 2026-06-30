@@ -7,13 +7,13 @@ when-to-use: |
   Apply behavioral science and psychological principles to a specific marketing challenge — page, copy, offer, or flow. Triggers on 'cognitive bias,' 'behavioral science,' 'why people buy,' 'social proof,' 'loss aversion,' 'apply psychology to,' or 'mental models for marketing.' For page optimization, see conversion-optimization. For copy framing, see copywriting. For pricing tactics, see pricing.
 argument-hint: |
   Apply psychology to our pricing page — high traffic but low conversion to the Pro plan
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Marketing Psychology

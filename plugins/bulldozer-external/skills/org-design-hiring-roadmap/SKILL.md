@@ -7,13 +7,13 @@ when-to-use: |
   Design the GTM org structure and sequence the hiring roadmap — role prioritization by revenue impact, headcount model by ARR milestone, hiring sequence logic, reporting lines, and span-of-control standards. Triggers on 'org design,' 'hiring roadmap,' 'who should I hire next,' 'GTM team structure,' 'hiring plan,' 'building out my team,' 'sales org chart,' or 'how do I scale my GTM team.' For team performance audit, see team-assessment. For budget and headcount planning, see budget-resources-planning.
 argument-hint: |
   Series A, €2.4M ARR. Founder-led sales closing, 1 AE hired 3 months ago hitting quota. 12-month target: €5M ARR. Budget for 4 GTM hires. Need to know who to hire, in what order, and what the org looks like at €5M.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Org Design & Hiring Roadmap

@@ -7,13 +7,13 @@ when-to-use: |
   Audit a GTM or revenue team — skills gap analysis, role clarity assessment, quota attainment review, capacity model, and a prioritized action plan. Triggers on 'team assessment,' 'skills gap analysis,' 'assess my team,' 'do we have the right people,' 'team audit,' 'sales team performance review,' 'where is my team weak,' or 'our team is not scaling.' For hiring roadmap, see org-design-hiring-roadmap. For budget planning, see budget-resources-planning.
 argument-hint: |
   Series B SaaS, 8-person GTM team: 3 AEs, 2 SDRs, 1 RevOps, 1 marketing generalist, 1 CS. ARR €3.2M. Only 1 of 3 AEs hit quota last quarter. SDR to SQL conversion at 9%. Need to know who to retain, who to upskill, and what role to hire next.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Team Assessment & Gap Analysis

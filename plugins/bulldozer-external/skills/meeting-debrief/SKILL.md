@@ -7,13 +7,13 @@ when-to-use: |
   Turn a meeting transcript or recording into a structured 1-page debrief — decisions logged, action items with owners and deadlines, and a push to Notion and Slack. Triggers on 'debrief this meeting,' 'meeting summary,' 'extract action items from transcript,' 'write up the meeting,' 'meeting notes from Claap,' or 'what did we decide.' For full sales call analysis and pipeline intelligence, see pipeline-deal-review. For customer interview synthesis, see customer-research.
 argument-hint: |
   Claap transcript from a 1-hour strategy meeting with the exec team. Need a 1-pager with decisions, action items (owner + deadline), and key context. Push to the #exec-sync Slack channel and create a Notion page in the Meeting Notes database.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Meeting Debrief

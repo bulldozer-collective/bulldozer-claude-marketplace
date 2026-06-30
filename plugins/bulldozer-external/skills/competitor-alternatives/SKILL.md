@@ -7,13 +7,13 @@ when-to-use: |
   Build competitor comparison and alternative pages that rank for competitive search terms. Triggers on 'alternative page,' 'vs page,' 'competitor comparison page,' 'alternatives to X,' 'X vs Y landing page,' or 'competitive landing pages.' For competitive intelligence and profiles, see competitor-profiling. For sales battle cards, see sales-enablement.
 argument-hint: |
   Build a '[Competitor] alternatives' page and a 'Us vs [Competitor]' comparison page
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Competitor & Alternative Pages

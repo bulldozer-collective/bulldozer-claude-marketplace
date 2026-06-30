@@ -7,13 +7,13 @@ when-to-use: |
   Build a revenue attribution model and full-funnel analytics system — model selection, touchpoint mapping, CRM data requirements, channel ROI calculation, and a standing attribution report. Triggers on 'attribution model,' 'funnel analytics,' 'which channels drive revenue,' 'marketing attribution,' 'how do we measure ROI by channel,' 'what's driving our pipeline,' or 'our marketing metrics don't connect to revenue.' For weekly growth tracking, see weekly-growth-review. For cohort-level analysis, see cohort-mmm.
 argument-hint: |
   B2B SaaS, €8M ARR, 60-day sales cycle, mix of outbound and inbound — using HubSpot. Currently only tracking last-touch, want to understand full-funnel contribution by channel.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Attribution & Funnel Analytics

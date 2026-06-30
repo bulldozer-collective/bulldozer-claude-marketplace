@@ -7,13 +7,13 @@ when-to-use: |
   Run a win/loss analysis program — structured buyer interviews, pattern extraction, competitive intelligence, and action-owner mapping. Triggers on 'win loss analysis,' 'why are we losing deals,' 'analyze lost deals,' 'win loss program,' 'why are we winning,' 'deal debrief,' or 'competitive intelligence from buyers.' For battlecard creation from findings, see battlecards. For ICP refinement, see icp-builder.
 argument-hint: |
   B2B SaaS, 15 closed deals last quarter — 8 wins, 7 losses. Want to understand why we're losing to Competitor X and whether our discovery process is the gap.
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Win/Loss Analysis

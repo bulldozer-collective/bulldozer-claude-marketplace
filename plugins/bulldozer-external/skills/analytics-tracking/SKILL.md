@@ -7,13 +7,13 @@ when-to-use: |
   Set up, fix, or audit analytics tracking — conversion tracking, event tracking, UTM parameters, and tracking plans. Triggers on 'set up tracking,' 'conversion tracking,' 'event tracking,' 'UTM parameters,' 'tracking plan,' or 'analytics isn't working.' For A/B test measurement, see ab-testing.
 argument-hint: |
   Set up GA4 + GTM for a SaaS marketing site — need conversion tracking for demo requests
-disable-model-invocation: false
-user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
+effort: |
+  high
 ---
 
 # Analytics Tracking
