@@ -7,7 +7,7 @@ The fridge upload endpoint is PUBLIC (no authentication) but requires a valid, n
 only credential this script needs.
 
 Constraints enforced by the server:
-  * file must be smaller than 10 MB
+  * file must be smaller than 25 MB
   * the object is deleted automatically ~2 hours after upload
   * there is no download or delete endpoint
 
@@ -25,8 +25,8 @@ import sys
 import uuid
 from urllib import error, request
 
-# 10 MB, matching FridgeConstraints.MAX_FILE_SIZE_BYTES on the server.
-MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024
+# 25 MB, matching FridgeConstraints.MAX_FILE_SIZE_BYTES on the server.
+MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024
 DEFAULT_BASE_URL = "https://api.bulldozer-collective.fr/v2"
 UPLOAD_PATH = "/pub/fridge/files"
 
@@ -84,7 +84,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Upload a file to the Bulldozer fridge (public, code-gated, auto-expiring).",
     )
-    parser.add_argument("--file", required=True, help="Path to the file to upload (< 10 MB).")
+    parser.add_argument("--file", required=True, help="Path to the file to upload (< 25 MB).")
     parser.add_argument(
         "--code",
         default=os.environ.get("FRIDGE_CODE"),
@@ -112,7 +112,7 @@ def main() -> int:
         return 2
     if size >= MAX_FILE_SIZE_BYTES:
         print(
-            "error: file is %d bytes; the fridge limit is < %d bytes (10 MB)"
+            "error: file is %d bytes; the fridge limit is < %d bytes (25 MB)"
             % (size, MAX_FILE_SIZE_BYTES),
             file=sys.stderr,
         )

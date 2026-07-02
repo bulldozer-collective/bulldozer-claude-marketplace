@@ -23,10 +23,17 @@ throwaway sharing — not durable storage.
 
 - **Ephemeral**: every file is deleted automatically ~2h after upload by an hourly cleanup. It
   **cannot** be deleted manually.
-- **Write-only via the API**: there is **no** download or delete endpoint. The upload returns the
-  file's metadata (`id`, etc.); the object lives at S3 key `fridge/{id}` in the `bdz-fridge` bucket.
-  Retrieval is out of band (S3 access).
-- **Size limit**: the file must be **smaller than 10 MB**. Any content type is allowed.
+- **No public URL**: a fridge file is **not** publicly served and has **no** user- or MCP-facing
+  download endpoint. The upload returns only metadata (`file.id`, etc.); the object lives privately at
+  S3 key `fridge/{id}` in the `bdz-fridge` bucket. **Never build, guess, or reconstruct a link to it.**
+  The **only** sanctioned way to consume a fridge file downstream is to pass its **`fridgeId`**
+  (= `file.id`) to hosting (owner-only) — see "Hosting a fridge file" below.
+- **Size limit**: the file must be **smaller than 25 MB** (the same ceiling as hosting). Any content
+  type is allowed.
+
+> ⚠️ **The intuitive trap:** do **not** take a fridge file and pass a reconstructed S3 URL as a `url`
+> to hosting (or anywhere). There is no such URL. Pass the **`fridgeId`** (the `file.id` from the
+> upload response) instead.
 - **Two-step, split-trust model**: the upload endpoint is **public** (no auth) but gated by a
   **fridge code**. The code is minted only by an **authenticated** user. So: *you* (authenticated)
   mint the code, then the (unauthenticated) upload script sends the file with that code. The code is
@@ -51,11 +58,13 @@ throwaway sharing — not durable storage.
        --file /path/to/file --code <code>
    ```
    The script is dependency-free (stock Python 3) and needs **no** auth — only the code.
-4. **Report the result** — on success the script prints the `FridgeFile`:
+4. **Report the result** — on success the script prints an `UploadFridgeFileResponse` in which the
+   `FridgeFile` is **nested under `file`** (it is **not** flat):
    ```json
-   { "id": "…", "fileName": "…", "contentType": "…", "sizeBytes": 12345, "createdAt": "…" }
+   { "file": { "id": "…", "fileName": "…", "contentType": "…", "sizeBytes": 12345, "createdAt": "…" } }
    ```
-   Tell the user the file will disappear ~2h after `createdAt`.
+   Take **`file.id`** — that id is the `fridgeId` you pass downstream (e.g. to hosting). Tell the user
+   the file will disappear ~2h after `file.createdAt`.
 
 ## Passing the fridge code to the script
 
@@ -71,11 +80,11 @@ involved in the upload.
 
 | Flag | Env fallback | Default | Notes |
 |------|--------------|---------|-------|
-| `--file` | — | — | **Required.** Path to the file (< 10 MB). |
+| `--file` | — | — | **Required.** Path to the file (< 25 MB). |
 | `--code` | `FRIDGE_CODE` | — | Fridge code from `bdzRequestFridgeCode`. |
 | `--base-url` | `FRIDGE_BASE_URL` | `https://api.bulldozer-collective.fr/v2` | Use `http://localhost:24510` for local dev. |
 
-The script validates the file exists and is < 10 MB **before** any network call, then POSTs to
+The script validates the file exists and is < 25 MB **before** any network call, then POSTs to
 `{base-url}/pub/fridge/files`.
 
 ## Errors
@@ -84,4 +93,20 @@ The script validates the file exists and is < 10 MB **before** any network call,
 |-------|------|------------------|
 | `bdzRequestFridgeCode` | 402 | Customer subscription lacks `BASICS`. |
 | upload script | 403 | Invalid or expired fridge code → mint a fresh one and retry. |
-| upload script | 400 | Empty file or file ≥ 10 MB. |
+| upload script | 400 | Empty file or file ≥ 25 MB. |
+
+## Hosting a fridge file
+
+If the user actually wants to **host / publish** the file (a durable link, not a throwaway drop),
+don't stop at the fridge — invoke the **`bulldozer-hosting`** skill (its Workflow B):
+
+1. Upload to the fridge as above and take **`file.id`**.
+2. In the hosting skill, call `bdzCreateHosting` with **`fridgeId` = `file.id`** (owner-only: only the
+   user who uploaded the fridge file may host it). Do this **within ~2h**, before the fridge file
+   auto-expires.
+
+Again: pass the **`fridgeId`**, never a reconstructed URL — the fridge file has no public URL.
+
+## Reference
+
+Full endpoint contract: `FRIDGE_API.md` at the repository root.
