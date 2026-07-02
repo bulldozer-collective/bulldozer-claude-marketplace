@@ -1,8 +1,8 @@
 ---
 name: bulldozer-hosting
-description: Host a static HTML page or zipped static site on Bulldozer — a private, project-scoped S3 upload  read back through short-lived presigned URLs
+description: Host a static HTML page, zipped static site, or image (png/jpeg/svg) on Bulldozer — a private, project-scoped S3 upload read back through short-lived presigned URLs
 when-to-use: |
-  Use when the user wants to durably host / publish / "put online" a static HTML page or a zipped  static site and get a link to view it, from a URL or a file they uploaded to the fridge. NOT for throwaway/scratch file drops (use the fridge) or generated project assets (use studio).
+  Use when the user wants to durably host / publish / "put online" a static HTML page, a zipped static site, or an image (png/jpeg/svg) and get a link to view it, from a URL or a file they uploaded to the fridge. NOT for throwaway/scratch file drops (use the fridge) or generated project assets (use studio)
 user-invocable: false
 allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__bdzCreateHosting
@@ -12,14 +12,16 @@ allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__bdzUpdateHosting
   - mcp__plugin_bulldozer_bulldozer__bdzDeleteHosting
   - mcp__plugin_bulldozer_bulldozer__bdzRequestFridgeCode
+  - mcp__plugin_bulldozer_bulldozer__bdzAddHostingShare
+  - mcp__plugin_bulldozer_bulldozer__bdzRemoveHostingShare
 effort: low
 ---
 
 # Bulldozer Hosting
 
-**Hosting** stores a static HTML page or a `.zip` archive in a **private** S3 bucket and lets you read
-it back via a **short-lived presigned URL**. It is project-scoped and durable (unlike the ephemeral
-fridge).
+**Hosting** stores a static HTML page, a `.zip` archive, or an image (png/jpeg/svg) in a **private** S3
+bucket and lets you read it back via a **short-lived presigned URL**. It is project-scoped and durable
+(unlike the ephemeral fridge).
 
 ## Core facts
 
@@ -29,7 +31,7 @@ fridge).
     who uploaded the fridge file can host it);
   - a **`url`** — an `http(s)` link the server downloads (SSRF-guarded: no private/internal hosts);
   - a **`file`** — a direct multipart upload (browser/API only; **not** available over MCP).
-  Content must be a single HTML page (`.html`/`.htm`) or a `.zip`, **≤ 25 MB**.
+  Content must be a single HTML page (`.html`/`.htm`), a `.zip`, or an image (`.png`/`.jpg`/`.jpeg`/`.svg`), **≤ 25 MB**.
 - **Private storage** — the object lives at S3 key `hostings/{id}`; it is **not** publicly served.
   The **only** way to read it is a presigned URL from **explore**.
 - **Identified by `id`** — create returns the `Hosting` (with its `id`). Use that id for get / explore
