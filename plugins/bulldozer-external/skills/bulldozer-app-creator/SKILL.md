@@ -1,5 +1,5 @@
 ---
-name: bulldozer-app
+name: bulldozer-app-creator
 description: Build a "Bulldozer App" — a custom tool/app developed in Angular, wired to the Bulldozer REST API, compiled, and published as a public static site via Bulldozer Hosting.
 when-to-use: |
   Use whenever the user wants to create a "tool", an "app", an "application", a "mini-app", a
@@ -45,6 +45,9 @@ Whenever the user asks to create a **tool**, **app**, **application**, **web app
   - **Subdomain** — explain that this is the part **at the end of the URL**: the app will be
     served at `https://{customerSlug}.bulldozer-os.fr/{subdomain}/`. Must be a valid DNS label
     (lowercase letters/digits/hyphens, max 63) and unique per customer.
+  - **Is this an internal tool?** — i.e. a tool for the **Bulldozer team itself** (admin / ops /
+    sales operators), as opposed to an app built for a customer. Explain that this single answer
+    decides whether the **Admin API** is available (see Rule 2.b) — it changes nothing else.
 
 ## Step 0.b — Generate a client id and prepare the hosting
 
@@ -89,6 +92,25 @@ Once you have the name and subdomain:
 - If the user requests a feature or data that is **not available in the docs**, **warn the user**
   clearly that it is not supported by the Bulldozer API, and do not silently invent an endpoint.
 
+## Rule 2.b — Admin API: internal tools only
+
+The **Admin API** (`/admin/**`) is reserved for tools built for the Bulldozer team. Whether it is in
+scope depends entirely on the internal-tool answer from Step 0:
+
+- **Internal tool → the Admin API doc is in scope.** Fetch it from:
+  **`https://docs.bulldozer-collective.fr/v2/ADMIN_API.md`**
+  It is **not listed in the chapter table** of `index.md`, so it will not be discovered by following
+  Rule 2 — use that direct URL. It covers `/admin/users`, `/admin/customers`,
+  `/admin/customers/{customerId}/projects`, and `/admin/commands`.
+- **Not an internal tool → ignore that doc entirely.** Do not fetch it, and do not use any `/admin/**`
+  endpoint: those endpoints are dedicated to internal tools. If the user asks for something only the
+  Admin API can provide, **warn them** that it is not available for a customer-facing app — same
+  posture as Rule 2 takes for undocumented features. Do not work around it with another endpoint.
+- **Roles**: every `/admin/**` endpoint requires the caller's JWT to carry `BULLDOZER_ADMINISTRATOR`,
+  `BULLDOZER_OPS`, or `BULLDOZER_SALES` — and some are Admin/Ops only, so read the access rules per
+  endpoint in the doc. A user without one of those roles gets `403`, which is exactly why these
+  endpoints are useless in a customer-facing app.
+
 ## Rule 3 — Customer/project context is mandatory
 
 **~99% of Bulldozer API endpoints require two headers** — `X-Bdz-Customer-Id` and
@@ -105,6 +127,11 @@ must, in this order:
    headers via an HTTP interceptor that reads it at request time. When the user changes the active
    membership in the `<select>`, the whole UI + every subsequent API call must use the new
    `customerId`/`projectId` pair automatically.
+
+**Exception — `/admin/**`:** admin endpoints are **realm-scoped** and need neither
+`X-Bdz-Customer-Id` nor `X-Bdz-Project-Id`. This does **not** exempt an internal tool from Rule 3: it
+will normally also call tenant-scoped endpoints, so keep the membership fetch, the project `<select>`,
+and the interceptor. Sending the two headers to `/admin/**` anyway is harmless.
 
 See the reference file **`references/project-context.md`** for the exact `ProjectService`,
 `customer-id.interceptor`, the project `<select>` picker, and the reactive `effect` pattern.
@@ -148,11 +175,13 @@ When the app is done:
 - [ ] Ensured `customerId`/`projectId` via `bulldozer-project-chooser` / `bulldozer.json`
 - [ ] Asked "Do you want to create a Bulldozer App?" and got a yes
 - [ ] Asked for the application **name** and **subdomain** (explained subdomain = end of URL)
+- [ ] Asked whether the app is an **internal tool** (decides whether the Admin API is available)
 - [ ] Generated a **client id** with a random suffix
 - [ ] Prepared the hosting (`bdzCreateHosting`, `HOSTING_TYPE_STATIC_SITE`, no fridgeId/url) → got publicUrl
 - [ ] Wired Keycloak OAuth (`auth.bulldozer-collective.fr` / `bdz-saas-dev` / generated client id) per `references/oauth-boilerplate.md`
 - [ ] Built in Angular (no React, no Vercel), using **hash routing**
 - [ ] After login: fetched memberships → project `<select>` → derived `customerId`/`projectId`, reactive to changes (per `references/project-context.md`)
 - [ ] Fetched & used `https://docs.bulldozer-collective.fr/v2/index.md`; warned on anything not in the docs
+- [ ] Used `ADMIN_API.md` / `/admin/**` **only** if the app is an internal tool — otherwise ignored it entirely
 - [ ] Built with `--base-href "/{subdomain}/"` and zipped from `dist/<project-name>/browser` (index.html at zip root)
 - [ ] Uploaded the zip via the `bulldozer-fridge` script, published with `bdzReplaceHostingContent`, and shared the public URL
