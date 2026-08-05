@@ -128,6 +128,16 @@ must, in this order:
    membership in the `<select>`, the whole UI + every subsequent API call must use the new
    `customerId`/`projectId` pair automatically.
 
+Two traps here produce **silent** failures — the app renders fine and the data is simply wrong or
+missing. Both are detailed in `references/project-context.md` (§3, §4):
+
+- **Never bind `[value]` on the project `<select>`.** Carry the selection on the `<option>`s with
+  `[selected]`. Otherwise the DOM value desyncs from the signal and the user's *first* project switch
+  emits no `change` event at all.
+- **Gate every tenant-scoped call on `activeProject()`, not on `activeProjectId()`.** The id is
+  restored from `localStorage` before the memberships are fetched, so keying on it fires requests
+  with no tenant headers — and, when the stored id is still valid, the reaction never re-runs.
+
 **Exception — `/admin/**`:** admin endpoints are **realm-scoped** and need neither
 `X-Bdz-Customer-Id` nor `X-Bdz-Project-Id`. This does **not** exempt an internal tool from Rule 3: it
 will normally also call tenant-scoped endpoints, so keep the membership fetch, the project `<select>`,

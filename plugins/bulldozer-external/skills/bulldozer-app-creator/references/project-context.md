@@ -67,8 +67,16 @@ export class ProjectService {
   readonly loading = signal(false);
   readonly ready = signal(false);
 
-  // Persisted so a reload keeps the same project.
-  readonly activeProjectId = signal<string | null>(localStorage.getItem(STORAGE_KEY));
+  /**
+   * Read at startup but **not published**: a restored id is not yet an active project — it may be
+   * stale, and `activeProject()` cannot resolve before the memberships are loaded. Publishing it
+   * straight away would open a window where the id is non-null while no tenant header is
+   * injectable, and where the id never changing afterwards prevents any reaction from re-running.
+   */
+  private readonly storedId = localStorage.getItem(STORAGE_KEY);
+
+  /** `null` until the memberships are loaded — persistence is applied at that point, not before. */
+  readonly activeProjectId = signal<string | null>(null);
 
   /** The selected project (source of the customerId/projectId pair). */
   readonly activeProject = computed(() =>
@@ -90,10 +98,12 @@ export class ProjectService {
           this.projects.set(list);
           this.loading.set(false);
           this.ready.set(true);
-          // Auto-select the first project if none stored or the stored id is stale.
-          const storedId = this.activeProjectId();
-          if (!list.some((p) => p.id === storedId) && list.length > 0) {
-            this.setActive(list[0].id);
+          // Persistence is preserved: the stored id wins if still valid, else the first project.
+          if (list.length > 0) {
+            const restored = list.some((p) => p.id === this.storedId)
+              ? this.storedId!
+              : list[0].id;
+            this.setActive(restored);
           }
         },
         error: () => {
@@ -115,38 +125,77 @@ export class ProjectService {
 }
 ```
 
-## 2. customer-id interceptor — inject both headers on every API call
+## 2. customer-id interceptor — inject both headers, and fail loudly without a project
 
 Register it in `app.config.ts` **after** `includeBearerTokenInterceptor` (see
 `oauth-boilerplate.md`): `withInterceptors([includeBearerTokenInterceptor, customerIdInterceptor])`.
+
+Letting a tenant-scoped request go out **without** the headers yields a `4xx` that the UI renders as
+"no data": the actual defect becomes invisible. Block it instead, with a message that says what to
+wait for.
 
 `src/app/core/interceptors/customer-id.interceptor.ts`:
 
 ```ts
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
+import { throwError } from 'rxjs';
 import { ProjectService } from '../services/project.service';
 import { environment } from '../../../environments/environment';
+
+/**
+ * API paths that do NOT require the tenant headers.
+ * `/project-memberships` MUST stay exempt — it is what populates `projects()`, so blocking it for
+ * lack of an active project would deadlock startup. `/admin/**` is realm-scoped (SKILL Rule 3):
+ * sending the headers is harmless, but *requiring* a project is not.
+ */
+const TENANT_FREE_PATHS = [/^\/project-memberships\b/, /^\/admin\//];
 
 export const customerIdInterceptor: HttpInterceptorFn = (req, next) => {
   if (!req.url.startsWith(environment.apiUrl)) return next(req);
 
-  const projectSvc = inject(ProjectService);
-  const activeProject = projectSvc.activeProject();
+  const path = req.url.slice(environment.apiUrl.length) || '/';
+  if (TENANT_FREE_PATHS.some((re) => re.test(path))) return next(req);
 
-  const headers: Record<string, string> = {};
-  if (activeProject?.customerId) headers['X-Bdz-Customer-Id'] = activeProject.customerId;
-  if (activeProject?.id) headers['X-Bdz-Project-Id'] = activeProject.id;
+  const activeProject = inject(ProjectService).activeProject();
 
-  if (Object.keys(headers).length === 0) return next(req);
-  return next(req.clone({ setHeaders: headers }));
+  if (!activeProject) {
+    return throwError(
+      () =>
+        new Error(
+          `Tenant-scoped call blocked — no active project resolved (${req.method} ${path}). ` +
+            `Wait for ProjectService.activeProject() to be defined: a non-null activeProjectId() is not enough.`,
+        ),
+    );
+  }
+
+  return next(
+    req.clone({
+      setHeaders: {
+        'X-Bdz-Customer-Id': activeProject.customerId,
+        'X-Bdz-Project-Id': activeProject.id,
+      },
+    }),
+  );
 };
 ```
+
+> ⚠️ **Adding an endpoint that legitimately needs no tenant context?** Add it to
+> `TENANT_FREE_PATHS`. Forgetting it turns a working call into a thrown error — loud and traceable,
+> which is the point, but make sure the exemption list matches the endpoints your app actually uses.
 
 Because the interceptor reads `projectSvc.activeProject()` at request time, **every request made
 after a selection change automatically carries the new customer/project pair** — no manual wiring.
 
 ## 3. Project picker — the `<select>`
+
+> ⚠️ **Put the selection on the `<option>`s, never `[value]` on the `<select>`.** A `[value]`
+> binding on the select is applied independently of the `<option>`s that `@for` creates: once the
+> options are inserted the browser resets the selection to the **first** one, while the signal still
+> points elsewhere (typically the project restored from `localStorage`). The DOM value and the signal
+> then disagree — and if the user's first click lands on the option the DOM already shows, **no
+> `change` event fires at all**. The symptom is "the first project switch does nothing, the next ones
+> work", which looks like a state bug and is really a DOM-sync bug.
 
 ```ts
 import { Component, inject } from '@angular/core';
@@ -156,12 +205,11 @@ import { ProjectService } from '../core/services/project.service';
   selector: 'app-project-picker',
   standalone: true,
   template: `
-    <select
-      [value]="projectSvc.activeProjectId() ?? ''"
-      (change)="onChange($event)"
-      [disabled]="!projectSvc.ready()">
+    <select (change)="onChange($event)" [disabled]="!projectSvc.ready()">
       @for (p of projectSvc.projects(); track p.id) {
-        <option [value]="p.id">{{ p.name }}</option>
+        <option [value]="p.id" [selected]="p.id === projectSvc.activeProjectId()">
+          {{ p.name }}
+        </option>
       }
     </select>
   `,
@@ -176,9 +224,30 @@ export class ProjectPickerComponent {
 }
 ```
 
+Worth a regression test, because the failure is silent — the app renders fine and only the first
+interaction is lost:
+
+```ts
+it('reflects the active project even when it is not the first option', async () => {
+  projectSvc.projects.set([
+    { id: 'p1', customerId: 'c1', name: 'One' },
+    { id: 'p2', customerId: 'c1', name: 'Two' },
+    { id: 'p3', customerId: 'c1', name: 'Three' },
+  ]);
+  projectSvc.setActive('p3');
+  projectSvc.ready.set(true);
+  await fixture.whenStable();
+
+  const select = fixture.nativeElement.querySelector('select') as HTMLSelectElement;
+  expect(select.value).toBe('p3'); // with [value] on the select this is 'p1'
+});
+```
+
 ## 4. Reacting to a project change in your own components/services
 
-Anything customer/project-aware should be driven by the signals so a switch refreshes it:
+Anything customer/project-aware should be driven by the signals so a switch refreshes it. **Depend on
+`activeProject()`, not on `activeProjectId()`** — that is the precondition the interceptor actually
+needs:
 
 ```ts
 import { effect, inject } from '@angular/core';
@@ -187,12 +256,23 @@ import { ProjectService } from '../core/services/project.service';
 const projectSvc = inject(ProjectService);
 
 effect(() => {
-  const projectId = projectSvc.activeProjectId();
-  const customerId = projectSvc.activeCustomerId();
-  if (!projectId) return;
-  // (re)load data for the newly active project here
+  // `activeProject()` is only defined once memberships are loaded AND the stored id resolves.
+  const project = projectSvc.activeProject();
+  if (!project) return;
+  // (re)load data here — the two tenant headers are guaranteed injectable at this point.
 });
 ```
+
+> ⚠️ **Do not guard on `activeProjectId()` alone.** It is restored from `localStorage` in the
+> service's field initialiser, so it is non-null *before any HTTP call has happened*. An effect
+> guarded on the id therefore fires while `projects()` is still empty — `activeProject()` is
+> `undefined`, the interceptor (§2) injects **no** headers, and every request of that first pass goes
+> out untenanted and fails.
+>
+> It then gets worse: `loadProjects()` only calls `setActive()` when the stored id is **stale**. With
+> a valid stored id, `activeProjectId` never changes, so **the effect never re-runs** and the user is
+> left looking at empty data with no error to explain it. Keying on `activeProject()` fixes both the
+> premature fire and the missing re-run, since the computed changes when memberships arrive.
 
 ## Rules recap
 
@@ -201,4 +281,10 @@ effect(() => {
   The `authGuard` in `oauth-boilerplate.md` (§6) is the concrete trigger for `loadProjects()`.
 - Persist the selection (`localStorage`) so a refresh keeps context.
 - Keep the selection in a **signal** so the interceptor and UI are reactive to changes.
+- **Resolution order matters.** Never fire a tenant-scoped call before `activeProject()` is defined.
+  `ProjectService` (§1) enforces this structurally by not publishing the stored id until the
+  memberships land, and the interceptor (§2) throws rather than sending an untenanted request — so
+  the mistake is impossible to make silently.
+- **Never bind `[value]` on the project `<select>`** — carry the selection on the `<option>`s with
+  `[selected]`, or the first switch is silently swallowed (§3).
 - If the user has **no** memberships, show an empty state (nothing to select → no headers → API 4xx).
