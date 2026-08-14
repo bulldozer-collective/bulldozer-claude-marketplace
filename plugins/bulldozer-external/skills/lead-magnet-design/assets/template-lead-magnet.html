@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="{{LANGUE}}">
+<head>
+<meta charset="utf-8">
+<title>{{TITRE}} — {{CLIENT}}</title>
+<!--
+  BASE TOKENISÉE — lead magnet · v1.1
+  Remplacer UNIQUEMENT les tokens de :root et les {{PLACEHOLDERS}}.
+
+  Cette base est calibrée pour WeasyPrint. Chaque règle marquée « ⚠ » corrige une panne
+  réellement payée en production : ne pas la « simplifier » sans relire
+  lead-magnet/references/pannes-et-parades.md.
+-->
+<style>
+/* ==========================================================================
+   TOKENS — extraits du CSS de production du client (charte-extraction.md)
+   ========================================================================== */
+:root{
+  /* --- les 7 tokens --- */
+  --fond:{{FOND}};
+  --accent:{{ACCENT}};
+  --texte:{{TEXTE}};
+  --typo-display:{{TYPO_DISPLAY}};
+  --typo-texte:{{TYPO_TEXTE}};
+  --radius:{{RADIUS}};
+
+  /* --- dérivés : VALEURS CALCULÉES EN DUR ---------------------------------
+     ⚠ WeasyPrint ignore color-mix() : la déclaration entière est jetée et la
+     couleur retombe en NOIR PUR, silencieusement. Calculer les dérivés à la
+     main (mélange sur --fond) et écrire la valeur, avec le calcul en commentaire. */
+  --accent-ink:{{ACCENT_INK}};          /* texte POSÉ SUR l'accent : mesurer le contraste, cf. plus bas */
+  --accent-deep:{{ACCENT_DEEP}};        /* accent assombri : surfaces pleines à texte blanc en petit corps */
+  --encre:{{ENCRE}};                    /* surface sombre : couverture, ouvertures, CTA */
+  --accent-soft:{{ACCENT_SOFT}};        /* accent à ~10 % sur --fond : fonds d'encadré */
+  --accent-soft-2:{{ACCENT_SOFT_2}};    /* accent à ~18 % sur --fond : en-têtes de tableau */
+  --texte-secondaire:{{TEXTE_SECONDAIRE}};  /* --texte à ~60 % sur --fond */
+  --filet:{{FILET}};                    /* --texte à ~14 % sur --fond */
+
+  /* --- échelle typographique (point 10 du standard) --- */
+  --corps:12pt;        /* réglé AVEC les marges : 166 mm à 12 pt = 70 caractères */
+  --h3:13.5pt;
+  --h2:19pt;
+  --h1:31pt;
+  --display:58pt;      /* chiffres KPI */
+  --hero:62pt;         /* titre de couverture */
+}
+
+/* ⚠ POLICES : un @font-face PAR GRAISSE, fichiers STATIQUES.
+   WeasyPrint refuse les plages de police variable (« Ignored font-weight:100 900 »)
+   et le document perd TOUT son gras. Google Fonts ne servant plus que des fichiers
+   variables, passer par @fontsource :
+     cdn.jsdelivr.net/npm/@fontsource/<famille>/files/<famille>-latin-<graisse>-normal.woff2
+   Vérifier après conversion : `pdffonts lead-magnet.pdf` doit lister chaque graisse. */
+@font-face{font-family:"{{FONT_TEXTE}}";src:url("assets/fonts/{{FONT_TEXTE_FILE}}-400.woff2") format("woff2");font-weight:400;font-style:normal}
+@font-face{font-family:"{{FONT_TEXTE}}";src:url("assets/fonts/{{FONT_TEXTE_FILE}}-600.woff2") format("woff2");font-weight:600;font-style:normal}
+@font-face{font-family:"{{FONT_TEXTE}}";src:url("assets/fonts/{{FONT_TEXTE_FILE}}-700.woff2") format("woff2");font-weight:700;font-style:normal}
+@font-face{font-family:"{{FONT_DISPLAY}}";src:url("assets/fonts/{{FONT_DISPLAY_FILE}}-700.woff2") format("woff2");font-weight:700;font-style:normal}
+@font-face{font-family:"{{FONT_DISPLAY}}";src:url("assets/fonts/{{FONT_DISPLAY_FILE}}-800.woff2") format("woff2");font-weight:800;font-style:normal}
+
+@page{
+  size:A4;
+  margin:20mm 22mm 16mm 22mm;   /* colonne = 166 mm : accordée à la mesure, cf. point 2 */
+  /* ⚠ les boîtes de marge n'héritent pas des variables CSS : recopier la valeur
+     du dérivé --texte-secondaire, et le dire. */
+  @bottom-left  { content:"{{CLIENT}} — {{TITRE_COURT}}"; font-family:"{{FONT_TEXTE}}",sans-serif; font-size:7.5pt; color:{{TEXTE_SECONDAIRE}}; }
+  @bottom-right { content:counter(page) " / " counter(pages); font-family:"{{FONT_TEXTE}}",sans-serif; font-size:7.5pt; color:{{TEXTE_SECONDAIRE}}; }
+}
+@page :first{ @bottom-left{content:none} @bottom-right{content:none} }
+@page opener { @bottom-left{content:none} @bottom-right{content:none} }
+
+/* Page pleine (fond à fond perdu) — portable WeasyPrint / impression navigateur.
+   296mm plutôt que 297 : 1 mm de tolérance d'arrondi, sinon la page déborde. */
+.fullbleed{
+  box-sizing:border-box;
+  height:296mm;
+  margin:-20mm -22mm -16mm -22mm;
+  padding:26mm 20mm;
+  break-after:page; page-break-after:always;
+  overflow:hidden;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--fond); color:var(--texte);
+  font-family:var(--typo-texte); font-size:var(--corps); line-height:1.55;
+}
+/* ⚠ AUCUN max-width sur la prose : c'est la COLONNE qui porte la mesure (point 2).
+   Brider la prose dans une colonne plus large la fait flotter — ligne correcte, mais
+   bande vide à droite et document « inachevé ». Régler par les marges de @page. */
+p{margin:0 0 .85em; orphans:3; widows:3}
+strong{font-weight:700}
+h1,h2,h3{font-family:var(--typo-display); line-height:1.12; break-after:avoid; page-break-after:avoid; margin:0}
+h2{font-size:var(--h2); margin:0 0 .55em; color:var(--encre)}
+h3{font-size:var(--h3); margin:1.4em 0 .4em; color:var(--accent-deep)}
+
+/* ---------- 1. COUVERTURE (pleine page) ----------
+   R8 : par défaut la couverture porte une IMAGE. Le voile dégradé est bâti sur
+   --encre pour que le texte reste lisible ; il s'ouvre en bas pour laisser voir le
+   sujet. Prompter l'image avec le sujet dans le tiers bas et deux tiers hauts vides
+   (voir lead-magnet-assets/references/studio-prompts.md).
+   MESURER le contraste du blanc sur la zone de titre — ne pas le supposer.
+   Variante typographique assumée (registre arbitré au cadrage) : remplacer
+   background-image par un simple linear-gradient sur les tokens. */
+.cover{
+  display:flex; flex-direction:column;
+  background-image:
+    linear-gradient(180deg,
+      rgba({{ENCRE_RGB}},.93) 0%,
+      rgba({{ENCRE_RGB}},.90) 46%,
+      rgba({{ENCRE_RGB}},.62) 68%,
+      rgba({{ENCRE_RGB}},.30) 100%),
+    url("assets/{{COVER_IMAGE}}");
+  background-size:cover, cover;
+  background-position:center center, center bottom;
+  background-repeat:no-repeat, no-repeat;
+  color:#FFFFFF;
+}
+.cover .top{display:flex; align-items:center; justify-content:space-between}
+.cover .logo{height:30px; width:auto}
+.cover .titre{margin-top:24mm}
+.cover .rule{width:64mm; height:4px; background:var(--accent); margin:0 0 8mm; border-radius:2px}
+.cover h1{font-size:var(--hero); letter-spacing:-.02em; max-width:13em}
+.cover .promesse{font-size:14pt; line-height:1.45; max-width:26em; margin-top:.7em; opacity:.92}
+.cover .meta{font-size:9pt; letter-spacing:.14em; text-transform:uppercase; opacity:.85}
+.cover .spacer{flex:1}
+
+/* ---------- 2. EXEC SUMMARY ---------- */
+.exec{page-break-before:always}
+.exec .enseignements{margin:1.5em 0; padding:0; list-style:none; counter-reset:ens}
+.exec .enseignements li{
+  counter-increment:ens; position:relative;
+  padding:.15em 0 .9em 9mm; margin-bottom:.35em; break-inside:avoid;
+}
+.exec .enseignements li::before{
+  content:counter(ens); position:absolute; left:0; top:0;
+  font-family:var(--typo-display); font-weight:800; font-size:15pt; color:var(--accent);
+}
+
+/* ---------- 3. SOMMAIRE ----------
+   Pas de saut de page forcé : une page de sommaire seule tombe souvent sous le seuil
+   de remplissage. Chaque entrée porte une promesse de lecture (contenu utile, pas du
+   remplissage). Les numéros se posent APRÈS une première conversion. */
+.toc ol{list-style:none; padding:0; margin:1.2em 0 0; counter-reset:toc}
+.toc h2{break-after:avoid}
+.toc li{
+  counter-increment:toc; display:flex; align-items:baseline; gap:.9em;
+  padding:.6em 0; border-bottom:1px solid var(--filet); font-size:11.5pt;
+}
+.toc li::before{content:counter(toc,decimal-leading-zero); font-family:var(--typo-display); font-weight:800; color:var(--accent); font-size:13pt; flex:0 0 auto}
+.toc .ttl{flex:1}
+.toc .ttl em{display:block; font-style:normal; font-size:9.5pt; color:var(--texte-secondaire); line-height:1.4; margin-top:.15em; max-width:30em}
+.toc .page{margin-left:auto; color:var(--texte-secondaire); font-variant-numeric:tabular-nums; flex:0 0 auto; padding-left:1em}
+
+/* ---------- 4. OUVERTURE DE CHAPITRE ----------
+   TROIS variantes, trois coûts de pagination : voir references/blocs-composes.md.
+   Défaut = BLOC EN RETRAIT. Un bloc assume ses marges ; un bandeau pleine largeur qui
+   tombe en haut de page laisse au-dessus de lui la bande blanche de 20 mm de @page,
+   qui se lit comme un défaut d'assemblage.
+   ⚠ GARDER L'OUVERTURE COURTE : un bloc atomique trop haut ne tient plus en bas de page
+   et migre en laissant un trou. Compacter les ouvertures a fait passer une production de
+   18 à 17 pages et de 8 à 5 pages signalées, sans toucher au texte.
+   ⚠ display:block et NON flex : WeasyPrint fragmente mal un conteneur flex insécable
+   et refuse de le poser dans l'espace libre d'une page entamée → page à moitié vide.
+   ⚠ PAS de page-break-before ici : le saut forcé fabrique une page-queue par chapitre. */
+.chapter-opener{
+  margin:.5em 0 8mm; padding:8mm 10mm 9mm; border-radius:var(--radius);
+  background:var(--encre); color:var(--fond);
+  break-inside:avoid;
+}
+/* numéro sur la ligne de base du titre : c'est ce qui garde le bloc court */
+.chapter-opener .num{font-family:var(--typo-display); font-weight:800; font-size:30pt; color:var(--accent-soft); line-height:1; letter-spacing:-.03em; margin-right:4mm; float:left}
+.chapter-opener h1{font-size:24pt; max-width:20em; line-height:1.16}
+.chapter-opener .idee{margin:.8em 0 0; max-width:34em; opacity:.82; font-size:10pt; line-height:1.5; clear:both}
+.chapter-opener .cle{margin-top:5mm; padding-top:4mm; border-top:1px solid rgba(255,255,255,.22); display:flex; align-items:baseline; gap:4mm}
+.chapter-opener .cle b{font-family:var(--typo-display); font-weight:800; font-size:22pt; color:var(--accent-soft); line-height:1; white-space:nowrap}
+.chapter-opener .cle span{font-size:9.5pt; opacity:.8; max-width:26em; line-height:1.4}
+/* variante bandeau : sort dans les marges latérales */
+.chapter-opener.bleed{margin:0 -22mm 8mm; padding:13mm 22mm 14mm; border-radius:0}
+/* variante pleine page (archétypes éditorial / premium minimal UNIQUEMENT).
+   Coût mesuré sur 4 chapitres : +5 pages et 6 pages remplies à 20-55 %. */
+.chapter-opener.full-page{page:opener; break-before:page; page-break-before:always; height:296mm; margin:-20mm -22mm -16mm -22mm; padding:26mm 20mm; border-radius:0; display:flex; flex-direction:column; justify-content:flex-end}
+.chapter-opener.full-page .num{float:none; display:block; font-size:104pt; margin:0}
+.chapter-opener.full-page h1{font-size:38pt; max-width:13em}
+
+/* ---------- CARTES KPI ---------- */
+.kpi-grid{display:flex; gap:8mm; margin:1.2em 0; break-inside:avoid}
+.kpi-card{flex:1; padding:6mm; border-radius:var(--radius); background:var(--accent-deep); color:var(--accent-ink); break-inside:avoid}
+/* ⚠ nowrap : un chiffre clé qui passe à la ligne est un défaut du standard.
+   Calibrer le corps sur la valeur la PLUS LONGUE de la grille (classes sm / xs). */
+.kpi-card .value{font-family:var(--typo-display); font-weight:800; font-size:var(--display); line-height:.95; display:block; letter-spacing:-.02em; white-space:nowrap}
+.kpi-card.sm .value{font-size:34pt}
+.kpi-card.xs .value{font-size:26pt}
+.kpi-card .label{display:block; margin-top:.55em; font-size:9.5pt; line-height:1.4; opacity:.94}
+.kpi-card .src{display:block; margin-top:.7em; font-size:7.5pt; opacity:.72}
+
+/* ---------- KPI EN DUO INÉGAL (blocs-composes.md §2) ----------
+   Deux blocs de tailles DIFFÉRENTES : le chiffre qui porte la thèse à 58 % en plein
+   accent, celui qui l'étaye à 42 % en fond doux. À préférer à .kpi-grid dès qu'un des
+   deux chiffres domine — la grille de cartes égales les met au même niveau.
+   ⚠ NE PAS en faire un bandeau pleine largeur : un seul chiffre, même à 96 pt, ne
+   remplit pas 166 mm et laisse une zone morte sur toute la moitié droite. */
+.kpi-duo{display:table; width:100%; border-spacing:5mm 0; margin:1.5em -5mm 1.6em; break-inside:avoid}
+.kpi-duo .b{display:table-cell; vertical-align:top; padding:9mm 9mm 8mm; border-radius:var(--radius)}
+.kpi-duo .b-major{width:58%; background:var(--accent-deep); color:var(--accent-ink)}
+.kpi-duo .b-minor{width:42%; background:var(--accent-soft)}
+.kpi-duo .v{font-family:var(--typo-display); font-weight:800; font-size:62pt; line-height:.85; letter-spacing:-.045em; display:block; white-space:nowrap}
+.kpi-duo .b-minor .v{font-size:38pt; color:var(--accent-deep)}
+.kpi-duo .l{display:block; margin-top:.5em; font-size:10.5pt; line-height:1.4}
+.kpi-duo .b-minor .l{color:var(--texte)}
+.kpi-duo .src{display:block; margin-top:5mm; font-size:7.5pt; opacity:.7}
+.kpi-duo .b-minor .src{color:var(--texte-secondaire); opacity:1}
+
+/* ---------- PAGE DE DONNÉES PLEINE PAGE (blocs-composes.md §4) ----------
+   Pour LE fait central du document, un seul par livrable. Trois groupes ancrés, pas un
+   bloc centré. La figure doit exister en version SOMBRE (palette dérivée de
+   --accent-on-ink sur --encre) : ne jamais poser un graphique clair sur fond sombre.
+   ⚠ Le bloc fait 296 mm : il démarre toujours sur une page neuve et laisse une
+   page-queue. Le placer APRÈS un bloc long (tableau, figure) pour que la page qui
+   précède se remplisse d'elle-même.
+   ⚠ check_rythme.py signalera cette page comme sous-remplie : faux positif attendu. */
+.data-page{
+  page:opener; box-sizing:border-box;
+  height:296mm; margin:-20mm -22mm -16mm -22mm; padding:30mm 22mm 26mm;
+  background:var(--encre); color:var(--fond);
+  break-before:page; page-break-before:always; break-after:page; page-break-after:always;
+  display:flex; flex-direction:column; justify-content:space-between; overflow:hidden;
+}
+.data-page .kicker{font-size:9pt; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-soft); margin-bottom:5mm}
+.data-page h2{font-size:26pt; color:var(--fond); max-width:15em; margin-bottom:9mm}
+.data-page svg{width:100%; height:auto; display:block}
+.data-page .lecture{padding-top:6mm; border-top:1px solid rgba(255,255,255,.22); font-size:11pt; line-height:1.5; opacity:.9; max-width:34em}
+.data-page .src{margin-top:5mm; font-size:8pt; opacity:.6}
+
+/* ---------- MOTIF DE MARQUE (charte-extraction.md → « signature graphique ») ----------
+   Le trait relevé sur le site du client, retracé en vectoriel. Posé en ÉLÉMENT et non en
+   background-image : WeasyPrint ne respecte pas le ratio intrinsèque d'un SVG en
+   background-size:100% auto et l'étire sur toute la hauteur de la page.
+   Marges négatives : l'encre touche les deux bords. À doser — 2 ou 3 apparitions. */
+.trait{display:block; width:calc(100% + 44mm); margin-left:-22mm; margin-right:-22mm; height:auto}
+
+/* ---------- PULL-QUOTE ---------- */
+.pullquote{
+  margin:1.35em 0; padding:0 0 0 8mm; border-left:4px solid var(--accent);
+  font-family:var(--typo-display); font-weight:700; font-size:20pt; line-height:1.25;
+  color:var(--encre); max-width:24em; break-inside:avoid;
+}
+
+/* ---------- TESTIMONIAL (uniquement si le manifeste en fournit un) ---------- */
+.testimonial{margin:1.35em 0; padding:7mm; border-radius:var(--radius); background:var(--accent-soft); display:flex; gap:6mm; align-items:flex-start; break-inside:avoid}
+.testimonial .avatar{width:16mm; height:16mm; border-radius:var(--radius); background:var(--accent-deep); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-family:var(--typo-display); font-size:15pt; flex:0 0 auto}
+.testimonial blockquote{margin:0; font-size:14pt; line-height:1.35; font-family:var(--typo-display)}
+.testimonial .who{margin-top:.6em; font-size:9pt; color:var(--texte-secondaire)}
+
+/* ---------- CHECKLIST / DO-DONT ----------
+   ⚠ Coupables : ces blocs sont des listes. Les rendre insécables crée des pages à
+   moitié vides. Seule la LIGNE est insécable. */
+.checklist{margin:1.2em 0}
+.checklist .t{font-family:var(--typo-display); font-weight:700; font-size:11.5pt; color:var(--encre); margin-bottom:.3em; break-after:avoid}
+.checklist ul{list-style:none; padding:0; margin:.4em 0; break-inside:auto}
+.checklist li{padding:.32em 0 .32em 6mm; position:relative; break-inside:avoid}
+.checklist li::before{content:"›"; position:absolute; left:0; color:var(--accent); font-weight:700}
+/* ⚠ display:table et NON flex. WeasyPrint fragmente mal un conteneur flex : le bloc
+   refuse de se poser dans les 120 mm libres d'un bas de page et migre à la page
+   suivante, qui reste remplie à 52 %. Le modèle tabulaire est fragmenté correctement et
+   rend exactement la même mise en page à deux colonnes. */
+.docdont{display:table; width:100%; border-spacing:3mm 0; margin:1.2em -3mm; break-inside:avoid}
+.docdont .col{display:table-cell; width:50%; padding:6mm; border-radius:var(--radius); vertical-align:top}
+.docdont .do{background:var(--accent-soft)}
+.docdont .dont{border:1px solid var(--filet)}
+.docdont .hd{font-size:8pt; letter-spacing:.12em; text-transform:uppercase; font-weight:700; margin-bottom:.5em}
+.docdont .do .hd{color:var(--accent-deep)}
+.docdont .dont .hd{color:var(--texte-secondaire)}
+.docdont ul{list-style:none; padding:0; margin:0}
+.docdont li{padding:.3em 0 .3em 5mm; position:relative; font-size:9.5pt; line-height:1.4; break-inside:avoid}
+/* ⚠ PUCES DESSINÉES EN CSS, PAS EN CARACTÈRES. « ✓ » (U+2713) et « → » (U+2192) sont
+   ABSENTS du sous-ensemble latin des polices servies par @fontsource : le moteur bascule
+   silencieusement sur une autre police pour ces seuls glyphes (visible dans `pdffonts`),
+   et la puce change de dessin au milieu du document. Un carré plein / un carré évidé ne
+   dépendent d'aucune police. */
+.docdont li::before{content:""; position:absolute; left:0; top:.62em; width:2.4mm; height:2.4mm; border-radius:1px}
+.docdont .do li::before{background:var(--accent-deep)}
+.docdont .dont li::before{border:1.2px solid var(--texte-secondaire)}
+
+/* variante BANDE pleine largeur (blocs-composes.md §3) — le passage du constat à la
+   recommandation. UNE SEULE FOIS par document : deux bandes et l'effet retombe. */
+.docdont-band{margin:1.6em -22mm; padding:10mm 22mm 11mm; width:calc(100% + 44mm); background:var(--accent-soft); break-inside:avoid}
+.docdont-band .bt{font-family:var(--typo-display); font-weight:700; font-size:13pt; color:var(--encre); margin-bottom:6mm}
+.docdont-band .docdont{margin:0; border-spacing:5mm 0}
+.docdont-band .docdont .do{background:var(--fond)}
+
+/* ---------- STEPS ---------- */
+.steps{margin:1.2em 0; counter-reset:step}
+.steps .t{font-family:var(--typo-display); font-weight:700; font-size:11.5pt; color:var(--encre); margin-bottom:.5em; break-after:avoid}
+.steps .step{display:flex; gap:5mm; padding:.62em 0; border-top:1px solid var(--filet); align-items:baseline; break-inside:avoid}
+.steps .step::before{counter-increment:step; content:counter(step,decimal-leading-zero); font-family:var(--typo-display); font-weight:800; color:var(--accent); font-size:14pt; flex:0 0 auto; line-height:1.1}
+.steps .step div{}
+
+/* ---------- TABLEAUX ----------
+   ⚠ Les longs tableaux DOIVENT pouvoir se couper, sinon ils créent des trous blancs.
+   thead se répète, la ligne reste insécable. Les tableaux COURTS (≤ 8 lignes) prennent
+   .keep : coupés, ils laissent une ligne orpheline avec son en-tête sur la page suivante. */
+table{width:100%; border-collapse:collapse; margin:1.05em 0; font-size:9pt}
+thead{display:table-header-group}
+tr{break-inside:avoid}
+table.keep{break-inside:avoid}
+/* ⚠ NE PAS utiliser <caption> : c'est une boîte distincte du corps du tableau, que
+   WeasyPrint détache même sous break-inside:avoid — le titre reste alors SEUL en bas de
+   page et le tableau part à la suivante. Le titre est un bloc AVANT le tableau, les deux
+   dans un .tbl (ajouter .court pour les tableaux de ≤ 4 lignes, qu'on ne coupe pas). */
+.tbl{break-inside:auto}
+.tbl.court{break-inside:avoid}
+.tbl-title{
+  font-family:var(--typo-display); font-weight:700; font-size:11.5pt; color:var(--encre);
+  margin:1.05em 0 .6em; break-after:avoid; page-break-after:avoid;
+}
+.tbl table{margin-top:0}
+th{background:var(--accent-soft-2); text-align:left; padding:.6em .7em; font-weight:700; color:var(--encre); line-height:1.35}
+td{padding:.55em .7em; border-top:1px solid var(--filet); line-height:1.4; vertical-align:top}
+tbody tr:nth-child(even) td{background:var(--accent-soft)}
+td.num,th.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+.src-note{font-size:7.5pt; color:var(--texte-secondaire); margin:-.9em 0 1.5em}
+/* grille à remplir : cellules vides visibles et imprimables */
+table.grille td.fill{background:var(--fond); border-left:1px solid var(--filet); height:9mm; min-width:26mm}
+table.grille tbody tr:nth-child(even) td.fill{background:var(--fond)}
+
+/* ---------- ENCARTS ---------- */
+.encart{margin:1.3em 0; padding:5.5mm 6.5mm; border-radius:var(--radius); background:var(--accent-soft); break-inside:avoid; max-width:36em}
+.encart.attention{border-left:4px solid var(--accent)}
+.encart .kind{display:block; font-size:8pt; letter-spacing:.14em; text-transform:uppercase; color:var(--accent-deep); font-weight:700; margin-bottom:.3em}
+.encart .ttl{font-family:var(--typo-display); font-weight:700; font-size:11.5pt; color:var(--encre); margin-bottom:.35em}
+.encart p{max-width:none; margin-bottom:.5em}
+.encart p:last-child{margin-bottom:0}
+.gap{background:var(--accent-soft-2); padding:.05em .35em; border-radius:3px; font-style:italic}
+
+/* ---------- FIGURES ----------
+   ⚠ POINT 13 DU STANDARD. Les figures restent DANS la colonne de texte, et les SVG
+   sont dessinés « encre bord à bord » (x=0 à x=W) : leur contenu tombe alors exactement
+   sur la colonne. Ne PAS remettre de margin négative « pour faire pleine largeur » :
+   le SVG garderait sa marge interne et plus rien ne serait aligné.
+   Titre au-dessus, au même style qu'un <caption> de tableau ; source en dessous. */
+figure{margin:1.3em 0; break-inside:avoid}
+figure img{width:100%; height:auto; display:block}
+.fig-title{font-family:var(--typo-display); font-weight:700; font-size:11.5pt; color:var(--encre); margin:0 0 .55em; break-after:avoid; page-break-after:avoid}
+figcaption{margin-top:.55em; font-size:8pt; line-height:1.45; color:var(--texte-secondaire)}
+/* bandeau photographique de respiration : hauteur fixe, recadrage centré */
+figure.band img{height:38mm; object-fit:cover}
+/* bandeau de CLÔTURE (page CTA) : comble le creux entre l'action et les mentions.
+   Image INÉDITE obligatoire — un doublon en clôture est immanquable. Sans légende :
+   son rôle est le registre, pas la démonstration. */
+.cta figure.band{margin:9mm 0 0}
+.cta figure.band img{height:44mm; border-radius:var(--radius)}
+
+/* ---------- ANNEXES ---------- */
+.annexes h2{break-after:avoid}
+.annexes h3{margin-top:1.9em}
+/* Appareil de référence, pas de lecture suivie : DEUX COLONNES et corps resserré d'un
+   cran. Fait tenir 9 à 12 notices sur une page au lieu de deux (blocs-composes.md §5).
+   ⚠ break-inside:avoid n'est PAS honoré par WeasyPrint sur un conteneur multi-colonnes :
+   si les dernières notices débordent quand même, donner sa page à l'annexe avec
+   .src-start plutôt que de laisser une page remplie à 8 %. */
+.sources{list-style:none; padding:0; margin:.7em 0 0; font-size:7.4pt; counter-reset:src;
+  column-count:2; column-gap:9mm}
+.sources li{counter-increment:src; padding:.38em 0 .38em 7mm; border-top:1px solid var(--filet); position:relative; line-height:1.4; break-inside:avoid}
+.sources li::before{content:"[" counter(src) "]"; position:absolute; left:0; font-weight:700; color:var(--accent-deep)}
+.sources .url{color:var(--texte-secondaire); word-break:break-all; font-size:7pt}
+.annexes h3.src-start{break-before:page; page-break-before:always; margin-top:0}
+
+/* ---------- CTA FINAL (pleine page) ---------- */
+.cta{
+  page:opener;   /* pas de pied de page gris sur un fond perdu foncé */
+  /* ⚠ space-between, PAS center (point 2 bis) : logo en haut, message et action au centre,
+     mentions ancrées en bas. Un bloc centré laisse la moitié basse flottante et le document
+     se termine sur une impression d'inachevé. Exige trois enfants directs. */
+  display:flex; flex-direction:column; justify-content:space-between;
+  background:var(--encre); color:#FFFFFF;
+  break-after:auto; page-break-after:auto;
+}
+.cta .logo{height:26px; width:auto}
+.cta .cta-corps, .cta .cta-pied{margin:0}
+.cta h1{font-size:var(--h1); max-width:19em}
+.cta p{opacity:.92; margin-top:1em}   /* largeur de la colonne, comme partout ailleurs */
+/* ⚠ inline-block, PAS width:max-content : non supportée par WeasyPrint, la règle est
+   ignorée et le bloc file sur toute la largeur. */
+.cta .action{margin-top:2em; display:inline-block; padding:5mm 8mm; border-radius:var(--radius); background:var(--accent-soft); color:var(--encre); font-weight:700; font-size:12pt}
+.cta .coords{margin-top:0; padding-top:5mm; border-top:1px solid rgba(255,255,255,.22); font-size:9.5pt; line-height:1.65; opacity:.85}
+.cta .legal{margin-top:1.1em; font-size:8pt; opacity:.6; line-height:1.5}
+</style>
+</head>
+<body>
+
+<!-- 1 — COUVERTURE : image + voile (R8). Tout le texte reste sur la zone opaque. -->
+<section class="fullbleed cover">
+  <div class="top">
+    <img class="logo" src="assets/{{LOGO_BLANC}}" alt="{{CLIENT}}">
+    <span class="meta">{{DATE}}</span>
+  </div>
+  <div class="titre">
+    <div class="rule"></div>   <!-- filet sobre par défaut, dérivé des tokens -->
+    <h1>{{TITRE}}</h1>
+    <p class="promesse">{{SOUS_TITRE}}</p>
+  </div>
+  <!-- Si le client a un MOTIF DE MARQUE relevé sur son site, il remplace avantageusement
+       le filet ci-dessus et se pose ici, dans la bande vide, de bord à bord.
+       Pas de motif trouvé sur le site = pas de motif (charte-extraction.md). -->
+  <img class="trait" src="assets/{{MOTIF}}" alt="">
+  <div class="spacer"></div>   <!-- laisse voir le sujet de la photo en bas -->
+</section>
+
+<!-- 2 — EXECUTIVE SUMMARY (écrit en dernier) -->
+<section class="exec">
+  <h2>En résumé</h2>
+  <p class="lede">{{PROBLEME}}</p>
+  <ul class="enseignements">
+    <li><strong>{{ENSEIGNEMENT_1}}</strong></li>
+    <li><strong>{{ENSEIGNEMENT_2}}</strong></li>
+    <li><strong>{{ENSEIGNEMENT_3}}</strong></li>
+  </ul>
+  <p><strong>Ce que vous saurez faire après :</strong> {{CE_QUE_VOUS_SAUREZ_FAIRE}}</p>
+</section>
+
+<!-- 3 — SOMMAIRE : enchaîne dans le flux, numéros posés après la 1re conversion -->
+<section class="toc">
+  <h2>Sommaire</h2>
+  <ol>
+    <li><span class="ttl">{{CHAPITRE_1}}<em>{{PROMESSE_1}}</em></span><span class="page">{{P1}}</span></li>
+    <li><span class="ttl">{{CHAPITRE_2}}<em>{{PROMESSE_2}}</em></span><span class="page">{{P2}}</span></li>
+    <li><span class="ttl">{{CHAPITRE_3}}<em>{{PROMESSE_3}}</em></span><span class="page">{{P3}}</span></li>
+  </ol>
+</section>
+
+<!-- 4 — CHAPITRE : ouverture en bloc dans le flux + blocs typés du manifeste.
+     Variantes d'ouverture : ajouter .bleed (bandeau) ou .full-page — coûts de
+     pagination comparés dans references/blocs-composes.md §1. -->
+<section class="chapter">
+  <div class="chapter-opener">
+    <span class="num">01</span>
+    <h1>{{TITRE_CHAPITRE}}</h1>
+    <p class="idee">{{IDEE_DIRECTRICE}}</p>
+    <div class="cle"><b>{{CHIFFRE_CLE}}</b><span>{{LIBELLE_CHIFFRE_CLE}}</span></div>
+  </div>
+
+  <p>{{PROSE}}</p>
+
+  <!-- Deux chiffres qui se valent → grille de cartes égales -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <span class="value">{{VALEUR}}</span>
+      <span class="label">{{LIBELLE}}</span>
+      <span class="src">{{SOURCE}}</span>
+    </div>
+  </div>
+
+  <!-- VARIANTE — un chiffre porte la thèse, l'autre l'étaye → duo inégal (§2).
+       Choisir l'un OU l'autre, jamais les deux dans le même chapitre. -->
+  <div class="kpi-duo">
+    <div class="b b-major">
+      <span class="v">{{VALEUR_PORTEUSE}}</span>
+      <span class="l">{{LIBELLE}}</span>
+      <span class="src">{{SOURCE}}</span>
+    </div>
+    <div class="b b-minor">
+      <span class="v">{{VALEUR_SECONDAIRE}}</span>
+      <span class="l">{{LIBELLE}}</span>
+      <span class="src">{{SOURCE}}</span>
+    </div>
+  </div>
+
+  <p>{{PROSE}}</p>
+
+  <blockquote class="pullquote">{{IDEE_FORCE}}</blockquote>
+
+  <figure>
+    <p class="fig-title">{{TITRE_FIGURE}}</p>
+    <img src="assets/{{FICHIER}}" alt="{{ALT_DESCRIPTIF}}">
+    <figcaption>{{ENSEIGNEMENT_DE_LA_FIGURE}} Source [{{N}}].</figcaption>
+  </figure>
+
+  <div class="tbl">
+    <p class="tbl-title">{{TITRE_TABLEAU}}</p>
+    <table>
+      <thead><tr><th>{{COL_1}}</th><th class="num">{{COL_2}}</th></tr></thead>
+      <tbody><tr><td>{{CELL}}</td><td class="num">{{CELL}}</td></tr></tbody>
+    </table>
+  </div>
+  <p class="src-note">Source [{{N}}].</p>
+
+  <div class="steps">
+    <div class="t">{{TITRE_STEPS}}</div>
+    <div class="step"><div>{{ETAPE_1}}</div></div>
+    <div class="step"><div>{{ETAPE_2}}</div></div>
+  </div>
+
+  <div class="encart attention">
+    <span class="kind">{{DEFINITION_METHODE_ATTENTION}}</span>
+    <div class="ttl">{{TITRE_ENCART}}</div>
+    <p>{{CORPS_ENCART}}</p>
+  </div>
+
+  <!-- VARIANTE — le do/don't en BANDE pleine largeur (§3), au moment où le document
+       bascule du constat à la recommandation. Une seule fois par livrable. -->
+  <div class="docdont-band">
+    <div class="bt">{{TITRE_DE_LA_BANDE}}</div>
+    <div class="docdont">
+      <div class="col do">
+        <div class="hd">{{À_FAIRE}}</div>
+        <ul><li>{{POINT}}</li></ul>
+      </div>
+      <div class="col dont">
+        <div class="hd">{{À_ÉVITER}}</div>
+        <ul><li>{{POINT}}</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE DE DONNÉES pleine page (§4) — pour LE fait central, un seul par document.
+       La figure est la variante SOMBRE du graphique. À placer après un bloc long. -->
+  <div class="data-page">
+    <div>
+      <div class="kicker">{{KICKER}}</div>
+      <h2>{{TITRE_DE_LA_FIGURE}}</h2>
+    </div>
+    {{SVG_INLINE_VERSION_SOMBRE}}
+    <div>
+      <p class="lecture">{{CE_QUE_LA_FIGURE_DÉMONTRE}}</p>
+      <p class="src">{{MÉTHODE_ET_SOURCE}}</p>
+    </div>
+  </div>
+
+  <!-- bandeau de respiration : seulement en fin de chapitre lourd, jamais au milieu
+       d'un raisonnement chiffré (R8) -->
+  <figure class="band">
+    <img src="assets/{{IMAGE_AMBIANCE}}" alt="{{ALT_DESCRIPTIF}}">
+    <figcaption>{{LEGENDE_QUI_RELIE_AU_CHAPITRE}}</figcaption>
+  </figure>
+</section>
+
+<!-- 5 — ANNEXES + SOURCES (obligatoire dès qu'une donnée est citée) -->
+<section class="annexes">
+  <h2>Annexes</h2>
+  <h3>A — Méthodologie</h3>
+  <p>{{METHODOLOGIE}}</p>
+  <!-- .src-start : à ajouter SEULEMENT si les dernières notices débordent malgré les
+       deux colonnes. Donne sa page à l'annexe plutôt qu'une page remplie à 8 %. -->
+  <h3>{{LETTRE}} — Sources</h3>
+  <ol class="sources">
+    <li>{{EMETTEUR}}, « {{TITRE_SOURCE}} », {{DATE_SOURCE}} — {{PERIMETRE}}.<br>
+        <span class="url">{{URL}}</span></li>
+  </ol>
+</section>
+
+<!-- 6 — CTA FINAL : une action unique -->
+<section class="fullbleed cta">
+  <img class="logo" src="assets/{{LOGO_BLANC}}" alt="{{CLIENT}}">
+
+  <div class="cta-corps">
+    <h1>{{ACCROCHE_CTA}}</h1>
+    <p>{{POURQUOI_C_EST_LA_SUITE_LOGIQUE}}</p>
+    <p><span class="action">{{LIBELLE_ACTION}}</span></p>
+    <!-- image INÉDITE, jamais une des précédentes ; sans légende -->
+    <figure class="band">
+      <img src="assets/{{IMAGE_CLOTURE}}" alt="{{ALT_DESCRIPTIF}}">
+    </figure>
+  </div>
+
+  <div class="cta-pied">
+    <div class="coords">{{CONTACT_REEL_OU_A_COMPLETER}}</div>
+    <p class="legal">{{MENTIONS}}</p>
+  </div>
+</section>
+
+</body>
+</html>

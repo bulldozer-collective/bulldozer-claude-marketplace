@@ -21,7 +21,7 @@ allowed-tools:
   - Edit
 effort: medium
 paths:
-  - **/bulldozer.json
+  - "**/bulldozer.json"
 ---
 
 # Bulldozer SEA services
