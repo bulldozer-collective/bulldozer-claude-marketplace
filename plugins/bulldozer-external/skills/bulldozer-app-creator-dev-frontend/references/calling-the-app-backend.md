@@ -28,6 +28,12 @@ load() {
 add(text: string) {
   this.app.post<Note>('/notes', { text }).subscribe(() => this.load());
 }
+
+search(status: string) {
+  // Second argument = query parameters. They reach the service as `?status=open&limit=20`.
+  this.app.get<{ items: Note[] }>('/notes', { status, limit: 20 })
+    .subscribe((page) => this.notes.set(page.items));
+}
 ```
 
 Anything that takes more than **30 seconds is cut off** — not by the app, by what sits in front of

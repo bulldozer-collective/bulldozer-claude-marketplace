@@ -492,6 +492,24 @@ export function relativePath(rawPath) {
   return (rawPath ?? '').replace(/^\/[^/]+\/[^/]+\/api/, '') || '/';
 }
 
+/**
+ * La chaîne de requête, prête à être recollée au chemin.
+ *
+ * La plateforme la livre à part du chemin : ce qui est reconstruit ici, c'est l'URL que le code de
+ * l'app croit recevoir. Deux sources sont acceptées, parce que selon la façon dont l'app est
+ * appelée l'une ou l'autre est fournie.
+ */
+export function queryOf(event) {
+  if (event?.rawQueryString) {
+    return `?${event.rawQueryString}`;
+  }
+  const parameters = event?.queryStringParameters;
+  if (!parameters || Object.keys(parameters).length === 0) {
+    return '';
+  }
+  return `?${new URLSearchParams(parameters).toString()}`;
+}
+
 /** Trouve la route déclarée qui correspond, en acceptant un paramètre final `{id}`. */
 export function matchRoute(routes, method, path) {
   const exact = routes[`${method} ${path}`] ?? routes[path];
@@ -548,7 +566,12 @@ async function runHttp(definition, event) {
   }
 
   try {
-    const request = new Request(`https://app.internal${path}`, {
+    // La chaîne de requête est recollée ici. Construire l'URL à partir du seul chemin la perdait :
+    // `new URL(request.url).searchParams` rendait toujours vide, donc `?limit=5` était ignoré et
+    // l'app repartait sur sa valeur par défaut — une réponse plausible, jamais une erreur. C'est le
+    // pire genre de défaut, et il a fallu un test de bout en bout comparant 5 demandés à 3 rendus
+    // pour le voir.
+    const request = new Request(`https://app.internal${path}${queryOf(event)}`, {
       method,
       headers: event.headers ?? {},
       ...(event.body ? { body: event.isBase64Encoded ? Buffer.from(event.body, 'base64') : event.body } : {}),

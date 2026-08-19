@@ -82,13 +82,20 @@ function parseArguments(argv) {
   return { ...options, customerId, projectId, userId };
 }
 
-/** `POST /notes {"text":"hi"}` → method, path, body. The body is everything after the path. */
+/**
+ * `POST /notes {"text":"hi"}` → method, path, query, body. The body is everything after the path.
+ *
+ * The query string is split off the path, because the platform delivers the two separately. Leaving
+ * `?limit=5` inside the path made route matching fail here while it worked in production — a harness
+ * that diverges on the shape of the event cannot be trusted about what the event carries.
+ */
 function parseRequest(raw) {
   const match = /^\s*([A-Z]+)\s+(\/\S*)\s*([\s\S]*)$/.exec(raw ?? '');
   if (!match || !HTTP_METHODS.has(match[1])) {
     throw new Error(`could not read the request "${raw}" — expected e.g. 'POST /notes {"a":1}'`);
   }
-  return { method: match[1], path: match[2], body: match[3].trim() || undefined };
+  const [path, query = ''] = match[2].split('?');
+  return { method: match[1], path, query, body: match[3].trim() || undefined };
 }
 
 // ─────────────────────────────────────────────────────────── running
@@ -125,10 +132,11 @@ async function prepare(appDir) {
   return work;
 }
 
-function httpEvent({ method, path, body }, context) {
+function httpEvent({ method, path, query, body }, context) {
   return {
     // The platform prefixes the public path; `relativePath` strips exactly these two segments.
     rawPath: `/local/app/api${path}`,
+    rawQueryString: query ?? '',
     requestContext: {
       http: { method },
       authorizer: {

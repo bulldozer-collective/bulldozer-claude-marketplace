@@ -31,7 +31,8 @@ reference they and you check against.
 
 Three tiers, and confusing them is how a manifest ends up lying:
 
-- **applied** — `storage` and `limits` decide what is actually set up;
+- **applied** — `storage`, `indexes` and `limits` decide what is actually set up. `indexes` is the
+  only one that is **billed**: an index too many costs on every write, used or not;
 - **checked before the app goes live** — `name`, `runtime`, `personalData`, `routes`, `egress`;
 - **neither** — `scopes` and `serviceProjects` are read and stored, but nothing acts on them yet.
   Do not write them expecting an effect, and never present them to the user as a protection.
@@ -114,9 +115,13 @@ of the app's collections, so `createdAt` declared once serves `leads`, `notes` a
 why 20 is a generous ceiling.
 
 > Removing an entry **deletes** the index on the next publication. No document is lost, but a query
-> that relied on it starts failing. Adding one to an app that already holds data makes that
-> publication take a few minutes: the platform waits for the index to be filled rather than let the
-> app read a half-built one.
+> that relied on it starts failing.
+>
+> Adding one to an app that already holds data makes that publication take **five to ten minutes**
+> instead of one: the platform waits for the index to be built rather than let the app read a
+> half-built one. That delay is a fixed cost of building an index, not something proportional to how
+> much data there is — it is the same on five documents as on five thousand. Say so before starting;
+> otherwise the wait looks like a failure.
 
 ## `limits` — the two settings that matter
 

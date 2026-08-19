@@ -29,6 +29,19 @@ export const handler = defineApp({
 `request.headers.get(…)`, `new URL(request.url).searchParams`. Return `ctx.json(body, status)`, or a
 plain object for a 200.
 
+```js
+'GET /leads': async (request, ctx) => {
+  const params = new URL(request.url).searchParams;         // ?limit=20&statut=ouvert
+  const limit = Number(params.get('limit') ?? 20);
+  const statut = params.get('statut');
+  return ctx.json(await ctx.db.collection('leads')
+    .list({ limit, ...(statut ? { where: { statut } } : {}) }));
+},
+```
+
+Read a missing parameter as absent, never as an error: a screen that omits `?statut=` is asking for
+everything, not making a mistake.
+
 ## 1. REST routes
 
 Declare only what the app needs, and name paths after what they hold, not after what they do:

@@ -54,6 +54,16 @@ write the value out in the open.
 gambling, and the other excluded categories are refused, and no rewording changes that. Tell the
 user directly; do not try to disguise the app's purpose.
 
+## One refusal that is **ours**, not the app's
+
+**"The check could not be completed, for a technical reason on our side."** That is exactly what it
+says: no check found anything against the app. The reviewing model's answer could not be read —
+usually because it ran long and was cut off.
+
+Do not look for a fault in the code, and do not change anything. Say plainly that the platform
+failed, and republish the same app unchanged. If it happens twice in a row on the same app, that is
+worth reporting rather than working around.
+
 ## Two refusals that are the *manifest's* fault, not the code's
 
 These two are worth checking before touching a single line, because the code is usually right and
