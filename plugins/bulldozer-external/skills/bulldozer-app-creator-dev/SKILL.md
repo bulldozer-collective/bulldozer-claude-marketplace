@@ -86,8 +86,8 @@ my-app/                    the Angular project (ng new), and inside it:
 └── .bulldozer-app.json    the local marker — never published
 ```
 
-Then: **service** → `bulldozer:bulldozer-app-creator-dev-backend` first, since the screen needs its
-routes; **screen** → `bulldozer:bulldozer-app-creator-dev-frontend`, given the `clientId` and the
+Then: **service** → `bulldozer-app-creator-dev-backend` first, since the screen needs its
+routes; **screen** → `bulldozer-app-creator-dev-frontend`, given the `clientId` and the
 `subdomain`; then publish with `references/packaging.md` §2 onwards.
 
 An app with a service is **reviewed before it goes live** — about a minute, and it can end in a

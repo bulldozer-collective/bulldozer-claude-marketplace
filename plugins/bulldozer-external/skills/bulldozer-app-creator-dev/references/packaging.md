@@ -57,10 +57,11 @@ refuses, **fix the cause** — the message names it — and run it again.
 ## 4. Upload, then publish
 
 The archive goes through the fridge, a short-lived drop. Use the `bulldozer:bulldozer-fridge`
-skill's script rather than hand-rolling the upload:
+skill's script rather than hand-rolling the upload — **invoke that skill and let it give you the
+path to its own script**, which is not the same depending on how it is installed:
 
 ```bash
-python skills/bulldozer-fridge/scripts/upload_fridge_file.py --file app.zip --code <code>
+python <path given by bulldozer-fridge>/upload_fridge_file.py --file app.zip --code <code>
 ```
 
 - mint the code with **`bdzRequestFridgeCode`** (needs `customerId`);
