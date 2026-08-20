@@ -53,6 +53,39 @@ app's author can see what broke — do not swallow errors to keep responses tidy
 **A request is cut off after 30 seconds**, by what sits in front of the app. There is no setting to
 raise. Anything that could take longer is a long task (§4).
 
+### The API documents itself
+
+Every app answers `GET …/api/openapi.yaml` (and `.json`) with an OpenAPI document, built from the
+routes it declares. Nothing to write and nothing to maintain — and **never declare these paths in
+the manifest**, the platform provides them like `GET /jobs/{id}`.
+
+Derived rather than written, because a hand-kept document drifts from its API on the second change,
+and a wrong document is worse than none: it gets believed.
+
+What cannot be derived is what the bodies contain. Add it with an optional `openapi` key — a plain
+OpenAPI fragment, merged over the generated one:
+
+```js
+export const handler = defineApp({
+  openapi: {
+    info: { title: 'Content Machine' },
+    paths: {
+      '/notes': {
+        post: {
+          summary: 'Creates a note',
+          requestBody: { content: { 'application/json': { schema: { $ref: '#/components/schemas/Note' } } } },
+        },
+      },
+    },
+    components: { schemas: { Note: { type: 'object', properties: { text: { type: 'string' } } } } },
+  },
+  routes: { … },
+});
+```
+
+Only what you add is yours to keep correct; paths, methods, path parameters and the platform's own
+response codes stay in step with the code on their own.
+
 ## 2. Its own data
 
 ```js
@@ -150,13 +183,34 @@ perfectly normal. Use `by`, or read everything with `all()`.
 await ctx.files.put('report.csv', csvText, 'text/csv');
 await ctx.files.get('report.csv');            // a Buffer
 await ctx.files.list();                       // [{ name, size, updatedAt }]
-await ctx.files.url('report.csv', 300);       // a link, valid 5 minutes
+await ctx.files.url('report.csv', 300);       // a download link, valid 5 minutes
+await ctx.files.uploadUrl('scan.pdf', 'application/pdf', 300);   // an upload link
 await ctx.files.delete('report.csv');
 ```
 
-To let someone download a file, **return `url(...)`, never the bytes**: a file passing through the
-app costs memory it does not have and is capped in size. Names cannot contain `..` or start with
-`/`; the storage is per-project, like the data.
+Names cannot contain `..` or start with `/`; the storage is per-project, like the data.
+
+**Files never travel through the app — in either direction.** To let someone download one, return
+`url(...)`, never the bytes. To let someone *send* one, return `uploadUrl(...)` and let the screen
+`PUT` the file straight to it.
+
+This is not a preference. **A request body reaching the app is capped at 1 MB**, and anything above
+that gets a `413` before your code runs. So an upload posted to one of your own routes works while
+the file is small and starts failing the day a user picks a real document — the worst kind of bug,
+because it looks like it works.
+
+The screen's side of an upload:
+
+```js
+const { url } = await api.post('/attachments', { name: file.name, type: file.type });
+await fetch(url, { method: 'PUT', headers: { 'Content-Type': file.type }, body: file });
+```
+
+The `Content-Type` sent must be **exactly** the one passed to `uploadUrl` — the signature covers
+it, so a different type is refused by the storage.
+
+The 1 MB cap applies to every route, not only file ones: a very long text or a large JSON payload
+hits it too. Split the work, or route the payload through a file.
 
 ## 4. Long tasks
 

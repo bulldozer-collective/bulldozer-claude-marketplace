@@ -90,8 +90,10 @@ COMMENT_RE = re.compile(r"/\*.*?\*/|(?<![:\\])//[^\n]*", re.S)
 # folder by that name has its files uploaded and never served — the one failure with no symptom.
 RESERVED_SCREEN_DIR = "api"
 
-# Provided by the platform on every app, so it is never declared and never implemented.
-BUILTIN_ROUTE = "/jobs/{id}"
+# Provided by the platform on every app, so they are never declared and never implemented. The
+# helper answers them from the request path rather than from a route key, precisely so that
+# `_check_routes` below does not read them out of the shipped helper as routes of the app.
+BUILTIN_ROUTES = {"/jobs/{id}", "/openapi.yaml", "/openapi.json"}
 
 SKIPPED_NAMES = {".DS_Store", "Thumbs.db", ".bulldozer-app.json"}
 SKIPPED_DIRS = {"__MACOSX", "node_modules", ".git", ".angular", "__pycache__"}
@@ -223,7 +225,7 @@ def _check_routes(manifest: dict, files: dict[str, str]) -> list[str]:
     for method, path in sorted(declared_in_code - in_manifest):
         problems.append('the code answers %s %s but "routes" does not declare it' % (method, path))
     for method, path in sorted(in_manifest - declared_in_code):
-        if path == BUILTIN_ROUTE:
+        if path in BUILTIN_ROUTES:
             problems.append('"routes" declares %s %s — the platform provides it, remove the entry'
                             % (method, path))
         else:

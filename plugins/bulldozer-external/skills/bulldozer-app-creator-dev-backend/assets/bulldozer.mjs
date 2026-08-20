@@ -36,6 +36,9 @@ const STORAGE_PREFIX = process.env.BDZ_STORAGE_PREFIX;
 const QUEUE_URL = process.env.BDZ_QUEUE_URL;
 const API_BASE_URL = process.env.BDZ_API_BASE_URL ?? 'https://api.bulldozer-collective.fr/v2';
 
+/** Taille maximale du corps d'une requête reçue par une app. Voir `runHttp` pour le pourquoi. */
+const MAX_BODY_BYTES = Number(process.env.BDZ_MAX_BODY_BYTES ?? 1_048_576);
+
 const db = DynamoDBDocumentClient.from(new DynamoDBClient({ region: REGION }));
 const s3 = new S3Client({ region: REGION });
 const sqs = new SQSClient({ region: REGION });
@@ -341,6 +344,26 @@ function files(projectId) {
         { expiresIn: expiresInSeconds });
     },
 
+    /**
+     * Une URL d'envoi à durée limitée, à donner au navigateur. Symétrique de `url()`, et pour la
+     * même raison — mais celle-ci a une histoire, donc elle a des consignes.
+     *
+     * Envoyer un fichier dans le corps d'une requête vers l'app le fait traverser CloudFront, son
+     * WAF, puis la mémoire de la fonction, et butter sur le plafond de 1 Mo posé plus haut. Le
+     * pare-feu coupait même à 8 Ko : aucune app ne pouvait recevoir de fichier, et l'erreur
+     * arrivait sous la forme d'un 403 de CloudFront que rien ne rattachait à l'app. Un envoi
+     * direct vers le stockage ne rencontre aucune de ces limites.
+     *
+     * Le navigateur doit faire un `PUT` sur cette URL, en posant exactement le même
+     * `Content-Type` que celui donné ici : la signature le couvre, donc un type différent est
+     * refusé par le stockage.
+     */
+    async uploadUrl(name, contentType = 'application/octet-stream', expiresInSeconds = 300) {
+      return getSignedUrl(s3, new PutObjectCommand({
+        Bucket: BUCKET, Key: keyOf(name), ContentType: contentType,
+      }), { expiresIn: expiresInSeconds });
+    },
+
     async delete(name) {
       await s3.send(new DeleteObjectCommand({ Bucket: BUCKET, Key: keyOf(name) }));
     },
@@ -477,6 +500,11 @@ function buildContext({ userId, customerId, projectId, role, token, timeoutSec }
  *                           relatifs : la plateforme ajoute le préfixe public.
  * @param definition.jobs    `{ 'mon-traitement': async (payload, ctx) => … }`. Ce que le handler
  *                           rend devient le résultat du traitement.
+ * @param definition.openapi  Facultatif. Un fragment OpenAPI fusionné par-dessus la documentation
+ *                           que l'aide génère à partir des routes, et servie d'office à
+ *                           `…/api/openapi.yaml`. Sert à ce que l'aide ne peut pas deviner : le
+ *                           contenu des corps de requête et de réponse.
+ *                           `{ info: { title: 'Mon app' }, paths: { '/notes': { post: { … } } } }`
  */
 export function defineApp(definition) {
   return async (event) => {
@@ -534,15 +562,212 @@ export function matchRoute(routes, method, path) {
   return null;
 }
 
+// ────────────────────────────────────────────── la documentation de l'API
+
+/**
+ * Les deux adresses où l'aide sert la documentation. Écrites comme constantes, et jamais sous la
+ * forme d'une clé de route : le script d'empaquetage relit tous les fichiers de l'archive à la
+ * recherche de clés « MÉTHODE /chemin », et il lirait une telle clé comme une route de l'app —
+ * puis refuserait l'archive parce que le manifeste ne la déclare pas.
+ */
+const OPENAPI_YAML = '/openapi.yaml';
+const OPENAPI_JSON = '/openapi.json';
+
+/** Ce qu'OpenAPI sait nommer. Sert à développer une route déclarée sans méthode. */
+const OPENAPI_METHODS = ['get', 'post', 'put', 'patch', 'delete'];
+
+/** Les méthodes qui portent un corps, donc les seules que le plafond de taille concerne. */
+const METHODS_WITH_BODY = new Set(['post', 'put', 'patch']);
+
+/**
+ * Les réponses que l'aide produit elle-même, définies une fois et référencées ensuite.
+ *
+ * Une seule chose est documentée par opération, et c'est la limite du procédé : l'aide ne sait pas
+ * quel code de succès une route rend. Elle annonce donc la famille « 2XX » plutôt que 200 —
+ * affirmer 200 serait faux sur toute route qui rend 201, ce qu'un POST fait normalement.
+ *
+ * Pas de 404 non plus : « aucune route ne correspond » n'est pas une réponse de cette opération-ci,
+ * c'est ce qu'on obtient quand aucune opération n'est atteinte. Seul /jobs/{id} en déclare un, parce
+ * que là il désigne vraiment un traitement inconnu.
+ */
+const SHARED_RESPONSES = {
+  BdzUnauthorized: { description: "Personne n'est connecté : la requête n'a pas de projet scellé." },
+  BdzForbidden: { description: 'Refusé en amont : jeton absent, invalide, ou projet non autorisé.' },
+  BdzPayloadTooLarge: {
+    description: `Le corps de la requête dépasse ${MAX_BODY_BYTES / 1024 / 1024} Mo. Pour un `
+      + "fichier, demander une URL d'envoi et envoyer directement au stockage.",
+  },
+  BdzError: { description: "Erreur non rattrapée dans l'app ; le message est celui de l'exception." },
+};
+
+const shared = (name) => ({ $ref: `#/components/responses/${name}` });
+
+function standardResponses(method) {
+  return {
+    '2XX': { description: 'Succès. Le code exact et le corps dépendent de la route.' },
+    401: shared('BdzUnauthorized'),
+    403: shared('BdzForbidden'),
+    ...(METHODS_WITH_BODY.has(method) ? { 413: shared('BdzPayloadTooLarge') } : {}),
+    500: shared('BdzError'),
+  };
+}
+
+/** Le préfixe public de l'app, tel qu'il apparaît dans la requête. */
+export function apiPrefix(rawPath) {
+  return (/^\/[^/]+\/[^/]+\/api/.exec(rawPath ?? '') ?? [''])[0];
+}
+
+function pathParameters(path) {
+  return [...path.matchAll(/\{(\w+)\}/g)].map(([, name]) => ({
+    name, in: 'path', required: true, schema: { type: 'string' },
+  }));
+}
+
+/**
+ * Le document OpenAPI de l'app, dérivé de sa table de routes.
+ *
+ * Dérivé, et non écrit : c'est ce qui le rend structurellement impossible à laisser périmer. Une
+ * documentation tenue à la main dérive de son API dès la deuxième modification, et une
+ * documentation fausse est pire qu'absente — elle est crue.
+ *
+ * Ce que l'aide ne peut pas deviner, c'est ce que les corps de requête et de réponse contiennent.
+ * L'auteur le fournit par la clé `openapi` de `defineApp`, fusionnée par-dessus ce squelette.
+ */
+export function openApiDocument(definition, prefix) {
+  const paths = {};
+
+  const put = (path, methods, summary) => {
+    const parameters = pathParameters(path);
+    paths[path] ??= {};
+    for (const method of methods) {
+      paths[path][method] = {
+        ...(summary ? { summary } : {}),
+        ...(parameters.length > 0 ? { parameters } : {}),
+        responses: standardResponses(method),
+      };
+    }
+  };
+
+  for (const declaration of Object.keys(definition?.routes ?? {})) {
+    const [declaredMethod, declaredPath] = declaration.includes(' ')
+      ? declaration.split(' ')
+      : ['', declaration];
+    // Une clé sans méthode répond à TOUTES les méthodes — voir matchRoute. OpenAPI n'a pas de
+    // joker, donc les cinq opérations sont écrites : c'est ce que l'app fait réellement, et
+    // n'en documenter qu'une serait faux plutôt que synthétique.
+    put(declaredPath, declaredMethod ? [declaredMethod.toLowerCase()] : OPENAPI_METHODS);
+  }
+
+  // Les routes fournies par l'aide. Les omettre rendrait le document incomplet sur des endpoints
+  // que toute app possède, et sur lesquels aucun auteur ne peut renseigner quoi que ce soit.
+  put('/jobs/{id}', ['get'], "L'état d'un traitement long.");
+  paths['/jobs/{id}'].get.responses[404] = { description: 'Traitement inconnu.' };
+  put(OPENAPI_YAML, ['get'], 'Ce document.');
+  put(OPENAPI_JSON, ['get'], 'Ce document, en JSON.');
+
+  return deepMerge({
+    openapi: '3.1.0',
+    info: { title: titleFrom(prefix), version: '1.0.0' },
+    // Relatif à dessein : un serveur absolu demanderait l'hôte, que la fonction ne reçoit que si
+    // le CDN le transmet. OpenAPI résout une URL relative contre l'adresse du document.
+    servers: [{ url: prefix || '/' }],
+    paths,
+    components: { responses: SHARED_RESPONSES },
+  }, definition?.openapi ?? {});
+}
+
+/**
+ * Le sous-domaine, faute de mieux : le manifeste n'est pas embarqué avec la fonction — seul
+ * `backend/` entre dans le bundle — donc le nom déclaré de l'app n'existe pas à l'exécution.
+ * L'auteur peut le remplacer par `openapi.info.title`.
+ */
+function titleFrom(prefix) {
+  const segments = (prefix ?? '').split('/').filter(Boolean);
+  return segments.length >= 2 ? segments[1] : 'app';
+}
+
+const isPlainObject = (value) =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+/** Fusion en profondeur. Un tableau est remplacé, pas concaténé : `servers` doit pouvoir être imposé. */
+function deepMerge(base, overlay) {
+  if (!isPlainObject(base) || !isPlainObject(overlay)) {
+    return overlay === undefined ? base : overlay;
+  }
+  const merged = { ...base };
+  for (const [key, value] of Object.entries(overlay)) {
+    merged[key] = key in merged ? deepMerge(merged[key], value) : value;
+  }
+  return merged;
+}
+
+/**
+ * Sérialise en YAML. Une trentaine de lignes plutôt qu'une dépendance : l'aide ne doit rien avoir
+ * à installer, et le document à écrire n'a que des maps, des tableaux et des scalaires.
+ */
+export function toYaml(value) {
+  return `${yamlBlock(value, 0).replace(/^\n/, '')}\n`;
+}
+
+/** Rend un fragment commençant soit par une espace (scalaire en ligne), soit par un saut de ligne. */
+function yamlBlock(value, depth) {
+  const pad = '  '.repeat(depth);
+
+  if (Array.isArray(value)) {
+    return value.length === 0
+      ? ' []'
+      : value.map((item) => `\n${pad}-${yamlBlock(item, depth + 1)}`).join('');
+  }
+
+  if (isPlainObject(value)) {
+    const entries = Object.entries(value).filter(([, item]) => item !== undefined);
+    return entries.length === 0
+      ? ' {}'
+      : entries.map(([key, item]) => `\n${pad}${yamlScalar(key)}:${yamlBlock(item, depth + 1)}`)
+        .join('');
+  }
+
+  return ` ${yamlScalar(value)}`;
+}
+
+/**
+ * Toute chaîne part entre guillemets doubles, échappée par `JSON.stringify`.
+ *
+ * Ce n'est pas une facilité : les échappements de JSON sont un sous-ensemble de ceux du YAML
+ * double-quoté, donc le résultat est valide **par construction**, pour n'importe quelle entrée.
+ * Un émetteur qui décide au cas par cas s'il faut des guillemets se casse sur les descriptions
+ * d'auteur — celles qui contiennent « : », un guillemet, ou un retour à la ligne.
+ */
+function yamlScalar(value) {
+  if (value === null) return 'null';
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  return JSON.stringify(String(value));
+}
+
 async function runHttp(definition, event) {
   const sealed = event?.requestContext?.authorizer?.lambda ?? {};
   if (!sealed.projectId) {
     return reply(401, { error: "Cette application n'est accessible qu'après connexion." });
   }
 
+  // Le plafond est posé ICI et pas dans le pare-feu, parce que le pare-feu ne sait pas le poser :
+  // il ne voit au plus que les 64 premiers kilo-octets d'un corps de requête, donc au-delà il ne
+  // distingue pas 100 Ko de 10 Mo. La taille exacte n'est connue qu'à cet endroit.
+  if (bodyBytes(event) > MAX_BODY_BYTES) {
+    return reply(413, {
+      error: `Le contenu envoyé dépasse ${MAX_BODY_BYTES / 1024 / 1024} Mo. `
+        + "Pour un fichier, demandez une URL d'envoi avec ctx.files.uploadUrl() et envoyez-le "
+        + 'directement, sans passer par cette application.',
+    });
+  }
+
   const ctx = buildContext({
     userId: sealed.userId,
-    customerId: sealed.customerId,
+    // Le contexte scellé ne nomme pas de client quand l'appelant entre par le laissez-passer
+    // administrateur : il n'a pas d'appartenance au projet, donc rien à en tirer. Le client de
+    // l'installation, lui, est fixe et connu de la fonction — c'est déjà ce que fait le chemin
+    // des traitements longs, plus bas.
+    customerId: sealed.customerId || process.env.BDZ_CUSTOMER_ID,
     projectId: sealed.projectId,
     role: sealed.role,
     token: bearerToken(event),
@@ -558,6 +783,15 @@ async function runHttp(definition, event) {
   if (method === 'GET' && jobStatus) {
     const job = await ctx.jobs.status(jobStatus[1]);
     return job ? reply(200, job) : reply(404, { error: 'Traitement inconnu.' });
+  }
+
+  // Fournie d'office elle aussi, et placée AVANT le routage : une route d'auteur portant le même
+  // nom masquerait sinon la documentation, sans que rien ne le signale nulle part.
+  if (method === 'GET' && (path === OPENAPI_YAML || path === OPENAPI_JSON)) {
+    const document = openApiDocument(definition, apiPrefix(event.rawPath));
+    return path === OPENAPI_YAML
+      ? replyText(200, 'application/yaml; charset=utf-8', toYaml(document))
+      : replyText(200, 'application/json; charset=utf-8', JSON.stringify(document, null, 2));
   }
 
   const route = matchRoute(definition.routes ?? {}, method, path);
@@ -638,6 +872,22 @@ function bearerToken(event) {
     .find(([key]) => key.toLowerCase() === 'authorization')?.[1];
   const [scheme, value] = String(raw ?? '').split(' ');
   return scheme?.toLowerCase() === 'bearer' && value ? value : null;
+}
+
+/**
+ * Taille réelle du corps, en octets.
+ *
+ * API Gateway livre un corps binaire encodé en base64 : mesurer la chaîne telle quelle
+ * surestimerait d'un tiers, et un envoi de 800 Ko serait refusé comme s'il dépassait le mégaoctet.
+ */
+export function bodyBytes(event) {
+  if (!event?.body) return 0;
+  return Buffer.byteLength(event.body, event.isBase64Encoded ? 'base64' : 'utf8');
+}
+
+/** Une réponse qui n'est pas du JSON — la documentation de l'API, seule dans ce cas à ce jour. */
+function replyText(status, contentType, body) {
+  return { statusCode: status, headers: { 'Content-Type': contentType }, body };
 }
 
 function reply(status, body) {

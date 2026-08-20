@@ -62,6 +62,39 @@ export class BulldozerAppService {
   }
 
   /**
+   * Sends a file, in two steps: the app hands out a one-time link, then the browser sends the bytes
+   * **straight to the storage** without going through the app at all.
+   *
+   * **Never post a file to one of the app's own routes.** A request body reaching the app is capped
+   * at 1 MB, and the platform's firewall used to cut it at 8 KB — an upload written that way works
+   * while the file is small, then fails the day someone picks a real document, with a `403` that
+   * names neither the app nor the size. Going through the storage has no such ceiling.
+   *
+   * The app's route must answer `{ url }`, from `ctx.files.uploadUrl(name, type)`. It is also the
+   * right place for it to record the file in its own data — it knows the name, since it just minted
+   * a link for it, so the screen does not need a third call to confirm.
+   *
+   * @param path  the app's route that hands out the link, named by the app, e.g. '/attachments'.
+   * @param file  what the file input gave you.
+   * @param extra anything else that route needs, alongside the file's name and type.
+   */
+  uploadFile(path: string, file: File, extra: Record<string, unknown> = {}): Observable<void> {
+    // Resolved ONCE and reused for both calls. A browser leaves `file.type` empty for an unknown
+    // extension; asking for a link under one type and then sending another breaks the signature,
+    // and the storage refuses with a message about neither.
+    const type = file.type || 'application/octet-stream';
+
+    return this.post<{ url: string }>(path, { name: file.name, type, ...extra }).pipe(
+      switchMap(({ url }) =>
+        // Deliberately WITHOUT the headers that `call()` adds: this request goes to the storage,
+        // not to the app. The link already carries its own authorisation, and sending the
+        // sign-in token to a third party would hand it out for nothing.
+        this.http.put<void>(url, file, { headers: { 'Content-Type': type } }),
+      ),
+    );
+  }
+
+  /**
    * Starts a long task and then reports its progress until it ends.
    *
    * Emits the task on every check and **completes on its own** once the state is final, so a

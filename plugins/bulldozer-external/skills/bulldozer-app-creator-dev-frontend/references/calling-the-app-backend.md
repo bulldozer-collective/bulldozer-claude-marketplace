@@ -39,6 +39,29 @@ search(status: string) {
 Anything that takes more than **30 seconds is cut off** — not by the app, by what sits in front of
 it. There is no setting to raise. Work that can exceed that must be a long task.
 
+## Sending a file
+
+Use `uploadFile`. **Never post a file to one of the app's own routes**, with `post()` or with a
+hand-written `fetch`:
+
+```ts
+attach(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (file) {
+    this.app.uploadFile('/attachments', file).subscribe(() => this.load());
+  }
+}
+```
+
+The app's route answers `{ url }` — a one-time link from `ctx.files.uploadUrl(name, type)` — and the
+browser then sends the bytes straight to the storage. Two calls, both handled for you.
+
+Why it matters: **a request body reaching the app is capped at 1 MB.** An upload posted to one of
+the app's own routes works while the file is small and fails the day someone picks a real document.
+Worse, a hand-written `fetch` misses the sign-in and project headers that this service adds, and the
+call is refused with `{"message":"Unauthorized"}` — which names neither the missing header nor the
+app. Both of these have already happened.
+
 ## Long tasks
 
 The route that starts the work answers immediately with the task, not with the result. The service
