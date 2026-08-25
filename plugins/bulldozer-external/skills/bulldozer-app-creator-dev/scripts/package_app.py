@@ -63,15 +63,26 @@ MAX_ARCHIVE_BYTES = 25 * 1024 * 1024
 MEMORY_MB = (128, 3008)
 TIMEOUT_SEC = (1, 300)
 
-# What the runtime provides. There is no dependency installation step: an import of anything else
-# resolves to nothing and the service crashes on its first call, in production, with no clue.
-PROVIDED = {
+# What the runtime provides — to the SHIPPED HELPER, and to nothing else.
+#
+# There is no dependency installation step, so an import of anything outside this set and Node's own
+# modules resolves to nothing and the service crashes on its first call, in production, with no clue.
+#
+# These five are the store, the file space and the queue. The helper reaches them and builds every
+# key from the caller's project; that key construction IS the project boundary, and it is the only
+# thing enforcing it — the app's IAM role grants its whole table, with no leading-key condition. An
+# app that imports these talks to the store directly, assembles its own keys, and reads the
+# neighbouring project of the same customer. Hence the refusal below, outside the helper.
+HELPER_ONLY = {
     "@aws-sdk/client-dynamodb",
     "@aws-sdk/lib-dynamodb",
     "@aws-sdk/client-s3",
     "@aws-sdk/s3-request-presigner",
     "@aws-sdk/client-sqs",
 }
+
+# The one file those imports belong to.
+HELPER = BACKEND_DIR + "bulldozer.mjs"
 
 IMPORT_RE = re.compile(r"""(?:^|[^\w$.])(?:import|export)\s
                            (?:[^'"()]*?\sfrom\s)?['"]([^'"]+)['"]""", re.X | re.M)
@@ -264,7 +275,20 @@ def _check_imports(files: dict[str, str]) -> list[str]:
         with open(source, encoding="utf-8", errors="replace") as f:
             code = COMMENT_RE.sub("", f.read())
         for specifier in IMPORT_RE.findall(code):
-            if specifier.startswith("node:") or specifier in PROVIDED:
+            if specifier.startswith("node:"):
+                continue
+            if specifier in HELPER_ONLY:
+                if archive_path == HELPER:
+                    continue
+                # Deliberately NOT the "nothing is installed" message below: this module does exist
+                # at runtime, so that message would be false and the author would chase the wrong
+                # thing. Name the boundary instead, and where to go.
+                problems.append(
+                    '%s imports "%s". An app reaches its data through ctx.db, its files through '
+                    "ctx.files and its long tasks through ctx.jobs — never the store directly. The "
+                    "shipped helper builds every key from the caller's project, and that is what "
+                    "keeps one project's data out of another's: a key assembled by hand reads the "
+                    "neighbouring project." % (archive_path, specifier))
                 continue
             if specifier.startswith("."):
                 target = os.path.normpath(
@@ -274,9 +298,9 @@ def _check_imports(files: dict[str, str]) -> list[str]:
                                     % (archive_path, specifier))
                 continue
             problems.append(
-                '%s imports "%s". Nothing is installed for the app: only relative files and '
-                "the modules the runtime provides (%s) can be imported."
-                % (archive_path, specifier, ", ".join(sorted(PROVIDED))))
+                '%s imports "%s". Nothing is installed for the app: only its own files, the shipped '
+                "helper, and Node's own modules can be imported."
+                % (archive_path, specifier))
     return problems
 
 

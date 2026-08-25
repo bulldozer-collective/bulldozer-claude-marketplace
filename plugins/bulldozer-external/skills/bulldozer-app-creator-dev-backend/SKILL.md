@@ -30,8 +30,12 @@ my-app/
 Copy the helper from `assets/bulldozer.mjs`. **Never edit it and never rewrite what it does.** It is
 what keeps one project's data out of another's, and an app that builds its own keys loses that.
 
-Nothing is installed. The service may import the helper, Node's own modules, and the same modules
-the helper itself imports — nothing else. There is no `package.json` and no dependency step.
+Nothing is installed. The service may import the helper, Node's own modules and its own files —
+nothing else. There is no `package.json` and no dependency step.
+
+**The helper's own imports are not yours.** They reach the store directly, and the helper is the only
+thing that builds keys from the caller's project — an app that imports them builds its own keys, and
+a hand-built key reads the neighbouring project. Packaging refuses them.
 
 ## 1. Understand the need, in the user's words
 

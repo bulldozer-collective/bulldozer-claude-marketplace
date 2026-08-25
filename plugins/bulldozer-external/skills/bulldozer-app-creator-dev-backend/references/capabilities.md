@@ -86,6 +86,16 @@ export const handler = defineApp({
 Only what you add is yours to keep correct; paths, methods, path parameters and the platform's own
 response codes stay in step with the code on their own.
 
+### Calls are counted
+
+Every call to one of your routes is recorded — who made it, which route, what status came back.
+Nothing to write: the helper does it, and the platform reads the caller's identity from their own
+token, so the figure cannot be inflated by the app.
+
+Only the routes **you** declare are counted. The endpoints the platform provides are not: the screen
+polls the job status every two seconds, and counting that would bury the only question the figures
+answer — who uses this app, and for what.
+
 ## 2. Its own data
 
 ```js
@@ -113,6 +123,33 @@ app's data changes when the user switches project.
 
 Every document also gets an `updatedAt`, written on each `put`. That is the only field the platform
 adds: **anything else the app needs, the app writes**.
+
+### What it actually is
+
+The store is **DynamoDB**, one table per installation, with two keys:
+
+| Key | Value |
+|-----|-------|
+| partition key | `{projectId}#{collection}` — built by the helper, never by the app |
+| sort key | the document's `id` |
+
+`by` names a **global secondary index**, and every index reuses that same partition key. The project
+boundary therefore holds by construction, indexes included: no query can be written that reaches
+another project's partition, not even through an index.
+
+Knowing this makes the rest deducible instead of arbitrary:
+
+- a sort axis has to be **declared** because the index must exist before it can be queried;
+- a condition **on the sort axis** narrows what is read; a condition on any other field is a filter
+  applied after reading the partition — which is why `scanned` can dwarf what comes back;
+- there is no `count()` and no `groupBy()` because DynamoDB has neither;
+- splitting `leads` into `leads-2026-08` splits the **partition**, and a smaller partition is a
+  cheaper read. That is usually the most effective answer to a slow query — more so than an index.
+
+**And the rule that follows from all of it: `ctx.db` is the only way in.** The AWS modules the helper
+imports are the helper's, not yours. Reaching the table directly means building the key yourself,
+and a key built by hand reads the neighbouring project of the same customer — the packaging step
+refuses those imports for exactly that reason.
 
 ### Sorting, filtering, limiting
 

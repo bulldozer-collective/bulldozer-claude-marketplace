@@ -35,8 +35,10 @@ export const handler = defineApp({
 - Copy the helper into the folder as `backend/bulldozer.mjs` if it is not already there, from the
   path given in your prompt. **Never modify it**, and never reimplement what it does: it is what
   keeps one project's data out of another's.
-- Nothing is installed. Import only `./bulldozer.mjs`, `node:*` built-ins, and the modules the
-  helper itself imports.
+- Nothing is installed. Import only `./bulldozer.mjs`, `node:*` built-ins, and your own files. The
+  helper's imports are **not** yours: they reach the store directly, where the helper builds every
+  key from the caller's project. Importing them means building your own key, and a hand-built key
+  reads the neighbouring project. Packaging refuses them.
 
 ## Hard rules
 

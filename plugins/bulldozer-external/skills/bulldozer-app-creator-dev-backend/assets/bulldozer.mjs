@@ -538,10 +538,17 @@ export function queryOf(event) {
   return `?${new URLSearchParams(parameters).toString()}`;
 }
 
-/** Trouve la route déclarée qui correspond, en acceptant un paramètre final `{id}`. */
+/**
+ * Trouve la route déclarée qui correspond, en acceptant un paramètre final `{id}`.
+ *
+ * Rend aussi la `declaration` qui a correspondu — le motif, pas le chemin appelé. C'est lui que la
+ * mesure d'usage enregistre : agréger sur `/notes/42` ne dirait rien, agréger sur `/notes/{id}` dit
+ * quel endpoint sert.
+ */
 export function matchRoute(routes, method, path) {
+  const exactDeclaration = routes[`${method} ${path}`] !== undefined ? `${method} ${path}` : path;
   const exact = routes[`${method} ${path}`] ?? routes[path];
-  if (exact) return { handler: exact, params: {} };
+  if (exact) return { handler: exact, params: {}, declaration: exactDeclaration };
 
   for (const [declaration, handler] of Object.entries(routes)) {
     const [declaredMethod, declaredPath] = declaration.includes(' ')
@@ -556,7 +563,9 @@ export function matchRoute(routes, method, path) {
     if (pattern === declaredPath) continue;
     const found = new RegExp(`^${pattern}$`).exec(path);
     if (found) {
-      return { handler, params: Object.fromEntries(names.map((n, i) => [n, found[i + 1]])) };
+      return {
+        handler, params: Object.fromEntries(names.map((n, i) => [n, found[i + 1]])), declaration,
+      };
     }
   }
   return null;
@@ -746,6 +755,7 @@ function yamlScalar(value) {
 
 async function runHttp(definition, event) {
   const sealed = event?.requestContext?.authorizer?.lambda ?? {};
+  const token = bearerToken(event);
   if (!sealed.projectId) {
     return reply(401, { error: "Cette application n'est accessible qu'après connexion." });
   }
@@ -770,7 +780,7 @@ async function runHttp(definition, event) {
     customerId: sealed.customerId || process.env.BDZ_CUSTOMER_ID,
     projectId: sealed.projectId,
     role: sealed.role,
-    token: bearerToken(event),
+    token,
     timeoutSec: Number(process.env.BDZ_TIMEOUT_SEC ?? 30),
   });
 
@@ -799,6 +809,7 @@ async function runHttp(definition, event) {
     return reply(404, { error: `Aucune route ${method} ${path}.` });
   }
 
+  let response;
   try {
     // La chaîne de requête est recollée ici. Construire l'URL à partir du seul chemin la perdait :
     // `new URL(request.url).searchParams` rendait toujours vide, donc `?limit=5` était ignoré et
@@ -811,13 +822,56 @@ async function runHttp(definition, event) {
       ...(event.body ? { body: event.isBase64Encoded ? Buffer.from(event.body, 'base64') : event.body } : {}),
     });
     request.params = route.params;
-    const result = await route.handler(request, ctx);
-    return normalise(result);
+    // `normalise` rend une PROMESSE quand le handler a rendu un objet Response : le `return` direct
+    // l'attendait implicitement, une affectation non. Sans ce `await`, la mesure enregistrerait
+    // `code: undefined` sur toute app qui rend des Response — sans que la réponse, elle, change.
+    response = await normalise(await route.handler(request, ctx));
   } catch (error) {
     // Le message est rendu à l'appelant : une app dont l'erreur est muette est indébuggable par
     // son auteur, qui n'a pas accès aux journaux de la plateforme.
     ctx.log.error('Erreur non rattrapée', { message: String(error?.message ?? error) });
-    return reply(500, { error: String(error?.message ?? error) });
+    response = reply(500, { error: String(error?.message ?? error) });
+  }
+
+  // Après le rattrapage, pas dedans : un 500 est un usage de l'app comme un autre, et c'est même
+  // celui qu'on a le plus envie de voir dans les mesures.
+  await recordAppCall(ctx, token, route.declaration, path, response.statusCode);
+  return response;
+}
+
+/**
+ * Enregistre l'appel comme usage de l'app.
+ *
+ * Ce qui est mesuré, ce sont les routes de l'AUTEUR — l'appelant est déjà passé par le routage
+ * quand on arrive ici. L'état des traitements est sondé toutes les deux secondes par l'écran et la
+ * documentation est lue par des outils : les compter noierait la seule question à laquelle ces
+ * lignes servent à répondre, qui se sert de cette app et pour quoi.
+ *
+ * Tout le reste se remplit côté plateforme, sans que l'app ait à le dire : l'utilisateur vient du
+ * jeton relayé, le client et le projet des en-têtes que `bulldozerApi` pose déjà, et l'origine du
+ * claim `azp` du jeton — pour un appel venu de l'écran, le clientId du hosting.
+ */
+async function recordAppCall(ctx, token, declaration, path, statusCode) {
+  // Sans jeton, il n'y a personne à qui attribuer l'appel — c'est le cas du harnais local, et il
+  // n'a rien d'anormal. Le signaler ferait apparaître un avertissement à chaque essai de l'auteur,
+  // pour une panne qui n'existe pas ; en production l'autorisateur garantit le jeton.
+  if (!token) {
+    return;
+  }
+
+  try {
+    await ctx.bulldozer.post('/metrics', {
+      type: 'METRIC_TYPE_APP_CALL',
+      // Le motif de route, pas le chemin appelé : agréger sur `/notes/42` ne dirait rien.
+      reference: declaration,
+      path,
+      code: statusCode,
+      successful: statusCode < 400,
+    });
+  } catch (error) {
+    // Jamais fatal. Une mesure perdue est un trou dans une statistique ; une réponse perdue est une
+    // panne pour l'utilisateur, et aucune statistique ne vaut ça.
+    ctx.log.warn("Mesure d'usage non enregistrée", { message: String(error?.message ?? error) });
   }
 }
 
