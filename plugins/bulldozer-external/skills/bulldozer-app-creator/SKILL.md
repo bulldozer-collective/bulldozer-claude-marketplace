@@ -1,197 +1,96 @@
 ---
 name: bulldozer-app-creator
-description: Build a "Bulldozer App" — a custom tool/app developed in Angular, wired to the Bulldozer REST API, compiled, and published as a public static site via Bulldozer Hosting.
+description: Build, update or remove a "Bulldozer App" — a custom app with a screen, its own data, its own files and long-running work, published at its own address.
 when-to-use: |
-  Use whenever the user wants to create a "tool", an "app", an "application", a "mini-app", a
-  "web app", a "dashboard", a "widget", or anything similar. Always first ask if they want to
-  create a "Bulldozer App"; if yes, follow this skill.
+  Use whenever the user wants a "tool", an "app", an "application", a "mini-app", a "web app", a
+  "dashboard", a "widget", or anything similar — and equally when they want to change or delete one
+  they already have. Always ask first whether they want to create a "Bulldozer App"; if yes, follow
+  this skill.
 user-invocable: true
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-  - WebFetch
+  - Skill
+  - Agent
+  - AskUserQuestion
   - mcp__plugin_bulldozer_bulldozer__bdzCreateHosting
   - mcp__plugin_bulldozer_bulldozer__bdzReplaceHostingContent
+  - mcp__plugin_bulldozer_bulldozer__bdzListHostings
+  - mcp__plugin_bulldozer_bulldozer__bdzGetHosting
+  - mcp__plugin_bulldozer_bulldozer__bdzDeleteHosting
   - mcp__plugin_bulldozer_bulldozer__bdzRequestFridgeCode
-  - mcp__plugin_bulldozer_bulldozer__bdzExploreHosting
 effort: medium
 ---
 
 # Bulldozer App
 
-A **Bulldozer App** is a custom tool/application built on the Bulldozer stack: an **Angular**
-front end that talks to the **Bulldozer REST API**, compiled to a static bundle and published
-as a **public static site** via **Bulldozer Hosting**.
+You are the **router**: you choose the path and delegate. You never write application code, fill
+in the manifest, or package anything by hand. Script paths below are relative to this skill's
+own directory.
 
-## Prerequisite — customer/project context
+An app has up to two halves:
 
-Every MCP call in this skill (`bdzCreateHosting`, `bdzRequestFridgeCode`,
-`bdzReplaceHostingContent`) needs a `customerId` and a `projectId`. Before anything else, ensure
-both are available via the **`bulldozer-project-chooser`** skill / **`bulldozer.json`** (same
-pattern as `bulldozer-hosting`). Do not hardcode them.
+- a **screen** — Angular, published at `https://{slug}.bulldozer-os.fr/{subdomain}/`;
+- a **service** that stores data, keeps files and runs long work — reachable by the screen at
+  `…/{subdomain}/api/…`, and by nothing else.
 
-## Step 0 — Confirm intent (MANDATORY)
+Speak in the user's vocabulary: *the app*, *its data*, *its files*, *a long task*, *its
+address*. Never name the platform's internals.
 
-Whenever the user asks to create a **tool**, **app**, **application**, **web app**, **dashboard**,
-**widget**, or any related word, **first ask**:
+## 1. Confirm the intent
 
-> "Do you want to create a **Bulldozer App**?"
+Ask: **"Do you want to create a Bulldozer App?"** No → drop this skill, help normally.
 
-- If **no** → do not apply this skill; help them the normal way.
-- If **yes** → also ask the following, then enforce the rules below (they are non-negotiable):
-  - **Name of the application** — a human-readable name.
-  - **Subdomain** — explain that this is the part **at the end of the URL**: the app will be
-    served at `https://{customerSlug}.bulldozer-os.fr/{subdomain}/`. Must be a valid DNS label
-    (lowercase letters/digits/hyphens, max 63) and unique per customer.
-  - **Is this an internal tool?** — i.e. a tool for the **Bulldozer team itself** (admin / ops /
-    sales operators), as opposed to an app built for a customer. Explain that this single answer
-    decides whether the **Admin API** is available (see Rule 2.b) — it changes nothing else.
+## 2. Ensure the customer/project context
 
-## Step 0.b — Generate a client id and prepare the hosting
+Everything below needs a `customerId` and a `projectId`, from
+`bulldozer:bulldozer-project-chooser` / `bulldozer.json`. Never hardcode them.
 
-Once you have the name and subdomain:
+## 3. Create, update, or remove?
 
-1. **Generate a client id** with a **random suffix** to prevent duplication, e.g.
-   `bdz-app-{subdomain}-{random}` (the random part guarantees the Keycloak client id is unique).
-2. **Prepare the hosting** (reserve the site + provision OAuth **before** building the app):
-   call **`bdzCreateHosting`** with:
-   - `type = HOSTING_TYPE_STATIC_SITE`
-   - `name` = the application name
-   - `subdomain` = the chosen subdomain
-   - `clientId` = the generated client id
-   - **omit `fridgeId` and `url`** — this "prepare" mode reserves the subdomain/URL and
-     provisions the public Keycloak OAuth client (redirect URIs / web origins are configured
-     server-side against `publicUrl` — no manual Keycloak step), returning `clientId`, `subdomain`,
-     `publicUrl` (and the hosting `id`). You upload the compiled code later (Rule 4).
-   - On a **re-publish**, reuse the **same `clientId`** and hosting `id` — `bdzReplaceHostingContent`
-     keeps the hosting and its OAuth client; a new client id would require a new hosting.
-3. **Use the response to set up Keycloak OAuth** in the Angular app:
-   - **Server**: `https://auth.bulldozer-collective.fr`
-   - **realm**: `bdz-saas-dev`
-   - **client-id**: the one you generated (returned in the response)
-   - See the reference file **`references/oauth-boilerplate.md`** for the exact `app.config.ts`,
-     `environment.ts`, `silent-check-sso.html`, and the `package.json` dependencies to add.
+Ask which. For the last two, find the working folder — **the platform keeps no source**:
 
-## Rule 1 — Angular only
+```bash
+python scripts/find_app.py --search <dir> [--search <dir>…]
+```
 
-- The app **must** be developed in **Angular**.
-- **No React. No Vue. No Vercel.** No other framework or hosting platform.
-- Scaffold with the Angular CLI (`ng new`), build a normal Angular project.
-- The app **must use hash routing** — `provideRouter(routes, withHashLocation())`. It is served
-  from a sub-path (`…/{subdomain}/`) on a static host with no SPA deep-link fallback, so path
-  routing would 404 on refresh. See `references/oauth-boilerplate.md`.
+It prints every folder carrying a `.bulldozer-app.json` marker (written at creation) with its
+name, subdomain and hosting id; cross-check with `bdzListHostings`. If no folder is left, say so
+plainly and offer to rebuild from scratch — do not pretend an update is possible.
 
-## Rule 2 — Use the Bulldozer REST API documentation
+**Removing** is `bdzDeleteHosting` on that id, and it is final: the app's screen, **its stored data
+and its files** go with it, with no copy kept and no undo. Say exactly that, name the app, and get a
+clear yes before calling. Afterwards, delete the local `.bulldozer-app.json` so the folder stops
+looking like a live app.
 
-- The Bulldozer REST API documentation is fetched from:
-  **`https://docs.bulldozer-collective.fr/v2/index.md`**
-- Fetch this doc (WebFetch) and use it as the **source of truth** to build whatever the user
-  asked for — endpoints, request/response shapes, auth.
-- If the user requests a feature or data that is **not available in the docs**, **warn the user**
-  clearly that it is not supported by the Bulldozer API, and do not silently invent an endpoint.
+## 4. The shape — one question, no jargon
 
-## Rule 2.b — Admin API: internal tools only
+> *"Does your app only need a screen, or must it also remember data and run work of its own?"*
 
-The **Admin API** (`/admin/**`) is reserved for tools built for the Bulldozer team. Whether it is in
-scope depends entirely on the internal-tool answer from Step 0:
+A screen only → front path, **no manifest, no review, published straight away**. Otherwise the
+app has a service. A service **without** a screen is allowed, but nothing calls it on its own — say
+so before agreeing to it.
 
-- **Internal tool → the Admin API doc is in scope.** Fetch it from:
-  **`https://docs.bulldozer-collective.fr/v2/ADMIN_API.md`**
-  It is **not listed in the chapter table** of `index.md`, so it will not be discovered by following
-  Rule 2 — use that direct URL. It covers `/admin/users`, `/admin/customers`,
-  `/admin/customers/{customerId}/projects`, and `/admin/commands`.
-- **Not an internal tool → ignore that doc entirely.** Do not fetch it, and do not use any `/admin/**`
-  endpoint: those endpoints are dedicated to internal tools. If the user asks for something only the
-  Admin API can provide, **warn them** that it is not available for a customer-facing app — same
-  posture as Rule 2 takes for undocumented features. Do not work around it with another endpoint.
-- **Roles**: every `/admin/**` endpoint requires the caller's JWT to carry `BULLDOZER_ADMINISTRATOR`,
-  `BULLDOZER_OPS`, or `BULLDOZER_SALES` — and some are Admin/Ops only, so read the access rules per
-  endpoint in the doc. A user without one of those roles gets `403`, which is exactly why these
-  endpoints are useless in a customer-facing app.
+## 5. Reserve, delegate, publish — in that order
 
-## Rule 3 — Customer/project context is mandatory
+The address must exist before the screen can be compiled against it, so **reserve first**:
+`references/packaging.md` §1. Keep the `id`, `clientId` and `publicUrl` it returns.
 
-**~99% of Bulldozer API endpoints require two headers** — `X-Bdz-Customer-Id` and
-`X-Bdz-Project-Id` — both derived from the **project membership the user selects**. The app
-must, in this order:
+One folder holds the whole app:
 
-1. **After confirming the user is authenticated**, fetch the user's **project memberships**
-   (`GET /project-memberships`).
-2. Let the user **choose which project** to use (e.g. a `<select>` of their memberships). This is
-   the **first screen after login**, before any other API call.
-3. Once chosen, set **`customerId` and `projectId` from the selected membership** (the membership's
-   `project.customerId` and `project.id`) — never hardcode them.
-4. Be **reactive to active-project changes**: keep the selection in a signal and inject the two
-   headers via an HTTP interceptor that reads it at request time. When the user changes the active
-   membership in the `<select>`, the whole UI + every subsequent API call must use the new
-   `customerId`/`projectId` pair automatically.
+```
+my-app/                    the Angular project (ng new), and inside it:
+├── bulldozer.app.json     what the app does
+├── backend/index.mjs      the service, next to the shipped helper
+└── .bulldozer-app.json    the local marker — never published
+```
 
-Two traps here produce **silent** failures — the app renders fine and the data is simply wrong or
-missing. Both are detailed in `references/project-context.md` (§3, §4):
+Then: **service** → `bulldozer-app-creator-backend` first, since the screen needs its
+routes; **screen** → `bulldozer-app-creator-frontend`, given the `clientId` and the
+`subdomain`; then publish with `references/packaging.md` §2 onwards.
 
-- **Never bind `[value]` on the project `<select>`.** Carry the selection on the `<option>`s with
-  `[selected]`. Otherwise the DOM value desyncs from the signal and the user's *first* project switch
-  emits no `change` event at all.
-- **Gate every tenant-scoped call on `activeProject()`, not on `activeProjectId()`.** The id is
-  restored from `localStorage` before the memberships are fetched, so keying on it fires requests
-  with no tenant headers — and, when the stored id is still valid, the reaction never re-runs.
-
-**Exception — `/admin/**`:** admin endpoints are **realm-scoped** and need neither
-`X-Bdz-Customer-Id` nor `X-Bdz-Project-Id`. This does **not** exempt an internal tool from Rule 3: it
-will normally also call tenant-scoped endpoints, so keep the membership fetch, the project `<select>`,
-and the interceptor. Sending the two headers to `/admin/**` anyway is harmless.
-
-See the reference file **`references/project-context.md`** for the exact `ProjectService`,
-`customer-id.interceptor`, the project `<select>` picker, and the reactive `effect` pattern.
-
-## Rule 4 — Compile, zip, and host as a static site
-
-When the app is done:
-
-1. **Compile** the Angular app with the **base href set to the sub-path** it will be served from
-   (otherwise the app cannot load its own JS/CSS):
-   ```bash
-   ng build --base-href "/{subdomain}/"
-   ```
-2. **Zip the build output root** — the Angular application builder emits to
-   `dist/<project-name>/browser/`, and `index.html` **must sit at the root of the archive**. Zip
-   from that directory, not from `dist/`:
-   ```bash
-   cd dist/<project-name>/browser && zip -r ../../../app.zip .
-   ```
-3. **Upload the zip to the fridge** using the **`bulldozer-fridge`** skill (do not hand-roll the
-   upload). The zip must be ≤ 25 MB:
-   - Mint a code: **`bdzRequestFridgeCode`** (needs `customerId`).
-   - Upload with the bundled script and take **`file.id`** from the response as the `fridgeId`:
-     ```bash
-     python skills/bulldozer-fridge/scripts/upload_fridge_file.py --file app.zip --code <code>
-     ```
-4. **Publish the content to the hosting prepared in Step 0.b** by calling
-   **`bdzReplaceHostingContent`** with `customerId`, `projectId`, the prepared hosting `id`, and
-   that `fridgeId` (endpoint `PUT /hostings/{id}/content`; content must be a single `.html`/`.zip`).
-   Do this within ~2h — fridge files auto-expire.
-   - The site is served publicly at `https://{customerSlug}.bulldozer-os.fr/{subdomain}/`
-     (the `publicUrl` from Step 0.b). Give that URL to the user.
-
-   > **Note:** `bdzReplaceHostingContent` may not resolve until it is deployed to the live MCP
-   > server. If it is unavailable, and you did not need "prepare" mode, you can instead create the
-   > hosting directly from the fridge zip: `bdzCreateHosting` with `type = HOSTING_TYPE_STATIC_SITE`,
-   > `fridgeId`, `name`, `subdomain`, and the generated `clientId`.
-
-## Summary checklist
-
-- [ ] Ensured `customerId`/`projectId` via `bulldozer-project-chooser` / `bulldozer.json`
-- [ ] Asked "Do you want to create a Bulldozer App?" and got a yes
-- [ ] Asked for the application **name** and **subdomain** (explained subdomain = end of URL)
-- [ ] Asked whether the app is an **internal tool** (decides whether the Admin API is available)
-- [ ] Generated a **client id** with a random suffix
-- [ ] Prepared the hosting (`bdzCreateHosting`, `HOSTING_TYPE_STATIC_SITE`, no fridgeId/url) → got publicUrl
-- [ ] Wired Keycloak OAuth (`auth.bulldozer-collective.fr` / `bdz-saas-dev` / generated client id) per `references/oauth-boilerplate.md`
-- [ ] Built in Angular (no React, no Vercel), using **hash routing**
-- [ ] After login: fetched memberships → project `<select>` → derived `customerId`/`projectId`, reactive to changes (per `references/project-context.md`)
-- [ ] Fetched & used `https://docs.bulldozer-collective.fr/v2/index.md`; warned on anything not in the docs
-- [ ] Used `ADMIN_API.md` / `/admin/**` **only** if the app is an internal tool — otherwise ignored it entirely
-- [ ] Built with `--base-href "/{subdomain}/"` and zipped from `dist/<project-name>/browser` (index.html at zip root)
-- [ ] Uploaded the zip via the `bulldozer-fridge` script, published with `bdzReplaceHostingContent`, and shared the public URL
+An app with a service is **reviewed before it goes live** — about a minute, and it can end in a
+refusal. Then read **`references/review-verdicts.md`**: explain the reason in plain words and ask
+the user how to proceed. Never rewrite their app to slip past a check on your own initiative.

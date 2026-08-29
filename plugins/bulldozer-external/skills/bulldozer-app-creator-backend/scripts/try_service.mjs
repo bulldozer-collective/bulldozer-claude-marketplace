@@ -23,6 +23,13 @@
  *
  *   node try_service.mjs --app ./my-app --request 'GET /leads?' --verbose
  *
+ * Who is calling, for a route that depends on it:
+ *   --project-role MANAGER          the caller's role in the project — MEMBER by default
+ *   --roles bulldozer-core-admin    their Bulldozer platform roles, comma-separated — none by default
+ *
+ * These are the two facets `ctx.project.role` and `ctx.user.roles`, sealed separately by the
+ * platform. A route reserved to managers or to staff is only testable here with them.
+ *
  * Long tasks queued by a request are run straight away, exactly as the platform would, so a single
  * command exercises the whole round trip. `--no-tasks` leaves them queued.
  *
@@ -57,11 +64,31 @@ const FAKES = [
 
 // ─────────────────────────────────────────────────────────── arguments
 
+/**
+ * The two values a project membership can carry. Validated rather than passed through, because the
+ * harness used to seal a made-up `PROJECT_MEMBER`: an app testing against the real constant failed
+ * locally for a reason no one could see, and a harness that lies about the event is worse than no
+ * harness.
+ */
+const PROJECT_ROLES = ['PROJECT_MEMBERSHIP_ROLE_MEMBER', 'PROJECT_MEMBERSHIP_ROLE_MANAGER'];
+
+function projectRoleOf(value) {
+  const full = value.startsWith('PROJECT_MEMBERSHIP_ROLE_')
+    ? value
+    : `PROJECT_MEMBERSHIP_ROLE_${value.toUpperCase()}`;
+  if (!PROJECT_ROLES.includes(full)) {
+    throw new Error(`--project-role must be one of ${PROJECT_ROLES.join(', ')} (or MEMBER / MANAGER)`);
+  }
+  return full;
+}
+
 function parseArguments(argv) {
   const options = { app: null, requests: [], tasks: true, token: null, verbose: false };
   let customerId = '00000000-0000-0000-0000-0000000000c0';
   let projectId = '00000000-0000-0000-0000-0000000000b0';
   let userId = '00000000-0000-0000-0000-0000000000a0';
+  let projectRole = 'PROJECT_MEMBERSHIP_ROLE_MEMBER';
+  let roles = [];
 
   for (let i = 0; i < argv.length; i += 1) {
     const flag = argv[i];
@@ -73,13 +100,18 @@ function parseArguments(argv) {
       case '--customer-id': customerId = value; i += 1; break;
       case '--project-id': projectId = value; i += 1; break;
       case '--user-id': userId = value; i += 1; break;
+      // Les deux facettes que la plateforme scelle séparément. Sans elles, un chemin réservé aux
+      // managers ou au staff ne serait pas essayable en local — et l'auteur le découvrirait en
+      // production.
+      case '--project-role': projectRole = projectRoleOf(value); i += 1; break;
+      case '--roles': roles = value.split(',').map((r) => r.trim()).filter(Boolean); i += 1; break;
       case '--no-tasks': options.tasks = false; break;
       case '--verbose': options.verbose = true; break;
       default:
         throw new Error(`unknown option ${flag}`);
     }
   }
-  return { ...options, customerId, projectId, userId };
+  return { ...options, customerId, projectId, userId, projectRole, roles };
 }
 
 /**
@@ -144,7 +176,12 @@ function httpEvent({ method, path, query, body }, context) {
           userId: context.userId,
           customerId: context.customerId,
           projectId: context.projectId,
-          role: 'PROJECT_MEMBER',
+          // La forme exacte de ce que scelle l'authorizer : le rôle DANS le projet d'un côté, les
+          // rôles de plateforme de l'autre, JOINTS en une chaîne — le contexte d'API Gateway ne
+          // porte que des chaînes, et un harnais qui livrerait un tableau ferait passer en local du
+          // code qui casse en production.
+          projectRole: context.projectRole,
+          roles: context.roles.join(','),
         },
       },
     },

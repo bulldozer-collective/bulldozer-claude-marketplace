@@ -84,6 +84,15 @@ data, files and long tasks in memory, and it takes a second:
 node <path>/try_service.mjs --app <folder> --request 'POST /notes {"text":"hi"}' --request 'GET /notes'
 ```
 
+If a route reads `ctx.project.role` or `ctx.user.roles`, try it as that person too — by default the
+caller is an ordinary project member with no platform role, so the privileged branch is never
+exercised:
+
+```bash
+node <path>/try_service.mjs --app <folder> --request 'DELETE /notes/1' \
+    --project-role MANAGER --roles bulldozer-core-admin
+```
+
 Exercise **every** route you wrote, and every long task. A `4xx` your own code returns on purpose is
 fine; a `5xx` is your bug. Do not return until it runs, and report in `notes` what you tried.
 

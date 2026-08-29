@@ -1,8 +1,8 @@
 ---
-name: bulldozer-app-creator-dev-frontend
+name: bulldozer-app-creator-frontend
 description: Build the screen of a Bulldozer App — an Angular front end, signed in against Bulldozer, scoped to the project the user picks, calling the Bulldozer API and the app's own service.
 when-to-use: |
-  Called by `bulldozer-app-creator-dev`. Not invoked on its own.
+  Called by `bulldozer-app-creator`. Not invoked on its own.
 user-invocable: false
 allowed-tools:
   - Bash

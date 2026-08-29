@@ -1,8 +1,8 @@
 ---
-name: bulldozer-app-creator-dev-backend
+name: bulldozer-app-creator-backend
 description: Build the service of a Bulldozer App — REST routes, its own data, its own files and long tasks — and the manifest that declares what it does.
 when-to-use: |
-  Called by `bulldozer-app-creator-dev`. Not invoked on its own.
+  Called by `bulldozer-app-creator`. Not invoked on its own.
 user-invocable: false
 allowed-tools:
   - Bash
@@ -69,6 +69,14 @@ so and retry with a sharper brief; do not paper over it by writing the code your
 node scripts/try_service.mjs --app <folder> \
     --request 'POST /notes {"text":"hello"}' \
     --request 'GET /notes'
+```
+
+A route that depends on who is calling needs to be tried as that person, otherwise it is only ever
+tried as an ordinary member:
+
+```bash
+node scripts/try_service.mjs --app <folder> --request 'DELETE /notes/1' \
+    --project-role MANAGER --roles bulldozer-core-admin
 ```
 
 The service runs on this machine with its data, its files and its long tasks held in memory —

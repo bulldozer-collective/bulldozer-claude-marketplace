@@ -15,7 +15,7 @@
  * └────────────────────────────────────────────────────────────────────────────────────────────┘
  *
  * Fichier canonique : bulldozer-app-backend-parent/sdk/bulldozer.mjs
- * Copie livrée par la skill : skills/bulldozer-app-creator-dev-backend/assets/bulldozer.mjs
+ * Copie livrée par la skill : skills/bulldozer-app-creator-backend/assets/bulldozer.mjs
  */
 
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
@@ -476,11 +476,28 @@ function logger(projectId) {
   };
 }
 
-function buildContext({ userId, customerId, projectId, role, token, timeoutSec }) {
+/**
+ * Les rôles, redécoupés depuis la chaîne scellée.
+ *
+ * Le contexte d'API Gateway est une table de CHAÎNES : l'autorisateur les a joints par des virgules
+ * parce qu'un tableau n'y survivrait pas. Le filtre écarte la chaîne vide, qui rendrait sinon un
+ * tableau d'un seul élément vide — donc un `roles.length` de 1 là où il n'y a aucun rôle.
+ */
+function rolesFrom(sealed) {
+  return typeof sealed !== 'string' ? [] : sealed.split(',').map((r) => r.trim()).filter(Boolean);
+}
+
+function buildContext({ userId, customerId, projectId, projectRole, roles, token, timeoutSec }) {
   return {
-    /** Qui appelle. Vient de la plateforme, pas de la requête : infalsifiable par l'app. */
-    user: userId ? { id: userId, role } : null,
-    project: { id: projectId, customerId },
+    /**
+     * Qui appelle. Vient de la plateforme, pas de la requête : infalsifiable par l'app.
+     *
+     * `roles` sont les rôles de la personne sur la plateforme, au pluriel. À ne pas confondre avec
+     * `project.role`, qui est son rôle dans CE projet — deux questions différentes, longtemps
+     * confondues dans un seul champ.
+     */
+    user: userId ? { id: userId, roles: rolesFrom(roles) } : null,
+    project: { id: projectId, customerId, role: projectRole ?? '' },
     db: { collection: (name) => collection(projectId, name) },
     files: files(projectId),
     jobs: jobs(projectId, timeoutSec),
@@ -779,7 +796,8 @@ async function runHttp(definition, event) {
     // des traitements longs, plus bas.
     customerId: sealed.customerId || process.env.BDZ_CUSTOMER_ID,
     projectId: sealed.projectId,
-    role: sealed.role,
+    projectRole: sealed.projectRole,
+    roles: sealed.roles,
     token,
     timeoutSec: Number(process.env.BDZ_TIMEOUT_SEC ?? 30),
   });
@@ -898,7 +916,9 @@ async function runJobs(definition, records) {
       userId: null,
       customerId: process.env.BDZ_CUSTOMER_ID,
       projectId: message.projectId,
-      role: null,
+      // Un traitement n'a pas d'appelant : ni rôle projet, ni rôles de plateforme.
+      projectRole: null,
+      roles: null,
       token: null,
       timeoutSec: Number(process.env.BDZ_TIMEOUT_SEC ?? 30),
     });

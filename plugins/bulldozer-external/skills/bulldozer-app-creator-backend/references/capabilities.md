@@ -299,9 +299,23 @@ error message says which.
 
 ## Also on `ctx`
 
-- `ctx.user` — `{ id, role }`, or `null` inside a task. Comes from the platform, so it cannot be
-  faked by a request.
-- `ctx.project` — `{ id, customerId }`.
+- `ctx.user` — `{ id, roles }`, or `null` inside a task. Comes from the platform, so it cannot be
+  faked by a request. **`roles` is a list** — the caller's roles on the Bulldozer platform, e.g.
+  `['bulldozer-customer-employee', 'bulldozer-core-admin']`. Often empty, and that is not an error.
+- `ctx.project` — `{ id, customerId, role }`. **`role` is the caller's role in THIS project**, and
+  there is exactly one: `PROJECT_MEMBERSHIP_ROLE_MANAGER` or `PROJECT_MEMBERSHIP_ROLE_MEMBER`.
+
+  Two different questions, so two fields — they used to share one, and an app could not tell which
+  vocabulary it had been handed:
+
+  ```js
+  if (ctx.project.role === 'PROJECT_MEMBERSHIP_ROLE_MANAGER') { … }   // manages this project
+  if (ctx.user.roles.includes('bulldozer-core-admin')) { … }          // Bulldozer staff
+  ```
+
+  A staff member reaching an app of a project they do not belong to has **`ctx.project.role` empty**
+  and their platform roles listed. Gate on whichever fact you actually mean; gating on the wrong one
+  fails silently.
 - `ctx.log.info / warn / error` — `(message, data)`. Values under keys that look like secrets are
   masked. ⚠️ **Nothing can read these logs today** — no viewer, no endpoint. They are written for
   support and for a future one.
