@@ -63,9 +63,13 @@ written by hand, and a `project_id uuid` column on every table. Read it; do not 
 Two things it is worth being told twice, because getting either wrong is silent:
 
 - **Never write `WHERE project_id = …` and never insert a `project_id`.** The platform sets the
-  caller's project on the transaction and PostgreSQL filters every read and stamps every write.
-  Adding the clause yourself is not belt-and-braces, it is the sign of an author who did not read
-  the reference — and the review reads it that way.
+  caller's project on the transaction, PostgreSQL filters every read, and a `DEFAULT` on the column
+  stamps every write. Adding the clause yourself is not belt-and-braces, it is the sign of an author
+  who did not read the reference — and the review reads it that way.
+- **Never write Row-Level Security in a migration** — no `CREATE POLICY`, no `… ROW LEVEL SECURITY`.
+  Partitioning is the platform's, and it poses a restrictive policy on every table after your
+  migrations run. Permissive policies combine with OR, so one `USING (true)` of yours would hand
+  every project's rows to everyone; packaging and the platform both refuse it.
 - **Migration files are applied once.** `001_`, then `002_` for a later change. Nothing needs to be
   idempotent, and a published file is never edited.
 

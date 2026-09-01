@@ -25,7 +25,24 @@ different way. It is also why the app cannot reach another project even by writi
 
 **Every table must carry a `project_id uuid` column.** It is the column the policy keys on; a table
 without it cannot be partitioned, and the platform refuses the publication rather than host a table
-that would show every project's rows to everyone.
+that would show every project's rows to everyone. You never write a value into it either — the
+platform puts a `DEFAULT` on the column, so the database stamps the project on every insert.
+
+### Row-Level Security is the platform's, never the app's
+
+**Never write `CREATE POLICY`, `ALTER POLICY`, `DROP POLICY`, or `… ROW LEVEL SECURITY` in a
+migration.** Packaging refuses them, and so does the platform — before the migration is recorded, so
+the file stays correctable.
+
+This is not a matter of tidiness. PostgreSQL combines permissive policies with **OR**: a single
+`CREATE POLICY tout_voir ON notes USING (true)` beside the platform's would hand every project's
+rows to everyone, silently. Measured on a real cluster: two rows returned where one was expected.
+
+The platform therefore poses its own policy **as restrictive** — restrictive policies combine with
+AND — so a policy written by an app can no longer widen what the platform has bounded. It is refused
+anyway, because wanting to write one means misunderstanding who guarantees what.
+
+What belongs in a migration is ordinary schema: tables, columns, indexes, constraints, defaults.
 
 ## Schema changes: `migrations/`
 

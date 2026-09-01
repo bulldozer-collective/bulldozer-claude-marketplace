@@ -119,6 +119,13 @@ MIGRATION_NAME_RE = re.compile(r"^(\d{3,})_[^/]+\.sql$")
 # whole publication — better to say so here, where the author still has the file open.
 PROJECT_COLUMN = "project_id"
 
+# Partitioning is the platform's to enforce, and a migration that writes its own policy is refused.
+# Not a style rule: permissive policies combine with OR, so one `USING (true)` next to the
+# platform's would hand every project's rows to everyone. Measured, before this check existed.
+SECURITY_DDL_RE = re.compile(
+    r"\b(CREATE\s+POLICY|ALTER\s+POLICY|DROP\s+POLICY"
+    r"|ALTER\s+TABLE\s+[^;]*?\bROW\s+LEVEL\s+SECURITY)", re.I | re.S)
+
 SKIPPED_NAMES = {".DS_Store", "Thumbs.db", ".bulldozer-app.json"}
 SKIPPED_DIRS = {"__MACOSX", "node_modules", ".git", ".angular", "__pycache__"}
 
@@ -488,6 +495,17 @@ def _check_migrations(manifest: dict, app: str | None) -> dict[str, str]:
             "migrations/001_initial.sql with the CREATE TABLE statements.")
 
     collected.sort()
+
+    for _, name, sql in collected:
+        found = SECURITY_DDL_RE.search(_strip_sql_comments(sql))
+        if found:
+            raise Refused(
+                "migrations/%s writes a security policy (%s). Partitioning by project is the "
+                "platform's job, not the app's: it puts a restrictive policy on every table after "
+                "your migrations run, and a policy written here is refused. Remove it — you never "
+                "filter by project, and you never write a project_id."
+                % (name, " ".join(found.group(1).split())))
+
     unpoliced = _tables_without_project_id([(name, sql) for _, name, sql in collected])
     if unpoliced:
         raise Refused(

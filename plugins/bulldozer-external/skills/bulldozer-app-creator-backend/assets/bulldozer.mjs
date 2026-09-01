@@ -476,7 +476,11 @@ function bulldozerApi(token, customerId, projectId) {
  * <strong>Le cloisonnement par projet n'est pas à écrire.</strong> Chaque requête part dans une
  * transaction où le projet actif est posé, et une politique de sécurité au niveau des lignes filtre
  * ce que la base rend. Un `WHERE project_id` oublié ne fait donc rien fuiter — c'est le moteur qui
- * décide, pas la requête. En revanche `project_id` doit être renseigné à l'insertion.
+ * décide, pas la requête.
+ *
+ * `project_id` n'est pas non plus à renseigner à l'insertion : la plateforme pose un DEFAULT sur la
+ * colonne, donc la base estampille le projet actif. L'écrire à la main ne sert à rien et échoue si
+ * c'est celui d'un autre projet.
  *
  * Les valeurs passent TOUJOURS par `params`, jamais concaténées : c'est ce qui rend une injection
  * SQL impossible plutôt qu'improbable.
