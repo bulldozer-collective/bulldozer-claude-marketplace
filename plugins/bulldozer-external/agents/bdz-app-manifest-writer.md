@@ -51,6 +51,11 @@ in first position only.
 
 ## `indexes` — read them off the queries, like the routes
 
+**Only for a `"documents"` app.** A `"sql"` app declares no `indexes`: its indexes live in its
+migration files as ordinary `CREATE INDEX`, cost nothing per write to declare, and the manifest field
+would mean nothing. Writing it for a SQL app claims a DynamoDB index the app does not have.
+
+
 Every `list({ by: 'x' })` in the code needs `x` declared, or that query fails outright once
 published. Collect them the same way you collect routes: from the code, never by asking.
 
@@ -71,7 +76,11 @@ refused: documents are already keyed on the id.
 - `name` — as given in the prompt, 120 characters max.
 - `runtime` — `"nodejs22"`.
 - `personalData` — the auditor's verdict, verbatim.
-- `storage` — `"documents"` if the code uses `ctx.db` anywhere, otherwise `"none"`.
+- `storage` — read it off the code, like everything else: `"sql"` if it calls `ctx.sql`,
+  `"documents"` if it calls `ctx.db`, `"none"` if it calls neither. **Never both**: the two never
+  coexist, and code using each is a defect to report in `notes`, not a manifest to average out. If
+  the folder holds a `migrations/` directory, the answer is `"sql"` — say so in `notes` if the code
+  disagrees, because packaging refuses that pair.
 - `limits` — omit unless the code needs more: raise `timeoutSec` (1–300) for a long task that works
   over many records, raise `memoryMb` (128–3008) for one that holds a lot in memory at once. Say why
   in `notes` whenever you set either.

@@ -27,6 +27,10 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
+import {
+  RDSDataClient, BeginTransactionCommand, CommitTransactionCommand,
+  RollbackTransactionCommand, ExecuteStatementCommand,
+} from '@aws-sdk/client-rds-data';
 import { randomUUID } from 'node:crypto';
 
 const REGION = process.env.BDZ_REGION;
@@ -34,6 +38,9 @@ const TABLE = process.env.BDZ_TABLE;
 const BUCKET = process.env.BDZ_BUCKET;
 const STORAGE_PREFIX = process.env.BDZ_STORAGE_PREFIX;
 const QUEUE_URL = process.env.BDZ_QUEUE_URL;
+const SQL_CLUSTER_ARN = process.env.BDZ_SQL_CLUSTER_ARN;
+const SQL_SECRET_ARN = process.env.BDZ_SQL_SECRET_ARN;
+const DATABASE = process.env.BDZ_SQL_DATABASE;
 const API_BASE_URL = process.env.BDZ_API_BASE_URL ?? 'https://api.bulldozer-collective.fr/v2';
 
 /** Taille maximale du corps d'une requête reçue par une app. Voir `runHttp` pour le pourquoi. */
@@ -42,6 +49,7 @@ const MAX_BODY_BYTES = Number(process.env.BDZ_MAX_BODY_BYTES ?? 1_048_576);
 const db = DynamoDBDocumentClient.from(new DynamoDBClient({ region: REGION }));
 const s3 = new S3Client({ region: REGION });
 const sqs = new SQSClient({ region: REGION });
+const rds = SQL_CLUSTER_ARN ? new RDSDataClient({ region: REGION }) : null;
 
 /** États d'un traitement long. Les mêmes que ceux de la plateforme, pour ne rien réapprendre. */
 export const JOB_STATES = ['PENDING', 'RUNNING', 'SUCCESS', 'FAILURE'];
@@ -458,6 +466,83 @@ function bulldozerApi(token, customerId, projectId) {
   };
 }
 
+/**
+ * Interroge la base SQL de l'app.
+ *
+ * ```js
+ * const rows = await ctx.sql('SELECT * FROM notes WHERE statut = :statut', { statut: 'ouvert' });
+ * ```
+ *
+ * <strong>Le cloisonnement par projet n'est pas à écrire.</strong> Chaque requête part dans une
+ * transaction où le projet actif est posé, et une politique de sécurité au niveau des lignes filtre
+ * ce que la base rend. Un `WHERE project_id` oublié ne fait donc rien fuiter — c'est le moteur qui
+ * décide, pas la requête. En revanche `project_id` doit être renseigné à l'insertion.
+ *
+ * Les valeurs passent TOUJOURS par `params`, jamais concaténées : c'est ce qui rend une injection
+ * SQL impossible plutôt qu'improbable.
+ */
+function sqlRunner(projectId) {
+  return async (query, params = {}) => {
+    if (!rds) {
+      throw new Error("Cette app n'a pas de base SQL. Déclarez \"storage\": \"sql\" dans son manifeste.");
+    }
+
+    const base = { resourceArn: SQL_CLUSTER_ARN, secretArn: SQL_SECRET_ARN, database: DATABASE };
+    const { transactionId } = await rds.send(new BeginTransactionCommand(base));
+
+    try {
+      // SET LOCAL et pas SET : la valeur meurt avec la transaction. Le Data API recycle les
+      // connexions, donc une valeur qui survivrait ferait lire le projet du précédent appelant.
+      await rds.send(new ExecuteStatementCommand({
+        ...base,
+        transactionId,
+        sql: 'SET LOCAL bdz.project_id = :bdz_project',
+        parameters: [{ name: 'bdz_project', value: { stringValue: projectId } }],
+      }));
+
+      const result = await rds.send(new ExecuteStatementCommand({
+        ...base,
+        transactionId,
+        sql: query,
+        parameters: Object.entries(params).map(([name, value]) => ({ name, value: sqlValue(value) })),
+        includeResultMetadata: true,
+      }));
+
+      await rds.send(new CommitTransactionCommand({ ...base, transactionId }));
+      return rowsOf(result);
+    } catch (error) {
+      await rds.send(new RollbackTransactionCommand({ ...base, transactionId })).catch(() => {});
+      throw error;
+    }
+  };
+}
+
+/** Une valeur JavaScript vers la forme attendue par le Data API. */
+function sqlValue(value) {
+  if (value === null || value === undefined) return { isNull: true };
+  if (typeof value === 'number') {
+    return Number.isInteger(value) ? { longValue: value } : { doubleValue: value };
+  }
+  if (typeof value === 'boolean') return { booleanValue: value };
+  if (value instanceof Date) return { stringValue: value.toISOString() };
+  // Un objet devient du JSON : c'est ce qu'un auteur attend en écrivant dans une colonne jsonb.
+  return { stringValue: typeof value === 'object' ? JSON.stringify(value) : String(value) };
+}
+
+/**
+ * Les lignes, en objets ordinaires.
+ *
+ * Le Data API rend des valeurs typées (`{stringValue: …}`) et les noms de colonnes à part : sans
+ * cette remise en forme, une app manipulerait des tableaux indexés par position, et un ORDER BY
+ * changé plus tard casserait son code sans erreur.
+ */
+function rowsOf(result) {
+  const columns = (result.columnMetadata ?? []).map((c) => c.label ?? c.name);
+  return (result.records ?? []).map((record) => Object.fromEntries(
+    record.map((cell, i) => [columns[i], cell.isNull ? null : Object.values(cell)[0]]),
+  ));
+}
+
 // ─────────────────────────────────────────────────────────── le contexte
 
 const SENSITIVE = /token|secret|password|authorization|apikey/i;
@@ -499,6 +584,7 @@ function buildContext({ userId, customerId, projectId, projectRole, roles, token
     user: userId ? { id: userId, roles: rolesFrom(roles) } : null,
     project: { id: projectId, customerId, role: projectRole ?? '' },
     db: { collection: (name) => collection(projectId, name) },
+    sql: sqlRunner(projectId),
     files: files(projectId),
     jobs: jobs(projectId, timeoutSec),
     bulldozer: bulldozerApi(token, customerId, projectId),
@@ -775,6 +861,22 @@ async function runHttp(definition, event) {
   const token = bearerToken(event);
   if (!sealed.projectId) {
     return reply(401, { error: "Cette application n'est accessible qu'après connexion." });
+  }
+
+  // Le client de l'installation est fixe et connu de la fonction ; celui du projet vient du contexte
+  // scellé. Qu'ils diffèrent signifie que l'appelant apporte un projet d'un AUTRE client : il en est
+  // membre, donc l'autorisateur l'a laissé passer — mais écrire ces données ici les déposerait dans
+  // l'installation d'un client qui n'y a aucun droit. C'est le pire cas de la plateforme, et il est
+  // atteignable sans rien forger dès qu'une personne appartient à deux clients.
+  //
+  // Deux absences sont volontairement tolérées : le laissez-passer administrateur ne scelle aucun
+  // client, il n'y a donc rien à comparer ; et une installation provisionnée avant que la variable
+  // n'existe ne doit pas cesser de répondre.
+  const ownCustomerId = process.env.BDZ_CUSTOMER_ID;
+  if (sealed.customerId && ownCustomerId && sealed.customerId !== ownCustomerId) {
+    return reply(403, {
+      error: "Ce projet n'appartient pas au client de cette application.",
+    });
   }
 
   // Le plafond est posé ICI et pas dans le pare-feu, parce que le pare-feu ne sait pas le poser :

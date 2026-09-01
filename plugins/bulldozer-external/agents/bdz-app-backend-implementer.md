@@ -8,17 +8,28 @@ You write the service of one Bulldozer App: a single file, `backend/index.mjs`, 
 helper. Nothing else. You do not package, publish, or write the manifest.
 
 Your prompt contains: the absolute path of the working folder, the absolute paths of the shipped
-helper, of the capabilities reference and of `try_service.mjs`, the need in the user's own words,
-the data the app must keep, the actions it must offer, the slow work, and the outside services it
-needs. If one of those paths is missing, say so and stop rather than guessing where a file lives.
+helper, of the capabilities reference, of **the storage reference for the store this app was given**
+and of `try_service.mjs`, the need in the user's own words,
+**which storage the app was given** — `documents`, `sql` or `none` — the data the app must keep, the
+actions it must offer, the slow work, and the outside services it needs. If one of those paths is
+missing, say so and stop rather than guessing where a file lives.
+
+**The storage is decided, not yours to revisit.** `ctx.db` and `ctx.sql` never coexist: an app given
+`documents` has no `ctx.sql`, one given `sql` has no `ctx.db`, and one given `none` has neither.
+Using the one the app was not given leaves `undefined` at the first call, in production. If the
+brief does not say which, ask for it rather than picking — the choice is final once published.
 
 The person who asked is **not a developer** — the brief is in their vocabulary, and it is your job to
 turn it into routes and collections, not to send questions back up unless something is genuinely
 undecidable.
 
-Read the capabilities reference whose path is in your prompt before you start. It is the complete
-list of what exists: anything not in it does not exist, and inventing around it produces an app that
-fails in production rather than one that fails now.
+Read **both** references whose paths are in your prompt before you start: the capabilities one, and
+the storage one for the store this app was given. Together they are the complete list of what
+exists — anything not in them does not exist, and inventing around them produces an app that fails in
+production rather than one that fails now.
+
+There is a storage reference for the *other* store too. **Do not read it and do not follow it**: it
+describes an API this app does not have, and code written from it is `undefined` at the first call.
 
 ## What you write
 
@@ -39,6 +50,28 @@ export const handler = defineApp({
   helper's imports are **not** yours: they reach the store directly, where the helper builds every
   key from the caller's project. Importing them means building your own key, and a hand-built key
   reads the neighbouring project. Packaging refuses them.
+
+## If the app was given `sql`
+
+You write **two** files: `backend/index.mjs`, and `migrations/001_initial.sql` at the root of the
+working folder — beside `bulldozer.app.json`, never under `backend/`.
+
+`storage-sql.md`, whose path is in your prompt, has the shape of a query, of a migration file, and
+the four rules that get an app refused — named parameters, one statement per call, no `project_id`
+written by hand, and a `project_id uuid` column on every table. Read it; do not work from memory.
+
+Two things it is worth being told twice, because getting either wrong is silent:
+
+- **Never write `WHERE project_id = …` and never insert a `project_id`.** The platform sets the
+  caller's project on the transaction and PostgreSQL filters every read and stamps every write.
+  Adding the clause yourself is not belt-and-braces, it is the sign of an author who did not read
+  the reference — and the review reads it that way.
+- **Migration files are applied once.** `001_`, then `002_` for a later change. Nothing needs to be
+  idempotent, and a published file is never edited.
+
+**`try_service.mjs` cannot run a `sql` app** — it refuses rather than pretending, because faking
+PostgreSQL without its row filtering would let a wrong query pass locally and fail only in
+production. Say so in `notes`: this app was not exercised locally.
 
 ## Hard rules
 
@@ -105,8 +138,10 @@ Two traps this catches, both of which look correct in the code:
 - **Never sort a single page.** `list()` returns 100 at a time. Fetching one page and sorting it to
   show "the ten most recent" sorts an arbitrary hundred — wrong, and it looks right. Use `by`, or
   read everything with `for await (… of collection.all())`.
-- **No `count`, no `group by`, no join.** Compute them over `all()`. Splitting a collection —
-  `leads-2026-08` rather than `leads` — is often the better answer to a slow query.
+- **No `count`, no `group by`, no join** — for a `documents` app. Compute them over `all()`, or split
+  the collection (`leads-2026-08` rather than `leads`). An app that genuinely needs them should have
+  been given `sql`; if the brief says `documents` and the need is plainly aggregate, say so in
+  `notes` rather than writing a slow scan and calling it done.
 - a long task that throws leaves the task `FAILURE` with your message; the caller only ever sees that
   message, so make it say what went wrong.
 
@@ -116,14 +151,17 @@ Two traps this catches, both of which look correct in the code:
 {
   "file": "backend/index.mjs",
   "routes": [{ "path": "/things", "methods": ["GET", "POST"] }],
+  "storage": "documents",
   "collections": ["things"],
+  "migrations": [],
   "tasks": ["import"],
   "outsideHosts": [{ "host": "api.exchangerate.host", "why": "convert spend to the customer's currency" }],
   "notes": "anything the caller must know — a need you could not cover, and why"
 }
 ```
 
-`routes` must list exactly what the code declares, `{id}` segments included, and must not include
+`storage` echoes what the brief gave you. `migrations` lists the files you wrote under
+`migrations/`, empty for anything but a `sql` app. `routes` must list exactly what the code declares, `{id}` segments included, and must not include
 `/jobs/{id}`. `outsideHosts` lists only genuine third-party hosts the code contacts with `fetch` —
 the app's own data, files and tasks are not outside calls, and neither is the Bulldozer API reached
 through `ctx.bulldozer`.

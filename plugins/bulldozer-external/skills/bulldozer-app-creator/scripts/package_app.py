@@ -53,6 +53,7 @@ FRONTEND_DIR = "frontend/"
 BACKEND_DIR = "backend/"
 BACKEND_ENTRY = "index.mjs"
 ROOT_INDEX = "index.html"
+MIGRATIONS_DIR = "migrations/"
 
 # The fridge refuses 25 MB or more, and that is the tighter of the two limits (the service bundle
 # alone may go to 40 MB). Checking the loose one would let a rejected upload look like our success.
@@ -68,17 +69,20 @@ TIMEOUT_SEC = (1, 300)
 # There is no dependency installation step, so an import of anything outside this set and Node's own
 # modules resolves to nothing and the service crashes on its first call, in production, with no clue.
 #
-# These five are the store, the file space and the queue. The helper reaches them and builds every
-# key from the caller's project; that key construction IS the project boundary, and it is the only
-# thing enforcing it — the app's IAM role grants its whole table, with no leading-key condition. An
-# app that imports these talks to the store directly, assembles its own keys, and reads the
-# neighbouring project of the same customer. Hence the refusal below, outside the helper.
+# These are the store, the file space and the queue. The helper reaches them and derives the project
+# boundary itself; that derivation IS the boundary, and it is the only thing enforcing it — the app's
+# IAM role grants its whole table and its whole database, with no per-project condition. An app that
+# imports these talks to the store directly and reads the neighbouring project of the same customer:
+# by assembling its own DynamoDB keys, or by opening its own transaction and setting bdz.project_id
+# to whatever it likes, which is precisely the value Row-Level Security trusts. Hence the refusal
+# below, outside the helper.
 HELPER_ONLY = {
     "@aws-sdk/client-dynamodb",
     "@aws-sdk/lib-dynamodb",
     "@aws-sdk/client-s3",
     "@aws-sdk/s3-request-presigner",
     "@aws-sdk/client-sqs",
+    "@aws-sdk/client-rds-data",
 }
 
 # The one file those imports belong to.
@@ -105,6 +109,15 @@ RESERVED_SCREEN_DIR = "api"
 # helper answers them from the request path rather than from a route key, precisely so that
 # `_check_routes` below does not read them out of the shipped helper as routes of the app.
 BUILTIN_ROUTES = {"/jobs/{id}", "/openapi.yaml", "/openapi.json"}
+
+# `001_initial.sql` — the number gives the order migrations are applied in, so a file without one
+# has no place in the sequence. Sorting by name instead would put `010_` before `9_`.
+MIGRATION_NAME_RE = re.compile(r"^(\d{3,})_[^/]+\.sql$")
+
+# Every table the platform hosts is partitioned by project, and it enforces that with Row-Level
+# Security keyed on this column. A table without it cannot be policed, so the platform refuses the
+# whole publication — better to say so here, where the author still has the file open.
+PROJECT_COLUMN = "project_id"
 
 SKIPPED_NAMES = {".DS_Store", "Thumbs.db", ".bulldozer-app.json"}
 SKIPPED_DIRS = {"__MACOSX", "node_modules", ".git", ".angular", "__pycache__"}
@@ -284,11 +297,12 @@ def _check_imports(files: dict[str, str]) -> list[str]:
                 # at runtime, so that message would be false and the author would chase the wrong
                 # thing. Name the boundary instead, and where to go.
                 problems.append(
-                    '%s imports "%s". An app reaches its data through ctx.db, its files through '
-                    "ctx.files and its long tasks through ctx.jobs — never the store directly. The "
-                    "shipped helper builds every key from the caller's project, and that is what "
-                    "keeps one project's data out of another's: a key assembled by hand reads the "
-                    "neighbouring project." % (archive_path, specifier))
+                    '%s imports "%s". An app reaches its data through ctx.db or ctx.sql, its files '
+                    "through ctx.files and its long tasks through ctx.jobs — never the store "
+                    "directly. The shipped helper derives the project from the caller's sealed "
+                    "token, and that is what keeps one project's data out of another's: a key "
+                    "assembled by hand, or a project set by hand, reads the neighbouring project."
+                    % (archive_path, specifier))
                 continue
             if specifier.startswith("."):
                 target = os.path.normpath(
@@ -369,6 +383,122 @@ def _verify_archive(out: str, expect_service: bool, expect_screen: bool) -> dict
     }
 
 
+# ───────────────────────────────────────────────────────────── the migrations
+
+
+def _strip_sql_comments(sql: str) -> str:
+    """Comments can hold anything — a `project_id` in prose must not count as a column."""
+    sql = re.sub(r"/\*.*?\*/", " ", sql, flags=re.S)
+    return re.sub(r"--[^\n]*", " ", sql)
+
+
+def _table_body(sql: str, start: int) -> str:
+    """The parenthesised column list beginning at `start`, paren-matched rather than regexed.
+
+    A column list holds nested parentheses — `numeric(10,2)`, `CHECK (x > 0)` — which a
+    non-greedy regex would cut short and a greedy one would run past.
+    """
+    depth = 0
+    for index in range(start, len(sql)):
+        if sql[index] == "(":
+            depth += 1
+        elif sql[index] == ")":
+            depth -= 1
+            if depth == 0:
+                return sql[start + 1:index]
+    return sql[start:]
+
+
+def _tables_without_project_id(migrations: list[tuple[str, str]]) -> list[str]:
+    """Replay the migrations on paper and report the tables that end up unpoliceable.
+
+    Cumulative on purpose: a column added by a later `ALTER TABLE` counts, because the platform
+    checks the state the base ends in, not the state each file leaves. Flagging a table that
+    `002` fixes would be a refusal the author cannot act on.
+    """
+    tables: dict[str, bool] = {}
+
+    for _, sql in migrations:
+        clean = _strip_sql_comments(sql)
+
+        for match in re.finditer(
+                r"\bCREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?([\w.\"]+)\s*\(",
+                clean, re.I):
+            body = _table_body(clean, match.end() - 1)
+            has_column = re.search(
+                r"\b%s\s+uuid\b" % PROJECT_COLUMN, body, re.I) is not None
+            tables[match.group(1).strip('"').lower()] = has_column
+
+        for match in re.finditer(
+                r"\bALTER\s+TABLE\s+(?:IF\s+EXISTS\s+)?([\w.\"]+)\s+ADD\s+(?:COLUMN\s+)?"
+                r"(?:IF\s+NOT\s+EXISTS\s+)?%s\s+uuid\b" % PROJECT_COLUMN, clean, re.I):
+            tables[match.group(1).strip('"').lower()] = True
+
+        for match in re.finditer(
+                r"\bDROP\s+TABLE\s+(?:IF\s+EXISTS\s+)?([\w.\"]+)", clean, re.I):
+            tables.pop(match.group(1).strip('"').lower(), None)
+
+    return sorted(name for name, policed in tables.items() if not policed)
+
+
+def _check_migrations(manifest: dict, app: str | None) -> dict[str, str]:
+    """Collect `migrations/`, in order, and refuse what the platform would refuse on upload."""
+    wants_sql = manifest.get("storage") == "sql"
+    folder = os.path.join(app, "migrations") if app else None
+    present = bool(folder) and os.path.isdir(folder)
+
+    if not present:
+        if wants_sql:
+            raise Refused(
+                'this app declares storage "sql" but has no migrations/ folder. Its database '
+                "would hold no table at all, and every query would fail on a missing relation. "
+                "Add migrations/001_initial.sql with the CREATE TABLE statements.")
+        return {}
+    if not wants_sql:
+        raise Refused(
+            'this app has a migrations/ folder but does not declare storage "sql", so the '
+            "platform would never run it. Either set storage to \"sql\" in %s, or delete the "
+            "folder." % MANIFEST)
+
+    numbers: dict[int, str] = {}
+    collected: list[tuple[int, str, str]] = []
+    for name in sorted(os.listdir(folder)):
+        source = os.path.join(folder, name)
+        if not os.path.isfile(source):
+            continue
+        matched = MIGRATION_NAME_RE.match(name)
+        if not matched:
+            raise Refused(
+                "migrations/%s is not a valid migration name. Expected a number of at least "
+                "three digits, an underscore, a label and .sql — 001_initial.sql for instance."
+                % name)
+        number = int(matched.group(1))
+        if number in numbers:
+            raise Refused(
+                "migrations/%s and migrations/%s share the number %d, so there is no saying "
+                "which runs first. Renumber one of them."
+                % (numbers[number], name, number))
+        numbers[number] = name
+        with open(source, encoding="utf-8") as f:
+            collected.append((number, name, f.read()))
+
+    if not collected:
+        raise Refused(
+            'this app declares storage "sql" but migrations/ holds no .sql file. Add '
+            "migrations/001_initial.sql with the CREATE TABLE statements.")
+
+    collected.sort()
+    unpoliced = _tables_without_project_id([(name, sql) for _, name, sql in collected])
+    if unpoliced:
+        raise Refused(
+            "these tables have no %s uuid column, so the platform cannot partition them by "
+            "project and will refuse the whole publication: %s. Add the column — you never "
+            "filter on it yourself, ctx.sql does."
+            % (PROJECT_COLUMN, ", ".join(unpoliced)))
+
+    return {MIGRATIONS_DIR + name: os.path.join(folder, name) for _, name, _ in collected}
+
+
 # ───────────────────────────────────────────────────────────── assembling
 
 
@@ -406,6 +536,7 @@ def build(app: str | None, screen: str | None, out: str) -> dict:
             raise Refused("the manifest and the code disagree — the review refuses this:\n  - %s"
                           % "\n  - ".join(problems))
         files.update(service)
+    files.update(_check_migrations(manifest, app))
     if screen:
         index = os.path.join(screen, ROOT_INDEX)
         if not os.path.isfile(index):

@@ -45,13 +45,16 @@ python scripts/package_app.py --app ./my-app \
     --screen ./my-app/dist/my-app/browser --out app.zip
 ```
 
-- `--app` — the folder holding `bulldozer.app.json` and `backend/`. Omit for a screen-only app.
+- `--app` — the folder holding `bulldozer.app.json` and `backend/`, plus `migrations/` for a
+  `storage: "sql"` app. Omit for a screen-only app.
 - `--screen` — the compiled screen. Omit for an app that has no screen.
 
 The script refuses to write an archive the platform would reject, and re-reads the one it wrote to
 prove its shape. It also catches, in a second rather than after a minute of review: a service that
 does not parse, an import nothing provides, a manifest that declares routes the code does not answer
-(or the reverse), a manifest field out of bounds, and a screen shipping a folder named `api`. If it
+(or the reverse), a manifest field out of bounds, and a screen shipping a folder named `api`. For a
+SQL app it also checks the migrations: numbered names, no two sharing a number, and a `project_id
+uuid` column on every table — without which the platform refuses the whole publication. If it
 refuses, **fix the cause** — the message names it — and run it again.
 
 ## 4. Upload, then publish

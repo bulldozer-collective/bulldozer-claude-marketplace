@@ -42,7 +42,7 @@ Three tiers, and confusing them is how a manifest ends up lying:
 | `name` | yes | non-empty, 120 characters max |
 | `runtime` | yes, with a service | `"nodejs22"` — the only one |
 | `personalData` | yes, with a service | `true` or `false`, never omitted, never guessed |
-| `storage` | no | `"documents"` (default) or `"none"` |
+| `storage` | no | `"documents"` (default), `"sql"` or `"none"` |
 | `routes` | no, but write them | `path` starts with `/`; `methods` from GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS; 100 max |
 | `egress` | no, but write them | `host` is a bare hostname, `why` is mandatory; 50 max |
 | `indexes` | no | fields the app sorts or filters on; 20 max, see below |
@@ -132,8 +132,25 @@ out of time on real data.
 request: those are cut off at 30 seconds by what sits in front of the app, whatever the manifest
 says.
 
-## `storage: "none"`
+## `storage` — which store the app gets
 
-Only for an app that stores nothing at all. It avoids setting up a database that would then have to
-be backed up, watched and purged for nothing. If the app calls `ctx.db` anywhere, this must stay
-`"documents"`.
+| Value | What the app gets | On `ctx` |
+|---|---|---|
+| `"documents"` (default) | a DynamoDB table of its own | `ctx.db` |
+| `"sql"` | a PostgreSQL database of its own | `ctx.sql` |
+| `"none"` | nothing | neither |
+
+The three are exclusive: an app declaring `"sql"` has no `ctx.db`, and one declaring `"documents"`
+has no `ctx.sql`. Getting this wrong is not caught until the first call, where the missing one is
+simply `undefined`.
+
+**`"none"`** is for an app that stores nothing at all — it avoids setting up a database that would
+then have to be backed up, watched and purged for nothing.
+
+**`"sql"`** additionally requires a `migrations/` folder at the root of the app, holding at least
+`001_initial.sql`, and every table in it must carry a `project_id uuid` column. Packaging refuses
+the app otherwise, and so does the platform. See `storage-sql.md`.
+
+Choose `"sql"` for what documents cannot do — joins, `GROUP BY`, `SUM`, uniqueness constraints,
+reporting over many rows. It bills for the shared database's capacity, so it is a decision, not a
+default.
