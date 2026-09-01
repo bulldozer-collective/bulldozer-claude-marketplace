@@ -607,7 +607,17 @@ function buildContext({ userId, customerId, projectId, projectRole, roles, token
      */
     user: userId ? { id: userId, roles: rolesFrom(roles) } : null,
     project: { id: projectId, customerId, role: projectRole ?? '' },
-    db: { collection: (name) => collection(projectId, name) },
+    db: {
+      collection: (name) => {
+        // Symétrique du refus de ctx.sql : les deux magasins s'excluent, et une app doit
+        // l'apprendre par un message plutôt que par un ResourceNotFound au premier appel.
+        if (!TABLE) {
+          throw new Error("Cette app n'a pas de magasin de documents. Déclarez \"storage\": "
+            + '"documents" dans son manifeste, ou utilisez ctx.sql si elle est en "sql".');
+        }
+        return collection(projectId, name);
+      },
+    },
     sql: sqlRunner(projectId),
     files: files(projectId),
     jobs: jobs(projectId, timeoutSec),
