@@ -485,6 +485,31 @@ function bulldozerApi(token, customerId, projectId) {
  * Les valeurs passent TOUJOURS par `params`, jamais concaténées : c'est ce qui rend une injection
  * SQL impossible plutôt qu'improbable.
  */
+/**
+ * L'instruction qui pose le projet du appelant pour la durée de la transaction.
+ *
+ * <p>`set_config(..., true)` et non `SET LOCAL`, pour une raison mécanique et non par goût :
+ * PostgreSQL ne planifie pas SET comme une requête, sa valeur doit être un littéral, et un
+ * paramètre lié y produit « syntax error at or near "$1" » — ce qui rendait TOUTE requête d'app
+ * impossible, puisque cette instruction précède les autres. set_config est une fonction, appelée
+ * dans un SELECT ordinaire : le projet y reste une valeur liée, jamais concaténée.
+ *
+ * Le troisième argument à `true` donne exactement la portée de SET LOCAL — la valeur meurt avec la
+ * transaction. Le Data API recycle les connexions, et une valeur qui survivrait ferait lire le
+ * projet du précédent appelant.
+ *
+ * Exportée pour être éprouvée : c'est une chaîne que rien d'autre ne relit.
+ */
+export function projectScope(projectId) {
+  return {
+    sql: 'SELECT set_config(:bdz_key, :bdz_project, true)',
+    parameters: [
+      { name: 'bdz_key', value: { stringValue: 'bdz.project_id' } },
+      { name: 'bdz_project', value: { stringValue: projectId } },
+    ],
+  };
+}
+
 function sqlRunner(projectId) {
   return async (query, params = {}) => {
     if (!rds) {
@@ -495,13 +520,8 @@ function sqlRunner(projectId) {
     const { transactionId } = await rds.send(new BeginTransactionCommand(base));
 
     try {
-      // SET LOCAL et pas SET : la valeur meurt avec la transaction. Le Data API recycle les
-      // connexions, donc une valeur qui survivrait ferait lire le projet du précédent appelant.
       await rds.send(new ExecuteStatementCommand({
-        ...base,
-        transactionId,
-        sql: 'SET LOCAL bdz.project_id = :bdz_project',
-        parameters: [{ name: 'bdz_project', value: { stringValue: projectId } }],
+        ...base, transactionId, ...projectScope(projectId),
       }));
 
       const result = await rds.send(new ExecuteStatementCommand({
