@@ -388,6 +388,13 @@ function jobs(projectId, timeoutSec) {
   return {
     /** Démarre un traitement. Rend immédiatement la main : le travail se fait à côté. */
     async start(type, payload = {}) {
+      // Sans tâche déclarée au manifeste, l'app n'a pas de file : rien ne consommerait ce message,
+      // et le traitement resterait PENDING pour toujours. La file n'est pas créée dans ce cas, parce
+      // qu'un consommateur la sonde ~21 600 fois par jour qu'elle serve ou non.
+      if (!QUEUE_URL) {
+        throw new Error("Cette app n'a pas de traitements longs. Déclarez-les dans « jobs » de son "
+          + 'manifeste, en reprenant les noms passés à ctx.jobs.start().');
+      }
       const job = await store.put({
         type,
         state: 'PENDING',

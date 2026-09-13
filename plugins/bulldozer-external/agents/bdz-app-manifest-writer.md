@@ -71,6 +71,24 @@ write of a document carrying the field, used or not. A field the code merely *fi
 `where` does not need one — that query works regardless, it just reads more. `id`, `pk` and `sk` are
 refused: documents are already keyed on the id.
 
+## `jobs` — the long tasks, read off the code like the routes
+
+Collect two things and union them: the keys of the `jobs` block passed to `defineApp`, and every
+name given to `ctx.jobs.start('name')`. Declare exactly those.
+
+```json
+"jobs": ["import", "monthly-report"]
+```
+
+**This one is billed, like `indexes`, and in a way that is easy to miss.** The platform creates a
+queue and a consumer only for an app that declares tasks, because a consumer polls its queue about
+21 600 times a day whether or not anything is ever sent to it. Declare a task the code never runs
+and the app pays for a queue it never uses; omit one it does run and the app gets no queue at all,
+and `ctx.jobs.start()` refuses at runtime.
+
+Omit the field entirely for an app with no long task. Never write `"jobs": []` and never invent a
+name to be safe.
+
 ## The rest
 
 - `name` — as given in the prompt, 120 characters max.

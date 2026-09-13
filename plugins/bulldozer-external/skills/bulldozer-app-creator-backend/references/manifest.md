@@ -43,6 +43,7 @@ Three tiers, and confusing them is how a manifest ends up lying:
 | `runtime` | yes, with a service | `"nodejs22"` — the only one |
 | `personalData` | yes, with a service | `true` or `false`, never omitted, never guessed |
 | `storage` | no | `"documents"` (default), `"sql"` or `"none"` |
+| `jobs` | no | names of the long tasks the code runs; omit when there are none |
 | `routes` | no, but write them | `path` starts with `/`; `methods` from GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS; 100 max |
 | `egress` | no, but write them | `host` is a bare hostname, `why` is mandatory; 50 max |
 | `indexes` | no | fields the app sorts or filters on; 20 max, see below |
@@ -131,6 +132,19 @@ out of time on real data.
 `timeoutSec` caps a **long task**. It cannot exceed 300, and raising it does not help an ordinary
 request: those are cut off at 30 seconds by what sits in front of the app, whatever the manifest
 says.
+
+## `jobs` — and why an empty one is not free
+
+List the long tasks the code actually runs: the keys of the `jobs` block, plus every name passed to
+`ctx.jobs.start()`. Omit the field when the app has none.
+
+The platform gives an app a queue and a consumer **only if it declares tasks**. That is not tidiness:
+a consumer polls its queue roughly 21 600 times a day whether or not a single message is ever sent.
+Three idle apps were enough to consume the whole free monthly allowance, so an app with no task is
+given no queue, and `ctx.jobs.start()` refuses rather than queueing into nothing.
+
+Declaring a task the code never runs buys a queue for nothing. Forgetting one it does run breaks it
+at runtime. Packaging checks both against the code.
 
 ## `storage` — which store the app gets
 

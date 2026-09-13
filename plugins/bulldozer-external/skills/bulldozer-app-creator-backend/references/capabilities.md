@@ -174,6 +174,10 @@ jobs: {
 },
 ```
 
+**Every task must be listed in the manifest's `jobs`.** The platform provisions a queue only for an
+app that declares tasks — a consumer polls its queue about 21 600 times a day whether or not
+anything is sent to it, so an app with no task is given none, and `ctx.jobs.start()` refuses.
+
 `start` hands the work off and returns straight away. **`GET /jobs/{id}` exists automatically** —
 never write it. What the handler returns becomes `result`; if it throws, the message becomes `error`.
 

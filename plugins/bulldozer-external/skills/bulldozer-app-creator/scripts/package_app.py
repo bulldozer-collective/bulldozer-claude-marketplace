@@ -94,6 +94,11 @@ IMPORT_RE = re.compile(r"""(?:^|[^\w$.])(?:import|export)\s
 # A route as `defineApp` declares it: `'GET /leads/{id}': async (…) => …`.
 ROUTE_RE = re.compile(r"""['"](GET|POST|PUT|PATCH|DELETE|HEAD|OPTIONS)\s+(/[^'"]*)['"]\s*:""")
 
+# A long task, as the code names it: a key of the `jobs` block, and every ctx.jobs.start('name').
+JOB_HANDLER_RE = re.compile(r"""['"]?([A-Za-z_][\w-]*)['"]?\s*:\s*async\s*\(""")
+JOB_START_RE = re.compile(r"""\bjobs\s*\.\s*start\s*\(\s*['"]([^'"]+)['"]""")
+JOBS_BLOCK_RE = re.compile(r"""\bjobs\s*:\s*\{""")
+
 # The sort axis of a query: `list({ by: 'createdAt', … })`.
 AXIS_RE = re.compile(r"""\bby\s*:\s*['"]([A-Za-z_]\w*)['"]""")
 
@@ -284,6 +289,57 @@ def _check_indexes(manifest: dict, files: dict[str, str]) -> list[str]:
     return ['the code sorts by "%s" but "indexes" does not declare it — that query would fail '
             "every time once published" % field
             for field in sorted(asked - declared)]
+
+
+def _jobs_in_code(files: dict[str, str]) -> set[str]:
+    """Every long task the code names — handlers declared, and names passed to ctx.jobs.start."""
+    found: set[str] = set()
+    for archive_path, source in files.items():
+        if not archive_path.endswith((".mjs", ".js")) or archive_path == HELPER:
+            continue
+        with open(source, encoding="utf-8", errors="replace") as f:
+            code = COMMENT_RE.sub("", f.read())
+        found.update(JOB_START_RE.findall(code))
+        block = JOBS_BLOCK_RE.search(code)
+        if block:
+            # The handlers live between `jobs: {` and the matching brace; scan a bounded window
+            # rather than parse, and let ctx.jobs.start above catch whatever this misses.
+            depth, end = 0, len(code)
+            for i in range(block.end() - 1, len(code)):
+                if code[i] == "{":
+                    depth += 1
+                elif code[i] == "}":
+                    depth -= 1
+                    if depth == 0:
+                        end = i
+                        break
+            found.update(JOB_HANDLER_RE.findall(code[block.end():end]))
+    return found
+
+
+def _check_jobs(manifest: dict, files: dict[str, str]) -> list[str]:
+    """The manifest's `jobs` against the ones the code actually runs.
+
+    This is not bookkeeping. The platform creates a queue and a consumer only for an app that
+    declares tasks, because a consumer polls its queue about 21 600 times a day whether or not
+    anything is ever sent to it — a fleet of idle apps is billed for nothing else. An undeclared
+    task therefore means no queue at all, and ctx.jobs.start refusing at runtime.
+    """
+    in_code = _jobs_in_code(files)
+    declared = {j for j in (manifest.get("jobs") or []) if isinstance(j, str) and j.strip()}
+
+    missing = sorted(in_code - declared)
+    if missing:
+        return ['the code runs long task(s) the manifest does not declare: %s. Add them to "jobs" '
+                "in %s — without it the app gets no queue and ctx.jobs.start() refuses."
+                % (", ".join(missing), MANIFEST)]
+
+    extra = sorted(declared - in_code)
+    if extra and in_code:
+        return ['"jobs" declares %s, which the code never runs. An app is given a queue only for '
+                "the tasks it declares, and a queue costs whether it is used or not."
+                % ", ".join(extra)]
+    return []
 
 
 def _check_imports(files: dict[str, str]) -> list[str]:
@@ -549,7 +605,8 @@ def build(app: str | None, screen: str | None, out: str) -> dict:
         if problems:
             raise Refused("the service cannot run as packaged:\n  - %s"
                           % "\n  - ".join(problems))
-        problems = _check_routes(manifest, service) + _check_indexes(manifest, service)
+        problems = (_check_routes(manifest, service) + _check_indexes(manifest, service)
+                    + _check_jobs(manifest, service))
         if problems:
             raise Refused("the manifest and the code disagree — the review refuses this:\n  - %s"
                           % "\n  - ".join(problems))
