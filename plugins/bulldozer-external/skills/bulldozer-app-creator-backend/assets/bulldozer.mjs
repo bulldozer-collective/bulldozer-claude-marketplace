@@ -27,6 +27,7 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
+import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import {
   RDSDataClient, BeginTransactionCommand, CommitTransactionCommand,
   RollbackTransactionCommand, ExecuteStatementCommand,
@@ -38,6 +39,7 @@ const TABLE = process.env.BDZ_TABLE;
 const BUCKET = process.env.BDZ_BUCKET;
 const STORAGE_PREFIX = process.env.BDZ_STORAGE_PREFIX;
 const QUEUE_URL = process.env.BDZ_QUEUE_URL;
+const API_KEY_SECRET_ARN = process.env.BDZ_API_KEY_SECRET_ARN;
 const SQL_CLUSTER_ARN = process.env.BDZ_SQL_CLUSTER_ARN;
 const SQL_SECRET_ARN = process.env.BDZ_SQL_SECRET_ARN;
 const DATABASE = process.env.BDZ_SQL_DATABASE;
@@ -434,10 +436,42 @@ function jobs(projectId, timeoutSec) {
  * Le jeton est celui de l'appelant, relayé tel quel : l'app n'a donc jamais plus de droits que la
  * personne qui l'utilise. Les en-têtes de client et de projet sont posés d'office.
  */
+/**
+ * La clé d'API de l'installation, lue une fois par conteneur.
+ *
+ * <p>Elle vit dans Secrets Manager et non dans l'environnement : le code de l'auteur lit
+ * `process.env` librement, alors qu'il ne peut pas importer le client AWS — l'empaquetage le
+ * refuse. Ce n'est pas une frontière pour autant, du code dans le même processus peut intercepter
+ * l'en-tête au moment de l'appel ; c'est un ralentisseur, et il vaut mieux le dire.
+ */
+let apiKeyPromise = null;
+
+function apiKey() {
+  if (!API_KEY_SECRET_ARN) {
+    return Promise.resolve(null);
+  }
+  // Mémorisée sur la PROMESSE, pas sur sa valeur : deux appels concurrents au démarrage d'un
+  // conteneur partagent alors la même lecture au lieu d'en faire deux.
+  apiKeyPromise ??= new SecretsManagerClient({ region: REGION })
+    .send(new GetSecretValueCommand({ SecretId: API_KEY_SECRET_ARN }))
+    .then((out) => out.SecretString ?? null);
+  return apiKeyPromise;
+}
+
 function bulldozerApi(token, customerId, projectId) {
   const call = async (method, path, body, params) => {
-    if (!token) {
-      throw new Error("L'API Bulldozer n'est joignable que depuis une requête d'un utilisateur.");
+    // Sans appelant — une tâche planifiée — l'app s'authentifie comme son propre compte de service.
+    // Ce que ça autorise se réduit alors à ses memberships : les projets inscrits à ses tâches.
+    const key = token ? null : await apiKey();
+    if (!token && !key) {
+      throw new Error("L'API Bulldozer n'est joignable que depuis une requête d'un utilisateur, ou "
+        + "depuis une tâche planifiée d'une app dont la clé a été déposée.");
+    }
+    if (key && !projectId) {
+      // L'en-tête manquant est un refus côté serveur, pas un laissez-passer : le dire ici plutôt
+      // que d'aller chercher un 403 dont la cause ne serait pas évidente.
+      throw new Error('Aucun projet actif : un appel à l\'API depuis une tâche planifiée doit '
+        + 'nommer son projet. Passez par ctx.forProject(id).');
     }
     const url = new URL(API_BASE_URL + path);
     for (const [key, value] of Object.entries(params ?? {})) {
@@ -446,7 +480,7 @@ function bulldozerApi(token, customerId, projectId) {
     const response = await fetch(url, {
       method,
       headers: {
-        Authorization: `Bearer ${token}`,
+        ...(token ? { Authorization: `Bearer ${token}` } : { 'X-Bdz-Api-Key': key }),
         'X-Bdz-Customer-Id': customerId,
         'X-Bdz-Project-Id': projectId,
         ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),

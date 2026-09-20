@@ -61,6 +61,7 @@ const FAKES_DIR = join(dirname(fileURLToPath(import.meta.url)), 'fakes');
 const FAKES = [
   'bdz-try-shared', 'client-dynamodb', 'lib-dynamodb',
   'client-s3', 's3-request-presigner', 'client-sqs', 'client-rds-data',
+  'client-secrets-manager',
 ];
 
 // ─────────────────────────────────────────────────────────── arguments

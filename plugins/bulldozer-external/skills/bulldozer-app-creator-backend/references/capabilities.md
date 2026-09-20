@@ -216,8 +216,13 @@ project was checked. An app serving five projects has five schedules for the sam
 independently. Registering happens outside the app; a schedule with no project registered never
 fires, and that is not a bug.
 
-⚠️ **`ctx.bulldozer` does not work in a tick.** It forwards the caller's token, and there is no
-caller. A scheduled task reads and writes its own data; it cannot call the platform API yet.
+**`ctx.bulldozer` works in a tick, but not by default.** With no caller there is no token to
+forward, so the app acts as **its own service account** — a Keycloak identity of its own, using a
+key deposited on the installation. What that allows is exactly what the service account is a member
+of: the projects registered to its scheduled tasks, and nothing else.
+
+Until a key is deposited, `ctx.bulldozer` refuses in a tick and says so. That is an operator's step,
+not something the app can arrange for itself.
 
 A failing tick is retried **twice**, then dropped — no queue builds up, and an hour late the run is
 abandoned rather than done at the wrong time. The failure is in the app's own log.

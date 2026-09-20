@@ -84,6 +84,7 @@ HELPER_ONLY = {
     "@aws-sdk/s3-request-presigner",
     "@aws-sdk/client-sqs",
     "@aws-sdk/client-rds-data",
+    "@aws-sdk/client-secrets-manager",
 }
 
 # The one file those imports belong to.
