@@ -603,8 +603,57 @@ function rolesFrom(sealed) {
   return typeof sealed !== 'string' ? [] : sealed.split(',').map((r) => r.trim()).filter(Boolean);
 }
 
-function buildContext({ userId, customerId, projectId, projectRole, roles, token, timeoutSec }) {
+/**
+ * Refuse une ressource partitionnée quand aucun projet n'est actif.
+ *
+ * <p>C'est l'état d'une tâche planifiée : personne n'appelle, donc aucun projet n'est scellé. Le
+ * refus est délibérément bruyant plutôt que silencieux — une lecture qui rendrait « rien » laisserait
+ * croire que la base est vide, et l'auteur chercherait le défaut dans ses données.
+ */
+function requireProject(projectId, what) {
+  if (!projectId) {
+    throw new Error(`Aucun projet actif : ${what} est partitionné par projet, et une tâche `
+      + "planifiée n'a pas d'appelant. Passez par ctx.forProject(id) pour choisir sur quel projet "
+      + 'travailler, ou ctx.projects() pour parcourir ceux que la plateforme autorise.');
+  }
+  return projectId;
+}
+
+function buildContext({ userId, customerId, projectId, projectRole, roles, token, timeoutSec,
+                        mode = 'user' }) {
+  const scoped = (id) => buildContext({
+    userId, customerId, projectId: id, projectRole, roles, token, timeoutSec, mode,
+  });
+
   return {
+    /**
+     * D'où vient cette exécution : `'user'` pour une requête, `'job'` pour un traitement long,
+     * `'schedule'` pour une tâche planifiée. Les deux derniers n'ont pas d'appelant, donc
+     * `ctx.user` y vaut `null`.
+     */
+    mode,
+    /** Le client de l'installation. Toujours présent, y compris sans projet actif. */
+    customerId,
+    /**
+     * Le contexte d'un projet précis. Les données, les fichiers et les traitements y sont
+     * partitionnés exactement comme pour une requête entrante.
+     *
+     * <p>Le magasin de l'app ne contient que ses propres données : nommer un projet ici ne donne
+     * donc accès à rien d'autre qu'à sa propre installation. Ce qui est réellement autorisé côté
+     * plateforme se joue dans `ctx.bulldozer`, que le serveur contrôle de son côté.
+     */
+    forProject: (id) => {
+      if (!id) {
+        throw new Error('ctx.forProject(id) demande un identifiant de projet.');
+      }
+      return scoped(id);
+    },
+    /** Les projets sur lesquels cette installation est autorisée à travailler sans appelant. */
+    projects: async () => {
+      throw new Error("La liste des projets autorisés n'est pas encore disponible : elle vient de "
+        + "l'API Bulldozer, que le mode service ne sait pas encore joindre. En attendant, une tâche "
+        + 'planifiée travaille sur un projet nommé explicitement via ctx.forProject(id).');
+    },
     /**
      * Qui appelle. Vient de la plateforme, pas de la requête : infalsifiable par l'app.
      *
@@ -613,7 +662,7 @@ function buildContext({ userId, customerId, projectId, projectRole, roles, token
      * confondues dans un seul champ.
      */
     user: userId ? { id: userId, roles: rolesFrom(roles) } : null,
-    project: { id: projectId, customerId, role: projectRole ?? '' },
+    project: projectId ? { id: projectId, customerId, role: projectRole ?? '' } : null,
     db: {
       collection: (name) => {
         // Symétrique du refus de ctx.sql : les deux magasins s'excluent, et une app doit
@@ -622,10 +671,10 @@ function buildContext({ userId, customerId, projectId, projectRole, roles, token
           throw new Error("Cette app n'a pas de magasin de documents. Déclarez \"storage\": "
             + '"documents" dans son manifeste, ou utilisez ctx.sql si elle est en "sql".');
         }
-        return collection(projectId, name);
+        return collection(requireProject(projectId, 'ctx.db'), name);
       },
     },
-    sql: sqlRunner(projectId),
+    sql: (query, params) => sqlRunner(requireProject(projectId, 'ctx.sql'))(query, params),
     files: files(projectId),
     jobs: jobs(projectId, timeoutSec),
     bulldozer: bulldozerApi(token, customerId, projectId),
@@ -652,6 +701,9 @@ function buildContext({ userId, customerId, projectId, projectRole, roles, token
  */
 export function defineApp(definition) {
   return async (event) => {
+    if (event?.trigger === 'schedule') {
+      return runSchedule(definition, event);
+    }
     if (Array.isArray(event?.Records)) {
       return runJobs(definition, event.Records);
     }
@@ -1036,6 +1088,57 @@ async function recordAppCall(ctx, token, declaration, path, statusCode) {
   }
 }
 
+/**
+ * Une tâche planifiée : EventBridge Scheduler invoque la fonction à l'heure dite.
+ *
+ * <p>Ce n'est pas une seconde sorte de code. Le gestionnaire exécuté est une entrée de `jobs` —
+ * le même que celui qu'un `ctx.jobs.start()` déclencherait — parce qu'une tâche de fond reste une
+ * tâche de fond, qu'on la lance ou qu'elle parte seule.
+ *
+ * <p>Le projet vient de la planification elle-même, où la plateforme l'a écrit quand quelqu'un l'y
+ * a inscrit — un appel où son appartenance au projet a été vérifiée. L'app ne le choisit pas, ne le
+ * devine pas et ne peut pas en changer : c'est la même garantie que sur une requête HTTP, obtenue
+ * autrement. Un couple (tâche, projet) a sa propre planification, donc un tick porte toujours un
+ * projet et un seul.
+ *
+ * <p>Aucune trace n'est écrite dans `__jobs` : rien n'attend le résultat d'un tick, et un
+ * enregistrement par nuit et par projet s'accumulerait sans que personne ne le lise. Le journal
+ * porte le début, la fin et l'échec.
+ */
+async function runSchedule(definition, event) {
+  const name = event?.name;
+  const ctx = buildContext({
+    userId: null,
+    customerId: process.env.BDZ_CUSTOMER_ID,
+    projectId: event?.projectId ?? null,
+    projectRole: null,
+    roles: null,
+    token: null,
+    timeoutSec: Number(process.env.BDZ_TIMEOUT_SEC ?? 30),
+    mode: 'schedule',
+  });
+
+  const handler = definition.jobs?.[name];
+  if (!handler) {
+    // Le manifeste est censé l'avoir empêché. Si on arrive ici, la planification a survécu au
+    // gestionnaire : le dire fort, sinon le tick échouerait chaque nuit sans rien expliquer.
+    ctx.log.error('Tâche planifiée inconnue', { name, connues: Object.keys(definition.jobs ?? {}) });
+    throw new Error(`Aucun traitement « ${name} » : la planification vise un gestionnaire absent.`);
+  }
+
+  ctx.log.info('Tâche planifiée démarrée', { name, projectId: event?.projectId ?? null });
+  try {
+    const result = await handler({}, ctx);
+    ctx.log.info('Tâche planifiée terminée', { name });
+    return { ok: true, name, result: result ?? null };
+  } catch (error) {
+    // Relancé volontairement : c'est ce qui fait échouer l'invocation côté Scheduler, donc ce qui
+    // déclenche ses réessais et, à terme, sa file de rebut. Avaler l'erreur rendrait le tick vert.
+    ctx.log.error('Tâche planifiée en échec', { name, erreur: String(error?.message ?? error) });
+    throw error;
+  }
+}
+
 async function runJobs(definition, records) {
   for (const record of records) {
     const message = JSON.parse(record.body);
@@ -1063,6 +1166,7 @@ async function runJobs(definition, records) {
       projectRole: null,
       roles: null,
       token: null,
+      mode: 'job',
       timeoutSec: Number(process.env.BDZ_TIMEOUT_SEC ?? 30),
     });
 

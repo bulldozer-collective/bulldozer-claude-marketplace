@@ -24,6 +24,7 @@
  *   node try_service.mjs --app ./my-app --request 'GET /leads?' --verbose
  *
  * Who is calling, for a route that depends on it:
+ *   --tick digest                   fire a scheduled task, as EventBridge would
  *   --project-role MANAGER          the caller's role in the project — MEMBER by default
  *   --roles bulldozer-core-admin    their Bulldozer platform roles, comma-separated — none by default
  *
@@ -83,7 +84,7 @@ function projectRoleOf(value) {
 }
 
 function parseArguments(argv) {
-  const options = { app: null, requests: [], tasks: true, token: null, verbose: false };
+  const options = { app: null, requests: [], ticks: [], tasks: true, token: null, verbose: false };
   let customerId = '00000000-0000-0000-0000-0000000000c0';
   let projectId = '00000000-0000-0000-0000-0000000000b0';
   let userId = '00000000-0000-0000-0000-0000000000a0';
@@ -96,6 +97,7 @@ function parseArguments(argv) {
     switch (flag) {
       case '--app': options.app = value; i += 1; break;
       case '--request': options.requests.push(value); i += 1; break;
+      case '--tick': options.ticks.push(value); i += 1; break;
       case '--token': options.token = value; i += 1; break;
       case '--customer-id': customerId = value; i += 1; break;
       case '--project-id': projectId = value; i += 1; break;
@@ -230,8 +232,9 @@ async function main() {
     console.error("error: --app is required, pointing at the app's working folder");
     return 2;
   }
-  if (options.requests.length === 0) {
-    console.error("error: pass at least one --request, e.g. --request 'GET /notes'");
+  if (options.requests.length === 0 && options.ticks.length === 0) {
+    console.error("error: pass at least one --request, e.g. --request 'GET /notes', "
+      + "or --tick <nom> to fire a scheduled task");
     return 2;
   }
   if (options.token) {
@@ -275,6 +278,20 @@ async function main() {
     }
 
     const store = globalThis.__bdzTry;
+
+    // Une tâche planifiée, telle qu'EventBridge l'enverrait. Le projet vient de l'inscription en
+    // production ; ici c'est --project-id, parce qu'il doit venir d'ailleurs que du code de l'app.
+    for (const name of options.ticks) {
+      let outcome;
+      try {
+        outcome = await handler({ trigger: 'schedule', name, projectId: options.projectId });
+        console.log(`\n✓ tick ${name} → ${JSON.stringify(outcome?.result ?? null)}`);
+      } catch (error) {
+        ok = false;
+        // Relancé volontairement par l'aide : c'est ce qui déclenche les réessais de Scheduler.
+        console.log(`\n✗ tick ${name} → ${error.message}`);
+      }
+    }
 
     for (const raw of options.requests) {
       const request = parseRequest(raw);

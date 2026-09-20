@@ -47,6 +47,7 @@ import shutil
 import subprocess
 import sys
 import zipfile
+import zoneinfo
 
 MANIFEST = "bulldozer.app.json"
 FRONTEND_DIR = "frontend/"
@@ -342,6 +343,120 @@ def _check_jobs(manifest: dict, files: dict[str, str]) -> list[str]:
     return []
 
 
+# `rate(3 hours)` and `cron(0 21 * * ? *)`, as EventBridge Scheduler spells them.
+RATE_RE = re.compile(r"^rate\(\s*(\d+)\s+(minute|minutes|hour|hours|day|days)\s*\)$", re.I)
+CRON_RE = re.compile(r"^cron\(\s*(.+?)\s*\)$", re.I)
+
+# minute, hour, day-of-month, month, day-of-week, year — AWS takes six fields, not the five of
+# Unix cron, and rejects the five-field form outright.
+CRON_FIELD_RANGES = [(0, 59), (0, 23), (1, 31), (1, 12), (1, 7), (1970, 2199)]
+
+# The schedule's full name must fit AWS's 64 characters next to `bdz-app-` and the installation id.
+MAX_SCHEDULE_NAME = 19
+
+
+def _cron_field_ok(field: str, low: int, high: int) -> bool:
+    """One field of an AWS cron expression, wildcards and lists included."""
+    if field in ("*", "?"):
+        return True
+    for part in field.split(","):
+        part = part.split("/", 1)[0]            # step: the base is what must be in range
+        if part in ("*", "?", "L", "W"):
+            continue
+        for bound in part.split("-", 1):
+            bound = bound.rstrip("LW#0123456789") or bound
+            if bound.isdigit():
+                if not low <= int(bound) <= high:
+                    return False
+            elif not bound.isalpha():           # JAN…DEC, MON…SUN and the like
+                return False
+    return True
+
+
+def _schedule_expression_error(expression: str) -> str | None:
+    """Why AWS would refuse this expression — said here rather than mid-deployment."""
+    if RATE_RE.match(expression):
+        if int(RATE_RE.match(expression).group(1)) < 1:
+            return "a rate must be at least 1"
+        return None
+
+    matched = CRON_RE.match(expression)
+    if not matched:
+        return ('expected cron(...) or rate(...), as in cron(0 21 * * ? *) or rate(3 hours)')
+
+    fields = matched.group(1).split()
+    if len(fields) != 6:
+        return ("a cron expression takes SIX fields — minute hour day-of-month month day-of-week "
+                "year — and got %d. The five-field Unix form is refused by AWS." % len(fields))
+    for field, (low, high) in zip(fields, CRON_FIELD_RANGES):
+        if not _cron_field_ok(field, low, high):
+            return 'field "%s" is out of range (%d-%d)' % (field, low, high)
+    if fields[2] != "?" and fields[4] != "?":
+        return ("day-of-month and day-of-week cannot both be set: one of them must be \"?\". "
+                "Use cron(0 21 * * ? *) for every day, cron(0 21 ? * MON *) for Mondays.")
+    return None
+
+
+def _check_schedules(manifest: dict, files: dict[str, str]) -> list[str]:
+    """The manifest's `schedules` against the code, and against what AWS will accept.
+
+    A schedule runs a `jobs` handler with no caller. Pointing it at a handler that does not exist
+    would fire on time, every time, and do nothing — the longest kind of failure to find. And an
+    expression AWS refuses only surfaces when the schedule is created, which is mid-deployment
+    rather than here.
+    """
+    schedules = manifest.get("schedules") or []
+    if not schedules:
+        return []
+
+    problems: list[str] = []
+    in_code = _jobs_in_code(files)
+    declared = {j for j in (manifest.get("jobs") or []) if isinstance(j, str)}
+    seen: set[str] = set()
+
+    for entry in schedules:
+        if not isinstance(entry, dict):
+            problems.append('every entry of "schedules" must be an object')
+            continue
+        name = (entry.get("name") or "").strip()
+        if not name:
+            problems.append('a schedule needs a "name", naming the job it runs')
+            continue
+        if name in seen:
+            problems.append('two schedules are both named "%s"' % name)
+        seen.add(name)
+        if len(name) > MAX_SCHEDULE_NAME:
+            problems.append('schedule "%s" exceeds %d characters; its full name must fit AWS\'s '
+                            "64-character limit next to the installation id"
+                            % (name, MAX_SCHEDULE_NAME))
+        if name not in declared:
+            problems.append('schedule "%s" runs a job that "jobs" does not declare' % name)
+        elif in_code and name not in in_code:
+            problems.append('schedule "%s" runs a job the code never defines: it would fire on '
+                            "time and do nothing" % name)
+
+        expression = (entry.get("cron") or "").strip()
+        if not expression:
+            problems.append('schedule "%s" has no "cron" expression' % name)
+        else:
+            why = _schedule_expression_error(expression)
+            if why:
+                problems.append('schedule "%s" has an invalid expression "%s": %s'
+                                % (name, expression, why))
+
+        tz = (entry.get("tz") or "").strip()
+        if not tz:
+            problems.append('schedule "%s" has no "tz". A time of day means nothing without a '
+                            "timezone, and it would drift by an hour twice a year." % name)
+        else:
+            try:
+                zoneinfo.ZoneInfo(tz)
+            except Exception:
+                problems.append('schedule "%s" names an unknown timezone "%s"; expected an IANA '
+                                'zone such as "Europe/Paris"' % (name, tz))
+    return problems
+
+
 def _check_imports(files: dict[str, str]) -> list[str]:
     """Every import of the service must resolve, offline, inside the archive."""
     problems: list[str] = []
@@ -606,7 +721,8 @@ def build(app: str | None, screen: str | None, out: str) -> dict:
             raise Refused("the service cannot run as packaged:\n  - %s"
                           % "\n  - ".join(problems))
         problems = (_check_routes(manifest, service) + _check_indexes(manifest, service)
-                    + _check_jobs(manifest, service))
+                    + _check_jobs(manifest, service)
+                    + _check_schedules(manifest, service))
         if problems:
             raise Refused("the manifest and the code disagree — the review refuses this:\n  - %s"
                           % "\n  - ".join(problems))

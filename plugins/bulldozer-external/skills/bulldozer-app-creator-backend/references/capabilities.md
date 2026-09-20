@@ -193,6 +193,35 @@ Three things to know, all of which have bitten:
   once its deadline passes, so nothing stays stuck — but the work is half-done. Keep tasks short
   enough to finish, or make them resumable.
 
+### Running on a timetable
+
+A task declared in `schedules` also runs on its own, with nobody calling it:
+
+```js
+jobs: {
+  digest: async (payload, ctx) => {
+    ctx.mode;          // 'schedule' rather than 'job' or 'user'
+    ctx.user;          // null — a tick has no caller, so no roles and no identity
+    ctx.project.id;    // the project this tick is for
+    await ctx.db.collection('reports').put(await build(ctx));
+  },
+}
+```
+
+**`payload` is empty**: nobody passed anything. Everything the task needs it reads from its own data.
+
+**The project is not in your code and not up to you.** Each tick carries one project, written into
+the schedule by the platform when someone registered it — a call where their membership of that
+project was checked. An app serving five projects has five schedules for the same task, firing
+independently. Registering happens outside the app; a schedule with no project registered never
+fires, and that is not a bug.
+
+⚠️ **`ctx.bulldozer` does not work in a tick.** It forwards the caller's token, and there is no
+caller. A scheduled task reads and writes its own data; it cannot call the platform API yet.
+
+A failing tick is retried **twice**, then dropped — no queue builds up, and an hour late the run is
+abandoned rather than done at the wrong time. The failure is in the app's own log.
+
 ## 5. The Bulldozer API, as the caller
 
 ```js

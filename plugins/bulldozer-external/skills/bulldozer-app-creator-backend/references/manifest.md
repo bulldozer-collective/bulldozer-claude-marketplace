@@ -44,6 +44,7 @@ Three tiers, and confusing them is how a manifest ends up lying:
 | `personalData` | yes, with a service | `true` or `false`, never omitted, never guessed |
 | `storage` | no | `"documents"` (default), `"sql"` or `"none"` |
 | `jobs` | no | names of the long tasks the code runs; omit when there are none |
+| `schedules` | no | `{ name, cron, tz }` per task that runs on a timetable |
 | `routes` | no, but write them | `path` starts with `/`; `methods` from GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS; 100 max |
 | `egress` | no, but write them | `host` is a bare hostname, `why` is mandatory; 50 max |
 | `indexes` | no | fields the app sorts or filters on; 20 max, see below |
@@ -145,6 +146,34 @@ given no queue, and `ctx.jobs.start()` refuses rather than queueing into nothing
 
 Declaring a task the code never runs buys a queue for nothing. Forgetting one it does run breaks it
 at runtime. Packaging checks both against the code.
+
+## `schedules` — running without being called
+
+```json
+"schedules": [{ "name": "digest", "cron": "cron(0 21 * * ? *)", "tz": "Europe/Paris" }]
+```
+
+`name` is a key of `jobs`: a scheduled task is not a second kind of code, it is one more trigger on
+a handler that already exists. It is capped at **19 characters** — the full schedule name must fit
+AWS's 64 next to the installation id.
+
+`cron` is EventBridge Scheduler's own syntax, and it takes **six** fields — minute, hour,
+day-of-month, month, day-of-week, year. The five-field Unix form is refused. One of day-of-month and
+day-of-week must be `?`. `rate(3 hours)` works too.
+
+| Want | Write |
+|---|---|
+| every day at 21:00 | `cron(0 21 * * ? *)` |
+| every three hours | `rate(3 hours)` |
+| the 1st of each month at 14:00 | `cron(0 14 1 * ? *)` |
+| every Monday at 09:30 | `cron(30 9 ? * MON *)` |
+
+`tz` is **mandatory**, an IANA zone. Without it a time of day means nothing, and an evening task
+would drift by an hour twice a year with nothing to connect the symptom to the clock change.
+
+**Declaring a schedule does not make it run.** It says the task exists; *which projects* it runs for
+is registered afterwards, one call per project, by someone who belongs to that project. A schedule
+with no project registered never fires. See `capabilities.md`.
 
 ## `storage` — which store the app gets
 

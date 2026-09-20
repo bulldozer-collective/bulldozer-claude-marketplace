@@ -89,6 +89,23 @@ and `ctx.jobs.start()` refuses at runtime.
 Omit the field entirely for an app with no long task. Never write `"jobs": []` and never invent a
 name to be safe.
 
+## `schedules` — only what the brief asked for
+
+Unlike everything else here, this one is **not** derivable from the code: a handler that runs on a
+timetable looks exactly like one that does not. Write a schedule only when the prompt says the app
+must act on its own — "every evening", "every three hours", "on the first of the month".
+
+```json
+"schedules": [{ "name": "digest", "cron": "cron(0 21 * * ? *)", "tz": "Europe/Paris" }]
+```
+
+`name` must be a key of `jobs`, 19 characters at most. `cron` takes **six** fields, not the five of
+Unix cron, and one of day-of-month / day-of-week must be `?`. `tz` is mandatory — an IANA zone, and
+the customer's own, not UTC unless they said so. See `manifest.md` for the four common shapes.
+
+Never invent a cadence the brief does not state, and never write `schedules` for a task that is only
+ever started by `ctx.jobs.start()`.
+
 ## The rest
 
 - `name` — as given in the prompt, 120 characters max.

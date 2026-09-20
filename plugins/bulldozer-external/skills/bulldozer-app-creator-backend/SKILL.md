@@ -47,6 +47,10 @@ The person asking is not a developer. Ask about the work, not the design:
 - **What must it be able to do?** — each action becomes a route.
 - **Is anything slow?** — a large import, a report over months of data, calls to another tool. Those
   become long tasks, because a request is cut off after 30 seconds.
+- **Does anything have to happen on its own?** — "every evening", "every three hours", "on the first
+  of the month". Those become **scheduled tasks**: the same `jobs` handler, with a timetable. Ask for
+  the time *and* the timezone; "21 h" means nothing without one. A scheduled task has no caller, so
+  it cannot call the Bulldozer API — say so if the need depends on it.
 - **Does it need anything from outside Bulldozer?** — name the tools out loud; each becomes an
   `egress` entry with a reason.
 
@@ -122,6 +126,12 @@ so and retry with a sharper brief; do not paper over it by writing the code your
 node scripts/try_service.mjs --app <folder> \
     --request 'POST /notes {"text":"hello"}' \
     --request 'GET /notes'
+```
+
+A scheduled task fires the same way, without waiting for its hour:
+
+```bash
+node scripts/try_service.mjs --app <folder> --tick digest
 ```
 
 A route that depends on who is calling needs to be tried as that person, otherwise it is only ever
