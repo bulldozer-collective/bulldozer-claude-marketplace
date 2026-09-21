@@ -454,15 +454,47 @@ function apiKey() {
   // conteneur partagent alors la même lecture au lieu d'en faire deux.
   apiKeyPromise ??= new SecretsManagerClient({ region: REGION })
     .send(new GetSecretValueCommand({ SecretId: API_KEY_SECRET_ARN }))
-    .then((out) => out.SecretString ?? null);
+    .then((out) => out.SecretString ?? null)
+    // Un rejet se mémorise aussi. Sans cette ligne, une coupure réseau au tout premier appel
+    // condamnerait le conteneur : chaque appel suivant rejouerait la même erreur sans jamais
+    // retenter la lecture.
+    .catch((error) => { apiKeyPromise = null; throw error; });
   return apiKeyPromise;
 }
 
+/**
+ * Oublie la clé mémorisée, pour que le prochain appel relise le secret.
+ *
+ * <p>Le renouvellement annuel crée la clé suivante et révoque la précédente aussitôt. Un conteneur
+ * encore chaud porte alors une clé morte et prendrait des 401 jusqu'à son recyclage — soit des
+ * heures, une fois par an et par app.
+ */
+function forgetApiKey() {
+  apiKeyPromise = null;
+}
+
 function bulldozerApi(token, customerId, projectId) {
+  const send = async (method, path, body, params, key) => {
+    const url = new URL(API_BASE_URL + path);
+    for (const [name, value] of Object.entries(params ?? {})) {
+      if (value !== undefined && value !== null) url.searchParams.set(name, String(value));
+    }
+    return fetch(url, {
+      method,
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : { 'X-Bdz-Api-Key': key }),
+        'X-Bdz-Customer-Id': customerId,
+        'X-Bdz-Project-Id': projectId,
+        ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
+      },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    });
+  };
+
   const call = async (method, path, body, params) => {
     // Sans appelant — une tâche planifiée — l'app s'authentifie comme son propre compte de service.
     // Ce que ça autorise se réduit alors à ses memberships : les projets inscrits à ses tâches.
-    const key = token ? null : await apiKey();
+    let key = token ? null : await apiKey();
     if (!token && !key) {
       throw new Error("L'API Bulldozer n'est joignable que depuis une requête d'un utilisateur, ou "
         + "depuis une tâche planifiée d'une app dont la clé a été déposée.");
@@ -473,20 +505,17 @@ function bulldozerApi(token, customerId, projectId) {
       throw new Error('Aucun projet actif : un appel à l\'API depuis une tâche planifiée doit '
         + 'nommer son projet. Passez par ctx.forProject(id).');
     }
-    const url = new URL(API_BASE_URL + path);
-    for (const [key, value] of Object.entries(params ?? {})) {
-      if (value !== undefined && value !== null) url.searchParams.set(key, String(value));
+
+    let response = await send(method, path, body, params, key);
+    if (response.status === 401 && key) {
+      // La clé a probablement été renouvelée depuis que ce conteneur l'a lue. Une seule relecture :
+      // si la neuve est refusée aussi, le problème n'est pas la fraîcheur.
+      forgetApiKey();
+      key = await apiKey();
+      if (key) {
+        response = await send(method, path, body, params, key);
+      }
     }
-    const response = await fetch(url, {
-      method,
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : { 'X-Bdz-Api-Key': key }),
-        'X-Bdz-Customer-Id': customerId,
-        'X-Bdz-Project-Id': projectId,
-        ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
-      },
-      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-    });
     if (!response.ok) {
       const detail = await response.text().catch(() => '');
       // Les trois codes que l'app doit savoir distinguer, dits en clair plutôt qu'en numéro.
