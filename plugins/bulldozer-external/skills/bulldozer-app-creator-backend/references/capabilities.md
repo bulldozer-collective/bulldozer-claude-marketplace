@@ -216,6 +216,11 @@ project was checked. An app serving five projects has five schedules for the sam
 independently. Registering happens outside the app; a schedule with no project registered never
 fires, and that is not a bug.
 
+**The caller's credentials never reach the app.** `Authorization`, `X-Bdz-Api-Key` and `Cookie` are
+stripped before the request is handed over: reading them returns nothing. Who is calling is in
+`ctx.user`, and the platform talks to itself on the app's behalf through `ctx.bulldozer`. Naming
+either header in the code is flagged by the review, and the app's own key is refused outright.
+
 **`ctx.bulldozer` works in a tick, but not by default.** With no caller there is no token to
 forward, so the app acts as **its own service account** — a Keycloak identity of its own, using a
 key deposited on the installation. What that allows is exactly what the service account is a member
@@ -223,6 +228,10 @@ of: the projects registered to its scheduled tasks, and nothing else.
 
 Until a key is deposited, `ctx.bulldozer` refuses in a tick and says so. That is an operator's step,
 not something the app can arrange for itself.
+
+`ctx.projects()` lists the projects the app was added to — the same ones the API will accept from
+it. A tick already carries its own project, so this is only for an app that needs to act beyond its
+ticks. It is read fresh each time: a manager can add or remove the app at any moment.
 
 A failing tick is retried **twice**, then dropped — no queue builds up, and an hour late the run is
 abandoned rather than done at the wrong time. The failure is in the app's own log.

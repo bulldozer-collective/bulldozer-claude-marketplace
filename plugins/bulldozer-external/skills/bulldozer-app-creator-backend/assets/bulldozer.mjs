@@ -711,11 +711,29 @@ function buildContext({ userId, customerId, projectId, projectRole, roles, token
       }
       return scoped(id);
     },
-    /** Les projets sur lesquels cette installation est autorisée à travailler sans appelant. */
+    /**
+     * Les projets sur lesquels cette app a le droit de travailler sans appelant.
+     *
+     * <p>Ce sont ses memberships : un manager de projet l'y a ajoutée, et rien d'autre ne les
+     * accorde. La liste vient donc de la plateforme à chaque appel — pas d'un cache, parce qu'elle
+     * change dès qu'un manager ajoute ou retire l'app, et travailler sur un projet qu'on vient de
+     * lui retirer serait pire que de le manquer.
+     *
+     * <p>Une tâche planifiée porte déjà SON projet : cette liste ne sert qu'à une app qui veut agir
+     * au-delà de ce que ses ticks lui donnent.
+     */
     projects: async () => {
-      throw new Error("La liste des projets autorisés n'est pas encore disponible : elle vient de "
-        + "l'API Bulldozer, que le mode service ne sait pas encore joindre. En attendant, une tâche "
-        + 'planifiée travaille sur un projet nommé explicitement via ctx.forProject(id).');
+      const response = await bulldozerApi(token, customerId, projectId)
+        .get('/project-memberships');
+      const now = Date.now();
+      return (response?.memberships ?? [])
+        // Un membership à durée limitée cesse d'autoriser à sa date : le rendre après coup
+        // enverrait l'app travailler sur un projet que l'API lui refusera.
+        .filter((m) => !m.deletedAt && (!m.validUntil || Date.parse(m.validUntil) > now))
+        .map((m) => m.project)
+        .filter((project) => project?.id && !project.deletedAt)
+        .map((project) => ({ id: project.id, name: project.name ?? null,
+                             customerId: project.customerId ?? customerId }));
     },
     /**
      * Qui appelle. Vient de la plateforme, pas de la requête : infalsifiable par l'app.
@@ -772,6 +790,24 @@ export function defineApp(definition) {
     }
     return runHttp(definition, event);
   };
+}
+
+/**
+ * Les en-têtes d'authentification ne sont jamais remis à l'app.
+ *
+ * <p>L'identité de l'appelant lui arrive par `ctx.user`, scellée par l'authorizer. Le jeton brut, lui,
+ * n'a aucun usage légitime dans le code d'une app — alors que le lui donner suffirait à le recopier
+ * vers n'importe quel hôte déclaré en `egress`, et à agir comme l'utilisateur bien après sa visite.
+ *
+ * <p>Retirer la capacité plutôt que la surveiller : une règle de revue se contourne, une valeur
+ * absente ne se lit pas. Le reste des en-têtes passe inchangé — `content-type`, `accept` et ce que
+ * l'app a mis elle-même lui servent.
+ */
+export function appHeaders(headers) {
+  const retires = new Set(['authorization', 'x-bdz-api-key', 'cookie']);
+  return Object.fromEntries(
+    Object.entries(headers ?? {}).filter(([name]) => !retires.has(name.toLowerCase())),
+  );
 }
 
 /** Extrait le chemin relatif : la plateforme sert l'app sous /{client}/{app}/api. */
@@ -1094,7 +1130,7 @@ async function runHttp(definition, event) {
     // pour le voir.
     const request = new Request(`https://app.internal${path}${queryOf(event)}`, {
       method,
-      headers: event.headers ?? {},
+      headers: appHeaders(event.headers),
       ...(event.body ? { body: event.isBase64Encoded ? Buffer.from(event.body, 'base64') : event.body } : {}),
     });
     request.params = route.params;
