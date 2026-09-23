@@ -114,6 +114,7 @@ Skills are invoked automatically by Claude based on your request, or manually wi
 | `bulldozer-sea-management` | SEA / Google Ads | Query Google Ads campaigns, ad groups, keywords, and performance metrics |
 | `bulldozer-studio` | Studio | Generate images and videos from text prompts via Bulldozer Studio |
 | `bulldozer-create-company` | Create Company | Create new companies in Bulldozer with deduplication checks |
+| `bulldozer-version` | Version | Gives the latest available version of the plugin |
 
 ### Example prompts
 
@@ -138,6 +139,10 @@ Fires before any Bulldozer MCP tool call. Records the tool usage as an AI metric
 ### PostToolUse — Config change detection
 
 Fires after any `Write` or `Edit` tool call. If `bulldozer.json` was modified, Claude is instructed to re-read the file and discard stale project context if `customerId` or `projectId` changed.
+
+### Git pre-commit — version sync (contributors)
+
+`.githooks/pre-commit` copies the staged `version` of `plugin.json` into the `bulldozer-version` skill, and into the `# Plugin version` instructions of `bulldozer-mcp-server/src/main/resources/application.yml` when that repo is found (`BULLDOZER_MCP_SERVER_DIR`, default `../../../backend/bulldozer-mcp-server`; not committed there). Enable it once per clone: `git config core.hooksPath .githooks`.
 
 ---
 

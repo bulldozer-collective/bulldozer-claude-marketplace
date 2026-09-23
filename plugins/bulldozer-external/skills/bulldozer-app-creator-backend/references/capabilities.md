@@ -117,6 +117,10 @@ separate sets, the app never writes a project id itself, and it cannot express a
 own project even by mistake. That is the platform's first safety rule, and it is why an app must
 never build its own keys or set its own project.
 
+The one way to name another project is `ctx.forProject(id)`, and it is bounded — see
+[Working on several projects](#working-on-several-projects) below. On a request it is refused
+outright: the project is the one the platform sealed.
+
 Everything below this section is the same either way.
 
 ## 3. Its own files
@@ -232,6 +236,29 @@ not something the app can arrange for itself.
 `ctx.projects()` lists the projects the app was added to — the same ones the API will accept from
 it. A tick already carries its own project, so this is only for an app that needs to act beyond its
 ticks. It is read fresh each time: a manager can add or remove the app at any moment.
+
+### Working on several projects
+
+`ctx.forProject(id)` returns a context whose data, files and tasks are partitioned on that project
+instead — the only way an app ever names a project.
+
+```js
+for (const project of await ctx.projects()) {
+  const c = ctx.forProject(project.id);
+  await c.db.collection('reports').put(await build(c));
+}
+```
+
+Two bounds, and neither is up to the app:
+
+- **On a request it is refused.** The project was sealed by the platform after checking that the
+  caller belongs to it; rewriting it would hand the app a project nobody authorised for that visit.
+- **In a tick or a task, the project must be one the app was added to.** The check runs at the first
+  operation on that context, against the same list `ctx.projects()` returns, and an unknown project
+  fails with its id in the message. The sealed project pays nothing: it is not re-checked.
+
+An id the app invented therefore reads nothing. Writing `ctx.forProject` on a request, or on a
+project the app was never added to, is a bug the platform will tell you about — not a way in.
 
 A failing tick is retried **twice**, then dropped — no queue builds up, and an hour late the run is
 abandoned rather than done at the wrong time. The failure is in the app's own log.

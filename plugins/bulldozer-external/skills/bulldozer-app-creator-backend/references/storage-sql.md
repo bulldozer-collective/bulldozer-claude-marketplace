@@ -42,6 +42,17 @@ The platform therefore poses its own policy **as restrictive** — restrictive p
 AND — so a policy written by an app can no longer widen what the platform has bounded. It is refused
 anyway, because wanting to write one means misunderstanding who guarantees what.
 
+### Everything lives in `public`
+
+**Never write `CREATE SCHEMA`, and never grant `CREATE ON SCHEMA`.** Both are refused, by packaging
+and by the platform, before the migration is recorded.
+
+The reason is the same one: partitioning is posed on `public` and nowhere else — the `project_id`
+default, row-level security, its policies, and the re-read of the catalogue that checks all three.
+A table in a schema of your own escapes every one of them and would return every project's rows,
+with no symptom at all. And an app allowed to create in `public` would **own** the tables it creates
+at runtime — PostgreSQL lets a table's owner turn row-level security off.
+
 What belongs in a migration is ordinary schema: tables, columns, indexes, constraints, defaults.
 
 ## Schema changes: `migrations/`

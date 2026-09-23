@@ -36,9 +36,21 @@ workaround and no exception. The fix is always the same: write the branches out 
 user genuinely needs a choice at runtime, it becomes a `switch` over a fixed set.
 
 **A module the app may not use** — `child_process`, `worker_threads`, `vm`, `net`, `dgram`,
-`cluster`, `v8`, `inspector`. Whatever the app was trying to do, it has a supported way to do it:
-long work goes through the long-task mechanism, calls out go through plain `fetch`, storage goes
-through the app's own data and files. Point at the capability instead of arguing the module.
+`cluster`, `v8`, `inspector`, `dns`, `module`. Whatever the app was trying to do, it has a supported
+way to do it: long work goes through the long-task mechanism, calls out go through plain `fetch`,
+storage goes through the app's own data and files. Point at the capability instead of arguing the
+module. `module` is on the list because `createRequire` rebuilds `require` from it, which would put
+every other name on this list back within reach.
+
+**A module that is not `node:` and not one of the app's own files.** Nothing is installed, so there
+is no third name to import. The only exception is the shipped helper, and it is the shipped helper
+that reaches the store — an app that imports the store's client builds its own keys, and a key built
+by hand reads the neighbouring project.
+
+**Reading `process`.** Not a style rule: a function's environment carries the credentials of its
+execution role, and nothing an app needs to read is in there. Its data is in `ctx.db` or `ctx.sql`,
+its files in `ctx.files`. Writing `const p = process` to get around the name is the same refusal —
+the check is on the reference, not on `process.env`.
 
 **Writing to a file on disk.** An app has no durable disk. Files belong in the app's own file
 storage; a scratch file, if truly needed, goes in `/tmp` and disappears. This one is usually a

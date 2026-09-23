@@ -133,6 +133,14 @@ SECURITY_DDL_RE = re.compile(
     r"\b(CREATE\s+POLICY|ALTER\s+POLICY|DROP\s+POLICY"
     r"|ALTER\s+TABLE\s+[^;]*?\bROW\s+LEVEL\s+SECURITY)", re.I | re.S)
 
+# Same family, and the platform refuses both. A table in a schema of the author's own escapes every
+# check the platform runs — they all read `public`: the project_id column, row-level security, the
+# policies, and the re-read of the catalogue. It would return every project's rows, with no symptom.
+# Giving CREATE back on `public` is the other half: the app would own the tables it creates at
+# runtime, and an owner may turn row-level security off.
+SCHEMA_DDL_RE = re.compile(
+    r"\b(CREATE\s+SCHEMA|GRANT\s+[^;]*?\bCREATE\b[^;]*?\bON\s+SCHEMA)", re.I | re.S)
+
 SKIPPED_NAMES = {".DS_Store", "Thumbs.db", ".bulldozer-app.json"}
 SKIPPED_DIRS = {"__MACOSX", "node_modules", ".git", ".angular", "__pycache__"}
 
@@ -676,6 +684,17 @@ def _check_migrations(manifest: dict, app: str | None) -> dict[str, str]:
                 "platform's job, not the app's: it puts a restrictive policy on every table after "
                 "your migrations run, and a policy written here is refused. Remove it — you never "
                 "filter by project, and you never write a project_id."
+                % (name, " ".join(found.group(1).split())))
+
+    for _, name, sql in collected:
+        found = SCHEMA_DDL_RE.search(_strip_sql_comments(sql))
+        if found:
+            raise Refused(
+                "migrations/%s reaches outside the public schema (%s). Partitioning lives on "
+                "public — the project_id default, row-level security and its policies are posed "
+                "there and nowhere else. A table in another schema, or a schema the app may create "
+                "in, would return every project's rows without a symptom, so the platform refuses "
+                "the publication. Keep your tables in public."
                 % (name, " ".join(found.group(1).split())))
 
     unpoliced = _tables_without_project_id([(name, sql) for _, name, sql in collected])

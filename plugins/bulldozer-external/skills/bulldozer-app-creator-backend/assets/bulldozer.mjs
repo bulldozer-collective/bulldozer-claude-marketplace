@@ -682,10 +682,85 @@ function requireProject(projectId, what) {
   return projectId;
 }
 
+/**
+ * Vérifie qu'un projet CHOISI par l'app est bien dans sa portée, et une seule fois.
+ *
+ * <p>La portée, ce sont ses memberships : un manager de projet l'y a ajoutée. Le magasin, lui, ne
+ * sait pas dire non — la clé de partition se construit à partir de l'identifiant qu'on lui donne, et
+ * le rôle IAM ouvre toute la table sans condition de projet. Sans cette vérification, une ligne
+ * suffisait à lire le projet voisin du même client.
+ *
+ * <p>Paresseuse à dessein : `ctx.forProject(id)` reste synchrone, donc le code des apps existantes
+ * ne change pas. Le contrôle tombe à la première opération, qui est de toute façon asynchrone.
+ *
+ * <p>Exportée pour être éprouvée : c'est le seul contrôle qui sépare deux projets d'un même client
+ * dans le magasin d'une app, et il n'a besoin d'aucune ressource AWS pour être joué.
+ *
+ * <p>Mémorisée sur la PROMESSE, et par contexte scopé : un tick qui écrit cent documents sur un
+ * projet ne demande la liste qu'une fois, et un tick qui travaille sur trois projets la demande
+ * trois fois — jamais moins, parce qu'un manager peut retirer l'app entre deux.
+ */
+export function scopeGuard(chosenProjectId, listProjects) {
+  let checked = null;
+  return () => {
+    checked ??= listProjects()
+      .then((projects) => {
+        if (!projects.some((project) => project.id === chosenProjectId)) {
+          throw new Error(`Le projet ${chosenProjectId} n'est pas dans la portée de cette app. `
+            + 'Un manager du projet doit l\'y ajouter — ctx.projects() rend ceux qui le sont.');
+        }
+      })
+      // Un échec ne se mémorise pas : une coupure réseau condamnerait sinon le contexte pour toute
+      // la durée de l'invocation.
+      .catch((error) => { checked = null; throw error; });
+    return checked;
+  };
+}
+
+/**
+ * Enveloppe une ressource partitionnée derrière le garde, sans changer sa forme.
+ *
+ * <p>Sans garde — le cas nominal, où le projet vient du scellé — la ressource est rendue telle
+ * quelle : un projet que la plateforme a écrit n'a rien à revérifier, et ne paie donc rien.
+ *
+ * <p>Le générateur asynchrone est traité à part : l'envelopper comme une fonction ordinaire rendrait
+ * une promesse d'itérateur, et `for await` cesserait de fonctionner sur `collection.all()`.
+ */
+export function guarded(resource, ensure) {
+  if (!ensure) {
+    return resource;
+  }
+  return Object.fromEntries(Object.entries(resource).map(([name, value]) => {
+    if (typeof value !== 'function') {
+      return [name, value];
+    }
+    if (value.constructor?.name === 'AsyncGeneratorFunction') {
+      return [name, async function* (...args) { await ensure(); yield* value(...args); }];
+    }
+    return [name, async (...args) => { await ensure(); return value(...args); }];
+  }));
+}
+
 function buildContext({ userId, customerId, projectId, projectRole, roles, token, timeoutSec,
-                        mode = 'user' }) {
+                        mode = 'user', ensureScope = null }) {
+  // Nommée avant l'objet : le garde d'un contexte scopé interroge la portée depuis le contexte
+  // COURANT, dont le projet est légitime — pas depuis celui qu'on est en train de vérifier.
+  const projects = async () => {
+    const response = await bulldozerApi(token, customerId, projectId).get('/project-memberships');
+    const now = Date.now();
+    return (response?.memberships ?? [])
+      // Un membership à durée limitée cesse d'autoriser à sa date : le rendre après coup
+      // enverrait l'app travailler sur un projet que l'API lui refusera.
+      .filter((m) => !m.deletedAt && (!m.validUntil || Date.parse(m.validUntil) > now))
+      .map((m) => m.project)
+      .filter((project) => project?.id && !project.deletedAt)
+      .map((project) => ({ id: project.id, name: project.name ?? null,
+                           customerId: project.customerId ?? customerId }));
+  };
+
   const scoped = (id) => buildContext({
     userId, customerId, projectId: id, projectRole, roles, token, timeoutSec, mode,
+    ensureScope: scopeGuard(id, projects),
   });
 
   return {
@@ -709,6 +784,13 @@ function buildContext({ userId, customerId, projectId, projectRole, roles, token
       if (!id) {
         throw new Error('ctx.forProject(id) demande un identifiant de projet.');
       }
+      // Sur une requête, le projet a été scellé par la plateforme après avoir vérifié que
+      // l'appelant en est membre. Le réécrire ici rendrait à l'app un projet que personne n'a
+      // autorisé pour CETTE visite — et le magasin, lui, servirait la partition demandée.
+      if (mode === 'user') {
+        throw new Error("ctx.forProject ne sert que sans appelant. Sur une requête, le projet est "
+          + "celui que la plateforme a scellé : c'est ctx.project, et il ne se choisit pas.");
+      }
       return scoped(id);
     },
     /**
@@ -722,19 +804,7 @@ function buildContext({ userId, customerId, projectId, projectRole, roles, token
      * <p>Une tâche planifiée porte déjà SON projet : cette liste ne sert qu'à une app qui veut agir
      * au-delà de ce que ses ticks lui donnent.
      */
-    projects: async () => {
-      const response = await bulldozerApi(token, customerId, projectId)
-        .get('/project-memberships');
-      const now = Date.now();
-      return (response?.memberships ?? [])
-        // Un membership à durée limitée cesse d'autoriser à sa date : le rendre après coup
-        // enverrait l'app travailler sur un projet que l'API lui refusera.
-        .filter((m) => !m.deletedAt && (!m.validUntil || Date.parse(m.validUntil) > now))
-        .map((m) => m.project)
-        .filter((project) => project?.id && !project.deletedAt)
-        .map((project) => ({ id: project.id, name: project.name ?? null,
-                             customerId: project.customerId ?? customerId }));
-    },
+    projects,
     /**
      * Qui appelle. Vient de la plateforme, pas de la requête : infalsifiable par l'app.
      *
@@ -752,12 +822,21 @@ function buildContext({ userId, customerId, projectId, projectRole, roles, token
           throw new Error("Cette app n'a pas de magasin de documents. Déclarez \"storage\": "
             + '"documents" dans son manifeste, ou utilisez ctx.sql si elle est en "sql".');
         }
-        return collection(requireProject(projectId, 'ctx.db'), name);
+        return guarded(collection(requireProject(projectId, 'ctx.db'), name), ensureScope);
       },
     },
-    sql: (query, params) => sqlRunner(requireProject(projectId, 'ctx.sql'))(query, params),
-    files: files(projectId),
-    jobs: jobs(projectId, timeoutSec),
+    sql: async (query, params) => {
+      const run = sqlRunner(requireProject(projectId, 'ctx.sql'));
+      if (ensureScope) {
+        await ensureScope();
+      }
+      return run(query, params);
+    },
+    files: guarded(files(projectId), ensureScope),
+    jobs: guarded(jobs(projectId, timeoutSec), ensureScope),
+    // Pas de garde ici, et ce n'est pas un oubli : cet appel part avec le projet en en-tête et
+    // c'est la plateforme qui décide, à chaque requête. Le vérifier d'abord coûterait un appel de
+    // plus pour arriver au même refus, rendu par l'autorité plutôt que par du code d'app.
     bulldozer: bulldozerApi(token, customerId, projectId),
     log: logger(projectId),
     /** Réponse JSON, pour n'avoir jamais à construire un objet de réponse à la main. */
@@ -1061,11 +1140,10 @@ async function runHttp(definition, event) {
   // l'installation d'un client qui n'y a aucun droit. C'est le pire cas de la plateforme, et il est
   // atteignable sans rien forger dès qu'une personne appartient à deux clients.
   //
-  // Deux absences sont volontairement tolérées : le laissez-passer administrateur ne scelle aucun
-  // client, il n'y a donc rien à comparer ; et une installation provisionnée avant que la variable
-  // n'existe ne doit pas cesser de répondre.
+  // L'autorisateur ne peut pas poser cette question : il est partagé par toutes les installations et
+  // ne sait pas laquelle est appelée. Elle se pose donc ici, et c'est le seul endroit où elle se pose.
   const ownCustomerId = process.env.BDZ_CUSTOMER_ID;
-  if (sealed.customerId && ownCustomerId && sealed.customerId !== ownCustomerId) {
+  if (ownCustomerId && !await ownsTheProject(sealed, ownCustomerId, token)) {
     return reply(403, {
       error: "Ce projet n'appartient pas au client de cette application.",
     });
@@ -1149,6 +1227,46 @@ async function runHttp(definition, event) {
   // celui qu'on a le plus envie de voir dans les mesures.
   await recordAppCall(ctx, token, route.declaration, path, response.statusCode);
   return response;
+}
+
+/**
+ * Les projets déjà reconnus comme appartenant au client de l'installation.
+ *
+ * <p>Un projet ne change jamais de client : la réponse positive se garde pour la vie du conteneur.
+ * Seule elle : une réponse négative ne se mémorise pas, un projet peut être créé entre deux appels.
+ */
+const ownProjects = new Set();
+
+/**
+ * Le projet scellé appartient-il au client de cette installation ?
+ *
+ * <p>Deux chemins, parce que l'autorisateur scelle deux choses différentes. Quand l'appelant est
+ * membre du projet, il scelle le client de ce membership et la comparaison suffit — rien à demander.
+ *
+ * <p>Quand il entre par le laissez-passer administrateur, il n'a aucun membership d'où tirer un
+ * client et scelle une chaîne vide (`authorizer/index.mjs`). C'est là que la garde cédait : comparer
+ * une chaîne vide ne refuse rien, et l'app d'un client recevait — puis stockait — les données d'un
+ * projet d'un autre. On demande donc à la plateforme, qui est seule à savoir : `GET /projects/{id}`
+ * avec le client de l'installation en en-tête ne rend le projet que s'il lui appartient.
+ *
+ * <p>Le coût ne porte que sur ce chemin-là, et une fois par projet et par conteneur.
+ */
+async function ownsTheProject(sealed, ownCustomerId, token) {
+  if (sealed.customerId) {
+    return sealed.customerId === ownCustomerId;
+  }
+  if (ownProjects.has(sealed.projectId)) {
+    return true;
+  }
+  try {
+    await bulldozerApi(token, ownCustomerId, sealed.projectId).get(`/projects/${sealed.projectId}`);
+  } catch {
+    // Introuvable sous ce client, ou l'API est muette : dans les deux cas on refuse. Une plateforme
+    // injoignable ne doit pas ouvrir l'installation d'un client aux projets d'un autre.
+    return false;
+  }
+  ownProjects.add(sealed.projectId);
+  return true;
 }
 
 /**

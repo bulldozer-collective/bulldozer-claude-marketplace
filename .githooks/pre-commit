@@ -1,0 +1,18 @@
+#!/bin/sh
+# Keeps the bulldozer-version skill, and the MCP server instructions that compare against it,
+# in sync with the version staged in plugin.json.
+manifest=plugins/bulldozer-external/.claude-plugin/plugin.json
+skill=plugins/bulldozer-external/skills/bulldozer-version/SKILL.md
+# Lives in another repo: only the working tree is updated, the change is committed there.
+server_yml=${BULLDOZER_MCP_SERVER_DIR:-../../../backend/bulldozer-mcp-server}/src/main/resources/application.yml
+
+version=$(git show ":$manifest" | python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])') || exit 1
+line="Dernière version disponible du plugin Bulldozer : **$version**"
+
+if [ -f "$server_yml" ]; then
+  sed -i "/Use the skill \`bulldozer-version\`/s/\*\*[0-9.]*\*\*/**$version**/" "$server_yml"
+fi
+
+grep -qxF "$line" "$skill" && exit 0
+sed -i "s/^Dernière version disponible du plugin Bulldozer : .*/$line/" "$skill"
+git add "$skill"

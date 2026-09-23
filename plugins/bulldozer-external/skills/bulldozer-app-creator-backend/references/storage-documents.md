@@ -26,6 +26,8 @@ in different collections may carry the same id without colliding.
 Documents are **automatically scoped to the project the caller is working in** — the app never
 writes a project id into a key, and cannot express a read outside its own project even by mistake.
 That is the platform's first safety rule, and it is why the app must not try to build keys itself.
+A tick that must serve several projects names them through `ctx.forProject(id)`, which is bounded to
+the projects the app was added to; on a request it is refused outright.
 The same collection name under two projects holds two separate sets of documents, which is why an
 app's data changes when the user switches project.
 
