@@ -4,8 +4,9 @@
 the address only exists once the app is reserved. Everything from §2 onwards runs once the code is
 there.
 
-Publishing an app that has a service costs a handful of jetons and takes about a minute, because it
-is reviewed first. Say so before starting, so neither the wait nor the cost is a surprise.
+Publishing an app that has a service costs a handful of jetons, and takes anything from a minute to
+ten depending on its size, because it is reviewed first. Say so before starting, so neither the
+wait nor the cost is a surprise.
 
 ## 1. Reserve the app — before building anything
 
@@ -74,9 +75,12 @@ python <path given by bulldozer-fridge>/upload_fridge_file.py --file app.zip --c
 
 ## 5. Wait for the verdict — only when the app has a service
 
-A screen-only app is live the moment step 4 returns. An app **with a service** is reviewed first.
-It takes about a minute, and **the version already online stays online throughout** — including if
-the new one is refused.
+A screen-only app is live the moment step 4 returns. An app **with a service** is reviewed first,
+and **the version already online stays online throughout** — including if the new one is refused.
+
+**Budget the wait.** About a minute for a small app. **Up to ten for a large one**: two of the
+checks re-read the code in slices, so the time grows with the size of the service, not with the
+number of files. Say so up front, then keep watching.
 
 Poll `bdzGetHosting` and read the answer through the script, which turns the verdict into plain
 words:
@@ -86,11 +90,25 @@ words:
 python scripts/wait_for_review.py --from-json -
 ```
 
+This renders one snapshot — it does not wait. Calling it again is your job.
+
 - `status: APP_REVIEW_STATUS_DEPLOYED` → live. Give the user `publicUrl`.
-- `APP_REVIEW_STATUS_PENDING` / `APPROVED` → still going. Wait ~10 s and call `bdzGetHosting`
-  again. Say what is happening rather than going quiet.
+- `APP_REVIEW_STATUS_PENDING` → under review.
+- `APP_REVIEW_STATUS_APPROVED` → accepted, **not yet live**. The database, the service and its
+  routes are being set up, and that follows the decision rather than being part of it.
 - `APP_REVIEW_STATUS_REJECTED` → read **`review-verdicts.md`**. Nothing was published and nothing
   is billed.
+- `APP_REVIEW_STATUS_SUPERSEDED` → a newer version of the app overtook this one. Follow that one.
+
+On either of the first two non-final answers, wait ~15 s and call `bdzGetHosting` again. **Keep
+going until `DEPLOYED`, `REJECTED` or `SUPERSEDED`** — those three are the only answers worth
+reporting. Say what is happening at each turn rather than going quiet, and do not announce an app as
+live on `APPROVED`.
+
+**Do not republish to unstick it.** A revision that stays `APPROVED` for a long time is a
+deployment that failed, and the platform retries it by itself every minute. Publishing again only
+supersedes the revision that was about to succeed and starts the whole setup over. Tell the user
+what you see and stop there.
 
 ## 6. Leave a trace — always, create or update
 

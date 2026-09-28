@@ -91,6 +91,8 @@ Then: **service** → `bulldozer-app-creator-backend` first, since the screen ne
 routes; **screen** → `bulldozer-app-creator-frontend`, given the `clientId` and the
 `subdomain`; then publish with `references/packaging.md` §2 onwards.
 
-An app with a service is **reviewed before it goes live** — about a minute, and it can end in a
-refusal. Then read **`references/review-verdicts.md`**: explain the reason in plain words and ask
-the user how to proceed. Never rewrite their app to slip past a check on your own initiative.
+An app with a service is **reviewed before it goes live** — a minute for a small one, up to ten for
+a large one — and it can end in a refusal. Accepted is not yet live: going live follows the
+decision. `packaging.md` §5 says how long to keep watching and what each status means. On a refusal,
+read **`references/review-verdicts.md`**: explain the reason in plain words and ask the user how to
+proceed. Never rewrite their app to slip past a check on your own initiative.
