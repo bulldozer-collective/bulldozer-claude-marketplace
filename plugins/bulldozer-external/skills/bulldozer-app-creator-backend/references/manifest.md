@@ -147,6 +147,10 @@ given no queue, and `ctx.jobs.start()` refuses rather than queueing into nothing
 Declaring a task the code never runs buys a queue for nothing. Forgetting one it does run breaks it
 at runtime. Packaging checks both against the code.
 
+**Tasks do not depend on `storage`.** An app in `sql`, or one with no store at all, runs them just
+as well: the platform keeps their journal in a store of its own, which your code never sees and
+cannot reach.
+
 ## `schedules` — running without being called
 
 ```json

@@ -36,6 +36,18 @@ import { randomUUID } from 'node:crypto';
 
 const REGION = process.env.BDZ_REGION;
 const TABLE = process.env.BDZ_TABLE;
+/**
+ * La table des écritures de la PLATEFORME — aujourd'hui le seul journal des traitements longs.
+ *
+ * Distincte de celle de l'app, et pas par goût du rangement. Elle doit exister quand l'app stocke en
+ * SQL ou ne stocke rien, cas où `BDZ_TABLE` est volontairement absente ; et rangé dans la table de
+ * l'app, ce journal serait à portée de `ctx.db.collection('__jobs')`, qui laisserait une app se
+ * déclarer elle-même en succès.
+ *
+ * Posée avec `BDZ_QUEUE_URL` et sous la même condition : pas de tâche déclarée, pas de file et pas
+ * de journal.
+ */
+const SYS_TABLE = process.env.BDZ_SYS_TABLE;
 const BUCKET = process.env.BDZ_BUCKET;
 const STORAGE_PREFIX = process.env.BDZ_STORAGE_PREFIX;
 const QUEUE_URL = process.env.BDZ_QUEUE_URL;
@@ -72,7 +84,7 @@ const JOB_GRACE_MS = 60_000;
  * La clé de partition vaut `{projet}#{collection}` et n'est jamais exposée : une app ne peut pas
  * exprimer une lecture hors de son projet actif, même par erreur.
  */
-function collection(projectId, name) {
+function collection(projectId, name, table = TABLE) {
   const pk = `${projectId}#${name}`;
 
   // Nommée avant l'objet plutôt que définie dedans : `all` s'appuie dessus, et passer par `this` la
@@ -92,7 +104,7 @@ function collection(projectId, name) {
       // une page plus de documents qu'il n'en manque, et les surnuméraires seraient jetés sans
       // qu'aucun curseur ne permette de les retrouver.
       const result = await db.send(new QueryCommand(
-        buildQuery(pk, TABLE, { ...options, limit: limit - items.length, startKey })));
+        buildQuery(pk, table, { ...options, limit: limit - items.length, startKey })));
       scanned += result.ScannedCount ?? 0;
       for (const raw of result.Items ?? []) {
         items.push(strip(raw));
@@ -119,12 +131,12 @@ function collection(projectId, name) {
     async put(document) {
       const id = document.id ?? randomUUID();
       const item = { ...document, pk, sk: id, id, updatedAt: new Date().toISOString() };
-      await db.send(new PutCommand({ TableName: TABLE, Item: item }));
+      await db.send(new PutCommand({ TableName: table, Item: item }));
       return strip(item);
     },
 
     async get(id) {
-      const got = await db.send(new GetCommand({ TableName: TABLE, Key: { pk, sk: id } }));
+      const got = await db.send(new GetCommand({ TableName: table, Key: { pk, sk: id } }));
       return got.Item ? strip(got.Item) : null;
     },
 
@@ -177,7 +189,7 @@ function collection(projectId, name) {
     },
 
     async delete(id) {
-      await db.send(new DeleteCommand({ TableName: TABLE, Key: { pk, sk: id } }));
+      await db.send(new DeleteCommand({ TableName: table, Key: { pk, sk: id } }));
     },
   };
 }
@@ -385,7 +397,7 @@ function files(projectId) {
 const JOBS_COLLECTION = '__jobs';
 
 function jobs(projectId, timeoutSec) {
-  const store = collection(projectId, JOBS_COLLECTION);
+  const store = collection(projectId, JOBS_COLLECTION, SYS_TABLE);
 
   return {
     /** Démarre un traitement. Rend immédiatement la main : le travail se fait à côté. */
@@ -1378,7 +1390,7 @@ async function runSchedule(definition, event) {
 async function runJobs(definition, records) {
   for (const record of records) {
     const message = JSON.parse(record.body);
-    const store = collection(message.projectId, JOBS_COLLECTION);
+    const store = collection(message.projectId, JOBS_COLLECTION, SYS_TABLE);
     const job = await store.get(message.jobId);
 
     // La file livre AU MOINS une fois : un travail déjà terminé ne doit pas être refait. Sans

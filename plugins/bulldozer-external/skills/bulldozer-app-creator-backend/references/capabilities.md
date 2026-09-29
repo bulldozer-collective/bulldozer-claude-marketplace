@@ -286,11 +286,11 @@ script, a scheduler somewhere else, or another service calls an app. The key goe
 ```bash
 curl https://…/my-app/api/status \
   -H "Authorization: Key bdz_…" \
-  -H 'X-Bdz-Project-Id: <uuid>' \
-  -H 'X-Bdz-Customer-Id: <uuid>'
+  -H 'X-Bdz-Project-Id: <uuid>'
 ```
 
-`Bearer` is for a person's token and refuses a key, so the two are never confused.
+Those two headers are all it takes. `Bearer` is for a person's token and refuses a key, so the two
+are never confused.
 
 The key stands for the person it was issued to, so the app still sees no more than that person may
 see: same membership check, same `ctx.project.role`. Two differences to write code against —
