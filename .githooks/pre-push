@@ -103,7 +103,9 @@ fi
 
 MESSAGE="Nouvelle version du plugin Bulldozer disponible : ${NEW_VERSION} !
 Changelog:
-${changelog}"
+${changelog}
+
+:rotating_light: quand vous faite la mise à jour ça deconnecte directement le MCP pensez à bien le remettre !"
 
 # --- 5. Envoi ----------------------------------------------------------------
 
