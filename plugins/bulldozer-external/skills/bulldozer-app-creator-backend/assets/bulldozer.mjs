@@ -473,6 +473,25 @@ function forgetApiKey() {
   apiKeyPromise = null;
 }
 
+/**
+ * Comment cet appel s'authentifie auprès de Bulldozer.
+ *
+ * <p>Deux credentials, un seul en-tête, distingués par leur schéma : le jeton de l'appelant en
+ * `Bearer` quand il y a un appelant, la clé de l'installation en `Key` quand il n'y en a pas — une
+ * tâche planifiée. La plateforme lit les deux (`ApiKeyAuthenticationFilter.presentedKey`).
+ *
+ * <p>`X-Bdz-Api-Key`, que cette fonction posait avant, reste accepté côté serveur pour les apps
+ * déjà installées, qui embarquent une version plus ancienne de cette aide. Rien de neuf ne doit
+ * l'émettre : un même appel ne porte qu'un credential, et la clé présentée dans les deux en-têtes à
+ * la fois n'authentifie personne.
+ *
+ * <p>Exportée pour être testée : c'est une ligne dont une erreur ne se verrait qu'en production, sur
+ * le seul chemin sans appelant.
+ */
+export function apiAuthHeader(token, key) {
+  return token ? { Authorization: `Bearer ${token}` } : { Authorization: `Key ${key}` };
+}
+
 function bulldozerApi(token, customerId, projectId) {
   const send = async (method, path, body, params, key) => {
     const url = new URL(API_BASE_URL + path);
@@ -482,7 +501,7 @@ function bulldozerApi(token, customerId, projectId) {
     return fetch(url, {
       method,
       headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : { 'X-Bdz-Api-Key': key }),
+        ...apiAuthHeader(token, key),
         'X-Bdz-Customer-Id': customerId,
         'X-Bdz-Project-Id': projectId,
         ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),

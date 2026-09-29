@@ -1,3 +1,4 @@
 PROJECT_CONTEXT_INIT.md
 .claude
 __pycache__/
+.slack-release.env

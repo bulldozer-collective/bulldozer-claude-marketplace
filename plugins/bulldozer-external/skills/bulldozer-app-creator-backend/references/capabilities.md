@@ -228,7 +228,8 @@ either header in the code is flagged by the review, and the app's own key is ref
 **`ctx.bulldozer` works in a tick, but not by default.** With no caller there is no token to
 forward, so the app acts as **its own service account** — a Keycloak identity of its own, using a
 key deposited on the installation. What that allows is exactly what the service account is a member
-of: the projects registered to its scheduled tasks, and nothing else.
+of: the projects registered to its scheduled tasks, and nothing else. The helper presents that key
+as `Authorization: Key …`, the same way a machine calls your own routes; your code never sees it.
 
 Until a key is deposited, `ctx.bulldozer` refuses in a tick and says so. That is an operator's step,
 not something the app can arrange for itself.
@@ -276,11 +277,33 @@ it**, and the customer and project headers are set for you. `get`, `post`, `put`
 Three failures are worth catching by name: out of jetons, access refused, too many requests. The
 error message says which.
 
+## Machines can call it too
+
+A route is reachable with a Bulldozer **API key** as well as a signed-in person — that is how a
+script, a scheduler somewhere else, or another service calls an app. The key goes in
+`Authorization`, under the `Key` scheme, not in `X-Bdz-Api-Key`:
+
+```bash
+curl https://…/my-app/api/status \
+  -H "Authorization: Key bdz_…" \
+  -H 'X-Bdz-Project-Id: <uuid>' \
+  -H 'X-Bdz-Customer-Id: <uuid>'
+```
+
+`Bearer` is for a person's token and refuses a key, so the two are never confused.
+
+The key stands for the person it was issued to, so the app still sees no more than that person may
+see: same membership check, same `ctx.project.role`. Two differences to write code against —
+**`ctx.user.roles` is empty** for a key, and a key never gets the staff pass, so a key whose holder
+belongs to no project you serve is refused. Gate on `ctx.project.role` rather than on
+`ctx.user.roles` if you want a route both people and machines can use.
+
 ## Also on `ctx`
 
 - `ctx.user` — `{ id, roles }`, or `null` inside a task. Comes from the platform, so it cannot be
   faked by a request. **`roles` is a list** — the caller's roles on the Bulldozer platform, e.g.
-  `['bulldozer-customer-employee', 'bulldozer-core-admin']`. Often empty, and that is not an error.
+  `['bulldozer-customer-employee', 'bulldozer-core-admin']`. Often empty, and that is not an error —
+  it always is when the caller is an API key.
 - `ctx.project` — `{ id, customerId, role }`. **`role` is the caller's role in THIS project**, and
   there is exactly one: `PROJECT_MEMBERSHIP_ROLE_MANAGER` or `PROJECT_MEMBERSHIP_ROLE_MEMBER`.
 

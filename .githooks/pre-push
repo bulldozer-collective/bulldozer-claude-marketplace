@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+#
+# Annonce dans Slack quand un push contient un changement de version du plugin.
+#
+# Actif via core.hooksPath=.githooks, pose par ./install-hooks.sh.
+# Secrets : .slack-release.env a la racine (gitignore). Voir le .example.
+#
+# git passe sur stdin une ligne par ref poussee :
+#     <ref local> <sha local> <ref distant> <sha distant>
+# On compare la version entre le sha distant (ce que le remote a deja) et le
+# sha local (ce qu'on pousse) : l'annonce ne part donc qu'une fois, au premier
+# push qui emporte le bump.
+#
+# DRY_RUN=1 ./.githooks/pre-push      -> construit le message, n'envoie rien.
+#
+set -uo pipefail
+
+REPO="$(git rev-parse --show-toplevel)"
+MANIFEST="plugins/bulldozer-external/.claude-plugin/plugin.json"
+SKILLS_DIR="plugins/bulldozer-external/skills"
+DRY_RUN="${DRY_RUN:-0}"
+
+die() { echo "pre-push(slack) : $*" >&2; exit 0; }   # jamais faire echouer le push
+
+version_at() {  # version_at <ref> -> le champ version, ou vide
+  git show "$1:$MANIFEST" 2>/dev/null | grep -oP '"version"\s*:\s*"\K[^"]+' | head -1
+}
+
+# --- 1. Le push emporte-t-il un changement de version ? -----------------------
+
+ZERO="0000000000000000000000000000000000000000"
+LOCAL_SHA=""; REMOTE_SHA=""
+
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+  [[ "${local_sha:-$ZERO}" == "$ZERO" ]] && continue          # suppression de branche
+  LOCAL_SHA="$local_sha"; REMOTE_SHA="$remote_sha"
+  break
+done
+
+# Lance a la main, sans stdin : on retombe sur HEAD.
+[[ -n "$LOCAL_SHA" ]] || { LOCAL_SHA="$(git rev-parse HEAD)"; REMOTE_SHA="$(git rev-parse HEAD~1)"; }
+
+NEW_VERSION="$(version_at "$LOCAL_SHA")"
+[[ -n "$NEW_VERSION" ]] || exit 0
+
+if [[ "${REMOTE_SHA:-$ZERO}" == "$ZERO" ]]; then
+  OLD_VERSION=""                                              # branche neuve cote remote
+else
+  OLD_VERSION="$(version_at "$REMOTE_SHA")"
+fi
+
+[[ "$NEW_VERSION" != "$OLD_VERSION" ]] || exit 0
+
+# --- 2. Borne basse : le commit precedent ou la version differait -------------
+
+PREV_BUMP=""
+while read -r sha; do
+  [[ "$sha" == "$LOCAL_SHA" ]] && continue
+  if [[ "$(version_at "$sha")" != "$NEW_VERSION" ]]; then PREV_BUMP="$sha"; break; fi
+done < <(git log --format='%H' "$LOCAL_SHA" -- "$MANIFEST")
+
+RANGE="${PREV_BUMP:+$PREV_BUMP..}$LOCAL_SHA"
+
+# --- 3. Faits : ce qui a reellement change entre les deux bumps ---------------
+
+facts="$(
+  git diff --name-status "$RANGE" -- "$SKILLS_DIR" \
+    | awk -F'\t' -v d="$SKILLS_DIR" '{
+        n = split($2, p, "/"); name = p[4];
+        if (name == "" || seen[name]) next;
+        seen[name] = 1;
+        print (substr($1,1,1) == "A" ? "ajoutee" : "modifiee") "\tskill\t" name;
+      }'
+  git diff --name-only "$RANGE" -- \
+      plugins/bulldozer-external/{agents,hooks,scripts,output-styles,bin} 2>/dev/null \
+    | awk -F'/' '{ if (!seen[$3]++) print "modifiee\tzone\t" $3 }'
+)"
+
+[[ -n "$facts" ]] || facts="modifiee	zone	le plugin"
+
+# --- 4. Redaction du changelog -----------------------------------------------
+
+fallback="$(awk -F'\t' '{
+  if ($2 == "skill") printf "- La Skill %s a été %s\n", $3, ($1 == "ajoutee" ? "rajoutée" : "mise à jour");
+  else               printf "- %s a été mis à jour\n", $3;
+}' <<< "$facts")"
+
+changelog=""
+if command -v claude >/dev/null 2>&1; then
+  changelog="$(printf '%s\n' "$facts" | timeout 90 claude -p \
+    --model claude-haiku-4-5-20251001 \
+    "Voici les changements d'une version du plugin Bulldozer, un par ligne, au format
+statut<TAB>type<TAB>nom. Rends UNIQUEMENT une liste à puces en français, une ligne par
+changement, sans titre ni commentaire, au format exact :
+- La Skill <nom> a été rajoutée
+- La Skill <nom> a été mise à jour
+Pour un type 'zone', écris : - <nom> a été mis à jour.
+N'invente aucun nom : n'utilise que ceux de la liste. Si plus de 8 lignes, regroupe les
+mises à jour de skills en une seule ligne les nommant toutes." 2>/dev/null)" || changelog=""
+fi
+
+[[ -n "${changelog// /}" ]] || changelog="$fallback"
+
+MESSAGE="Nouvelle version du plugin Bulldozer disponible : ${NEW_VERSION} !
+Changelog:
+${changelog}"
+
+# --- 5. Envoi ----------------------------------------------------------------
+
+if [[ "$DRY_RUN" == "1" ]]; then
+  echo "--- DRY RUN, rien n'est envoye (${OLD_VERSION:-?} -> ${NEW_VERSION}, plage ${RANGE}) ---"
+  printf '%s\n' "$MESSAGE"
+  exit 0
+fi
+
+ENV_FILE="$REPO/.slack-release.env"
+[[ -f "$ENV_FILE" ]] || die "$ENV_FILE introuvable — copie .slack-release.env.example et renseigne-le."
+# shellcheck disable=SC1090
+set -a; source "$ENV_FILE"; set +a
+
+[[ -n "${SLACK_BOT_TOKEN:-}" ]]  || die "SLACK_BOT_TOKEN vide dans $ENV_FILE."
+[[ -n "${SLACK_CHANNEL_ID:-}" ]] || die "SLACK_CHANNEL_ID vide dans $ENV_FILE."
+
+response="$(printf '%s' "$MESSAGE" \
+  | jq -Rs --arg channel "$SLACK_CHANNEL_ID" '{channel: $channel, text: .}' \
+  | curl -sS --max-time 20 -X POST https://slack.com/api/chat.postMessage \
+      -H "Authorization: Bearer ${SLACK_BOT_TOKEN}" \
+      -H 'Content-Type: application/json; charset=utf-8' \
+      --data-binary @- 2>&1)" \
+  || die "appel Slack KO : $response"
+
+if [[ "$(jq -r '.ok // false' <<< "$response" 2>/dev/null)" == "true" ]]; then
+  echo "pre-push(slack) : version ${NEW_VERSION} annoncee dans ${SLACK_CHANNEL_ID}."
+else
+  die "Slack a refuse : $(jq -r '.error // .' <<< "$response" 2>/dev/null). Message non publie."
+fi
