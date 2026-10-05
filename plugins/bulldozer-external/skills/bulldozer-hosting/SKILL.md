@@ -15,6 +15,8 @@ allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__bdzAddHostingShare
   - mcp__plugin_bulldozer_bulldozer__bdzRemoveHostingShare
 effort: low
+metadata:
+  forge: disabled
 ---
 
 # Bulldozer Hosting

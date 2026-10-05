@@ -22,6 +22,8 @@ allowed-tools:
 effort: medium
 paths:
   - "**/bulldozer.json"
+metadata:
+  forge: disabled
 ---
 
 # Bulldozer SEA services

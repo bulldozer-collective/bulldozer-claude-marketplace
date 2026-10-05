@@ -22,6 +22,8 @@ allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__bdzDeleteHosting
   - mcp__plugin_bulldozer_bulldozer__bdzRequestFridgeCode
 effort: medium
+metadata:
+  forge: disabled
 ---
 
 # Bulldozer App

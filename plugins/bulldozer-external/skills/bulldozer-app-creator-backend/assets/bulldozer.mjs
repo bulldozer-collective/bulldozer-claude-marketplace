@@ -396,12 +396,22 @@ function files(projectId) {
 
 const JOBS_COLLECTION = '__jobs';
 
-function jobs(projectId, timeoutSec) {
+/** Exportée pour être éprouvée : le refus d'une relance depuis un traitement. */
+export function jobs(projectId, timeoutSec, mode) {
   const store = collection(projectId, JOBS_COLLECTION, SYS_TABLE);
 
   return {
     /** Démarre un traitement. Rend immédiatement la main : le travail se fait à côté. */
     async start(type, payload = {}) {
+      // Un traitement qui en lance un autre écrit dans la file qui l'a lui-même déclenché. Lambda y
+      // voit une boucle et, passé une quinzaine de maillons, supprime le message sans rien dire :
+      // le reste du travail n'est jamais fait et le traitement reste PENDING pour toujours.
+      if (mode === 'job') {
+        throw new Error('ctx.jobs.start() ne peut pas être appelé depuis un traitement. Pour un '
+          + 'travail plus long que le temps imparti, avancez par tranches dans le même traitement '
+          + 'tant qu\'il reste du temps, gardez un curseur, et laissez une tâche planifiée '
+          + '(« schedules » du manifeste) reprendre là où il s\'est arrêté.');
+      }
       // Sans tâche déclarée au manifeste, l'app n'a pas de file : rien ne consommerait ce message,
       // et le traitement resterait PENDING pour toujours. La file n'est pas créée dans ce cas, parce
       // qu'un consommateur la sonde ~21 600 fois par jour qu'elle serve ou non.
@@ -864,7 +874,7 @@ function buildContext({ userId, customerId, projectId, projectRole, roles, token
       return run(query, params);
     },
     files: guarded(files(projectId), ensureScope),
-    jobs: guarded(jobs(projectId, timeoutSec), ensureScope),
+    jobs: guarded(jobs(projectId, timeoutSec, mode), ensureScope),
     // Pas de garde ici, et ce n'est pas un oubli : cet appel part avec le projet en en-tête et
     // c'est la plateforme qui décide, à chaque requête. Le vérifier d'abord coûterait un appel de
     // plus pour arriver au même refus, rendu par l'autorité plutôt que par du code d'app.

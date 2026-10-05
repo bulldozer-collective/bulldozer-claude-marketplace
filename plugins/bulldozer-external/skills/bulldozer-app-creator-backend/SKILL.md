@@ -12,6 +12,8 @@ allowed-tools:
   - Agent
   - AskUserQuestion
 effort: medium
+metadata:
+  forge: disabled
 ---
 
 # The service

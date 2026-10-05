@@ -1,6 +1,7 @@
 ---
-name: Bulldozer Identity
+name: bulldozer-identity
 description: Use this skill to understand Bulldozer's identity, business model and offers.
+when-to-use: Use this skill to understand Bulldozer's identity, business model and offers.
 ---
 
 ## Utilisation

@@ -185,7 +185,7 @@ anything is sent to it, so an app with no task is given none, and `ctx.jobs.star
 `start` hands the work off and returns straight away. **`GET /jobs/{id}` exists automatically** —
 never write it. What the handler returns becomes `result`; if it throws, the message becomes `error`.
 
-Three things to know, all of which have bitten:
+Four things to know, all of which have bitten:
 
 - **A task may be delivered more than once.** Work that has already finished is never redone, but
   work interrupted halfway can restart. Make the handler safe to re-run: write with a stable id
@@ -196,6 +196,11 @@ Three things to know, all of which have bitten:
 - **A task that runs out of time dies without being able to say so.** The platform reports it failed
   once its deadline passes, so nothing stays stuck — but the work is half-done. Keep tasks short
   enough to finish, or make them resumable.
+- **A task cannot start another task.** `ctx.jobs.start()` throws inside a task: a task that queues
+  its own continuation writes into the queue that triggered it, and Lambda cuts such a loop after
+  about 16 links, silently dropping the rest of the work. For work longer than the time limit,
+  loop over chunks inside the same task while time remains, save a cursor, and let a schedule
+  (below) pick up from that cursor.
 
 ### Running on a timetable
 

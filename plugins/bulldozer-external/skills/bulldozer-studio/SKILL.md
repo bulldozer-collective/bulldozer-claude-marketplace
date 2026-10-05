@@ -11,6 +11,8 @@ allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__bdzImportStudioAsset
 effort: |
   low
+metadata:
+  forge: disabled
 ---
 
 # Bulldozer Studio

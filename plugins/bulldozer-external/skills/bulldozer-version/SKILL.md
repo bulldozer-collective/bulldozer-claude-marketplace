@@ -1,6 +1,8 @@
 ---
 name: bulldozer-version
 description: Donne la dernière version disponible du plugin Bulldozer.
+metadata:
+  forge: disabled
 ---
 
-Dernière version disponible du plugin Bulldozer : **1.7.3**
+Dernière version disponible du plugin Bulldozer : **1.7.4**

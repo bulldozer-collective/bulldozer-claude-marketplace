@@ -21,6 +21,8 @@ effort: |
 paths:
   - "bulldozer.json"
   - "**/bulldozer.json"
+metadata:
+  forge: disabled
 ---
 
 # Bulldozer Ads Management
@@ -64,7 +66,7 @@ Every private ad-related tool call must be associated with an ad account. Some t
 
 ### `bulldozer.json`
 
-The ad account for a given platform is stored in `bulldozer.json`, usually at the project root. The relevant key is `.ads.adAccount.${PLATFORM}` where `${PLATFORM}` is `LINKEDIN` or `META`.
+The ad account for a given platform is stored in `bulldozer.json`, usually at the project root. The relevant key is `.ads.adAccount.${PLATFORM}` where `${PLATFORM}` is `LINKEDIN` or `META`. Its value is an object `{ "id": "<registered ad account UUID>", "name": "<ad account name>" }`: use `id` as the `adAccountId` of tool calls, and `name` when naming the account to the user. An older file may hold the UUID alone as a string: read it as the `id`, and rewrite it as an object the next time you persist the account.
 
 **Discovery:** Locate `bulldozer.json` by searching upward from the current working directory until one is found or the filesystem root is reached. If none exists, create one at the project root (CWD) when persisting the resolved ad account.
 
@@ -76,8 +78,8 @@ Example structure:
 {
   "ads": {
     "adAccount": {
-      "LINKEDIN": "<linkedin-ad-account-id>",
-      "META": "<meta-ad-account-id>"
+      "LINKEDIN": { "id": "<linkedin-ad-account-uuid>", "name": "<linkedin-ad-account-name>" },
+      "META": { "id": "<meta-ad-account-uuid>", "name": "<meta-ad-account-name>" }
     }
   }
 }
@@ -93,7 +95,7 @@ If the ad account for the target platform is not present in `bulldozer.json`:
    - Call `bdzSearchAdAccounts` with the target platform (e.g., `{ platform: "META" }`).
    - **If one or more accounts are returned:** present a numbered list (`id`, `name`, `platform`) and ask the user to choose one. Then call `bdzCreateAdAccount` with the chosen account to register it.
    - **If `bdzSearchAdAccounts` also returns 0:** stop and inform the user that no ad account is available for the platform; ask them to grant access or create one on the platform side, then retry. Do not proceed with any ad operation.
-3. Persist the resolved ad account into `bulldozer.json` under `.ads.adAccount.${PLATFORM}` (creating the file or keys as needed, preserving any existing unrelated keys).
+3. Persist the resolved ad account into `bulldozer.json` under `.ads.adAccount.${PLATFORM}` as `{ "id": "<id>", "name": "<name>" }`, both taken from the chosen account (creating the file or keys as needed, preserving any existing unrelated keys).
 4. Use the resolved ad account for subsequent calls.
 
 ### Ad hierarchy and nomenclature

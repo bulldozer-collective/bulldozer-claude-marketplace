@@ -11,6 +11,8 @@ allowed-tools:
   - Edit
   - WebFetch
 effort: medium
+metadata:
+  forge: disabled
 ---
 
 # The screen

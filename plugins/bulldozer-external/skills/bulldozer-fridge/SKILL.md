@@ -11,6 +11,8 @@ user-invocable: false
 allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__bdzRequestFridgeCode
 effort: low
+metadata:
+  forge: disabled
 ---
 
 # Bulldozer Fridge

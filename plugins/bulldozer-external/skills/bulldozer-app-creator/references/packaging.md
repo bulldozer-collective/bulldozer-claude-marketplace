@@ -110,6 +110,28 @@ deployment that failed, and the platform retries it by itself every minute. Publ
 supersedes the revision that was about to succeed and starts the whole setup over. Tell the user
 what you see and stop there.
 
+## 5bis. When the app is live but misbehaves — read its logs
+
+A deployed app that answers `500`, or a scheduled task that does nothing, has written why.
+`bdzGetHostingLogs` returns it: both functions by default — `api` for the routes, `worker` for the
+long tasks and the ticks — oldest first, with the level and the requestId that ties one invocation
+together.
+
+```bash
+# the last hour, every source
+bdzGetHostingLogs(hostingId, customerId, projectId)
+
+# a failing tick last night, worker only
+bdzGetHostingLogs(hostingId, customerId, projectId,
+                  since="2026-10-02T02:00:00Z", until="2026-10-02T04:00:00Z", source="worker")
+```
+
+The window cannot exceed **24 hours** and a wider one is refused — reading logs is billed on the
+volume scanned. Narrow it, or follow `nextCursor`. Lines live **30 days**.
+
+Read them before guessing, and before asking the user to reproduce: the answer is usually in the
+first error line. Quote the line that explains the failure rather than summarising it away.
+
 ## 6. Leave a trace — always, create or update
 
 The platform keeps no source. Write `.bulldozer-app.json` at the root of the working folder, so

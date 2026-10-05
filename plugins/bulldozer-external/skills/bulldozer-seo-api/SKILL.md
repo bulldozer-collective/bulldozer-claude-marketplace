@@ -22,6 +22,8 @@ model: |
   sonnet
 effort: |
   medium
+metadata:
+  forge: disabled
 ---
 
 # Bulldozer SEO API

@@ -13,6 +13,8 @@ effort: |
   low
 paths:
   - "**/bulldozer.json"
+metadata:
+  forge: disabled
 ---
 
 # Bulldozer Project / Customer Chooser
