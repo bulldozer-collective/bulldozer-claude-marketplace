@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   weekly-growth-review
-description: |
+description: |-
   Build a weekly growth review system — north star metric, leading indicator KPI tree, 60-minute meeting structure, red/amber/green threshold system, and IDS issue resolution protocol. Triggers on 'weekly growth review,' 'weekly metrics review,' 'growth meeting,' 'weekly KPIs,' 'growth dashboard,' 'how do we track growth weekly,' or 'we're always surprised at month end.' For attribution methodology, see attribution-funnel. For cohort analysis, see cohort-mmm.
-when-to-use: |
+when-to-use: |-
   Build a weekly growth review system — north star metric, leading indicator KPI tree, 60-minute meeting structure, red/amber/green threshold system, and IDS issue resolution protocol. Triggers on 'weekly growth review,' 'weekly metrics review,' 'growth meeting,' 'weekly KPIs,' 'growth dashboard,' 'how do we track growth weekly,' or 'we're always surprised at month end.' For attribution methodology, see attribution-funnel. For cohort analysis, see cohort-mmm.
-argument-hint: |
+argument-hint: |-
   B2B SaaS, sales-led motion, 4-person growth team, currently doing ad-hoc monthly reporting — want a weekly rhythm that surfaces issues before month-end surprises
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -74,43 +74,7 @@ Define 1–2 guardrails that prevent gaming the NSM. Example: if NSM is "demos h
 
 ## Step 2: Build the KPI Tree
 
-The KPI tree connects the NSM to the weekly actions teams can take. Maximum structure: 1 NSM → 4 stage metrics → 8–10 leading indicators.
-
-**Standard tree for sales-led B2B:**
-
-```
-NORTH STAR: Qualified pipeline created per week
-│
-├── ACQUISITION
-│   Stage metric: ICP accounts contacted per week
-│   Leading indicators:
-│   • Outreach sequences activated (target: [X]/week)
-│   • ICP accounts in active sequence (target: [X] total)
-│
-├── ACTIVATION (MQL → SQL)
-│   Stage metric: Discovery calls held with ICP accounts
-│   Leading indicators:
-│   • Positive reply rate to outreach (target: >5%)
-│   • Discovery-to-pipeline conversion (target: >60%)
-│
-├── REVENUE (SQL → Close)
-│   Stage metric: Opportunities advanced per stage per week
-│   Leading indicators:
-│   • Pipeline coverage ratio (next quarter: target >3x)
-│   • Demo-to-proposal conversion (target: >50%)
-│   • Avg sales cycle vs. target (flag if >120% of target)
-│
-└── RETENTION (Pipeline health)
-    Stage metric: NRR (tracked monthly, flagged weekly if warning signals)
-    Leading indicators:
-    • At-risk accounts (usage below activation threshold)
-    • Expansion opportunities identified
-```
-
-**Rules for the KPI tree:**
-- Each leading indicator must be movable by a named team or person in a single week
-- No orphan metrics (metrics that require other teams but have no joint owner)
-- No lagging indicators at the weekly level — track them monthly, reference them in the weekly for context only
+For how to build the KPI tree (1 north star, stage metrics, leading indicators, what to leave out of the weekly level), read `references/kpi-tree-and-rag.md`.
 
 ---
 
@@ -136,6 +100,18 @@ The weekly growth review is not a status update. It is a decision-making session
 - Each stage metric with RAG status
 - 3–5 leading indicators with weekly targets
 - Annotations: any external factor affecting numbers (holiday, campaign launch, pricing change)
+- Data completeness for any CRM-sourced metric: what share of the underlying records carry a
+  logged activity, not just a recent "last modified" timestamp. On most CRMs (confirmed on
+  HubSpot) a record's last-modified date changes on any property write, including an
+  automated enrichment sync nobody triggered — a base can read 100% "fresh" with no human
+  activity in a year. Score staleness on an activity field (HubSpot's "Last Activity Date"),
+  and keep last-modified only to show the gap between the two when it's worth flagging
+- Anomaly flag for any GA4-sourced leading indicator, read before it's eyeballed. A report
+  run through Bulldozer OS's GA4 connector already computes and stores this on every run —
+  a metric that moved more than 2 standard deviations from its own history is flagged (the
+  full detail sits on the report itself; a quick pass over stored reports shows a lightweight
+  version of the same flag). That is the exact rupture signal Step 5 exists to catch — check
+  it before staring at a week-over-week percentage by eye
 
 **Meeting rules:**
 - No slides — one shared dashboard, visible to all, updated before the meeting
@@ -146,71 +122,42 @@ The weekly growth review is not a status update. It is a decision-making session
 
 ## Step 4: RAG Threshold System
 
-For each metric, define three thresholds. These are not opinions — they are pre-committed rules. Thresholds set in the moment of a red metric always favor the metric owner.
-
-**Threshold structure:**
-
-| Status | Definition | Response |
-|--------|-----------|----------|
-| **Green** | Within 10% of target | No action required |
-| **Amber** | 10–25% below target | Flag with one hypothesis; monitor next week |
-| **Red** | >25% below target OR red two weeks in a row | Full IDS treatment — owner, root cause, action, deadline |
-
-**Example thresholds:**
-
-| Metric | Target | Amber | Red |
-|--------|--------|-------|-----|
-| ICP outreach sequences activated | 20/week | <18 | <15 or 2 weeks <18 |
-| Positive reply rate | 5% | <4.5% | <3.5% |
-| Discovery calls held | 8/week | <7 | <6 or 2 weeks <7 |
-| Pipeline coverage (next Q) | 3.5x | <3.0x | <2.5x |
-| Demo-to-proposal conversion | 50% | <45% | <37% |
-
-**The two-week rule:** A metric that is amber for two consecutive weeks automatically becomes red. Growth problems rarely resolve themselves.
+For the three pre-committed thresholds per metric (green, amber, red) and the rules on never moving a threshold to fit the data, read `references/kpi-tree-and-rag.md`.
 
 ---
 
 ## Step 5: IDS Issue Resolution Protocol
 
-IDS = Identify, Discuss, Solve. The structure that turns a red metric into a closed action in 15 minutes.
-
-**Identify (3 minutes):**
-State the metric, the gap, and one hypothesis for the root cause. No debate here — one hypothesis per metric owner. "Pipeline coverage is at 2.1x against 3.5x target. Hypothesis: we had 3 reps at the sales conference last week and outreach volume dropped 40%."
-
-**Discuss (7 minutes):**
-Test the hypothesis with the data available. Is the drop structural (ICP targeting) or episodic (conference week)? Pull the leading indicator: did outreach volume actually drop? Did reply rate hold up despite lower volume? Or did both drop simultaneously — which would suggest a different root cause?
-
-The three root cause buckets for most growth metric drops:
-1. **Volume problem** — Not enough top-of-funnel activity (outreach, traffic, leads). Fix: increase volume this week.
-2. **Conversion problem** — Volume is fine but conversion between stages dropped. Fix: diagnose the stage where conversion dropped and identify what changed (messaging, targeting, ICP quality).
-3. **Lag problem** — Nothing is actually wrong; the pipeline is building but hasn't converted yet. Fix: no action, increase monitoring.
-
-**Solve (5 minutes):**
-One action, one owner, one deadline. Log it in the action tracker. The action must be specific enough that next week's meeting can verify it was done.
-
-Format: "Who does what by when? [Name] will [specific action] by [specific date]."
-
-Not: "The team will improve outreach quality." That's not an action.
-Yes: "Alex will rewrite the top 3 outreach sequences using the updated ICP criteria and launch by Thursday."
+For the IDS (Identify, Discuss, Solve) protocol that turns a red metric into a closed action, with worked examples, read `references/ids-and-weekly-template.md`.
 
 ---
 
 ## Weekly KPI Template
 
-```
-## Weekly Growth Review — Week of [Date]
+For the weekly KPI report template (north star, stage metrics, leading indicators, annotations, action log), read `references/ids-and-weekly-template.md`.
 
-### North Star: [NSM name]
-This week: [number] | Last week: [number] | 4-week avg: [number] | Status: [RAG]
+---
 
-### Stage Metrics
-| Metric | Target | This Week | Status | Owner |
-|--------|--------|-----------|--------|-------|
-| [Stage 1] | | | | |
-| [Stage 2] | | | | |
-| [Stage 3] | | | | |
-| [Stage 4] | | | | |
+## Common Mistakes
 
-### Leading Indicators
-| Metric | Target | This Week | Status | Owner |
-|--------|---
+- **Tracking revenue weekly instead of the NSM.** Revenue is 30–60 days downstream of the actions a team takes this week. Reviewing it weekly produces the exact lagging-indicator theater this system exists to replace — track it monthly, reference it for context only.
+- **Setting thresholds after seeing the number.** A threshold set the week a metric misses is not a threshold, it's an excuse. Set Green/Amber/Red before the quarter starts and change them only at a quarter boundary, never mid-review.
+- **Letting the scorecard block run long.** The moment someone explains a number during the 10-minute reporting block, the meeting has become a status update. Cut it off and move the explanation to the issues block.
+- **More than 10 metrics on the shared dashboard.** Past 7, attention drops and the meeting reverts to reading a spreadsheet out loud. If the KPI tree produces more candidates, that's a sign the leading indicators aren't tied tightly enough to the stage metrics above them — cut, don't add a second dashboard.
+- **An IDS action with no name or no date.** "The team will look into it" is not an action — it's the same conversation happening again next week with nothing to show for it.
+- **Comparing a channel or segment on a handful of data points.** A reply rate or win rate computed on fewer than a few dozen underlying events swings on noise, not signal — call it "too early to read" rather than red or green.
+- **Trusting pipeline coverage, or any self-reported ratio, without a paired check.** It goes green two ways that have nothing to do with pipeline health: a rep sliding a close date to protect this period's number, or junk opportunities logged to pad it. Watch close-date-push rate and stage-to-stage conversion alongside the ratio, not instead of it.
+- **Reading "last modified" as "someone worked this."** On most CRMs that field also flips on an automated enrichment sync — a base can show 100% fresh with no human activity in months. Score staleness on a logged-activity field and keep last-modified only to show the gap.
+- **Eyeballing a GA4 number's week-over-week move instead of reading the flag Bulldozer OS already computed.** Every report run through the OS's GA4 connector is scored for anomaly (>2 standard deviations from its own history) the moment it runs — checking that flag first catches a rupture faster and more consistently than scanning a raw percentage during the scorecard block.
+- **Building the weekly pipeline number around a direct CRM SQL query.** On most HubSpot portals that path fails on a missing scope, and not only for revenue questions — a plain count of open deals fails the same way. Filter and paginate instead, then aggregate on your side; the fix is reconnecting the HubSpot app and explicitly checking the missing permission (HubSpot doesn't grant it by default, even on an already-connected app) — escalate to an admin only if it shows a lock icon. Either way, don't make SQL the default plumbing for a number the meeting depends on.
+
+---
+
+## Rules
+
+- **The NSM is a behavior, not revenue.** Revenue is the lagging confirmation that the behavior worked. If the metric can only move monthly, it does not belong in a weekly review.
+- **One number, one source.** Each metric in the KPI tree has exactly one system of record — CRM for pipeline and revenue, analytics for traffic and product behavior, the ad platforms for spend. Never sum numbers pulled from two sources into one line.
+- **Thresholds are pre-committed, not judged in the room.** The two-week rule is absolute: amber two weeks running becomes red automatically, no vote. The only valid reason to reset a threshold mid-quarter is a stated change in the assumption it was built on (pricing, ICP, a channel launched or paused) — never a metric owner asking for room ahead of a miss.
+- **Every red metric leaves the room with an owner, a root cause hypothesis, and a due date.** No exceptions, no "let's discuss next week" — that is what turned the last monthly miss into a surprise.
+- **60 minutes, fixed, no slides.** One shared dashboard, updated before the meeting starts. If the meeting runs long, the agenda was wrong, not the clock.
+- **Where Bulldozer OS already holds the data, pull it — don't re-key it.** A GA4 report template can run on a WEEKLY schedule inside the OS (Bulldozer's GA4 report scheduling) so top-of-funnel and product numbers are waiting Monday morning instead of pulled by hand. On the pipeline side, match the tool to the metric, but don't build this week's number around a direct SQL query by default: Bulldozer's HubSpot connector can in principle run one against the deal object (grouped by week/month/quarter), yet on most portals it fails outright on a missing scope — and not only for revenue questions, a bare count of open deals fails the same way. The path that actually works: filter deals by property (stage, a date range) and paginate, then group by week or month on your side; if the volume ever justifies fixing the SQL path properly, the first move is reconnecting the HubSpot app and explicitly checking the missing permission yourself — it isn't granted by default even on an app that's already connected — and only escalating to an admin if the permission shows a lock icon (an admin has disabled it for this app, and reconnecting won't change that). Either way, don't wire a weekly number to a query a permissions change can silently break. HubSpot's native attribution reports answer a different question — channel-level revenue credit — and are scoped to closed-won deals only, so they will never show this week's newly created open pipeline; don't reach for them to fill the ACQUISITION or ACTIVATION rows of the tree. Manual copy-paste into the template above should be the fallback, not the default, wherever a connected source already produces the number.

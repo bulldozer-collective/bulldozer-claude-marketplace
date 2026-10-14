@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   signup-optimization
-description: |
+description: |-
   Optimize signup, registration, and trial activation flows to reduce dropoff and increase completion rates. Triggers on 'signup conversions,' 'signup form optimization,' 'reduce signup dropoff,' 'nobody completes registration,' or 'simplify our signup.' For post-signup activation, see onboarding. For lead capture forms, see conversion-optimization.
-when-to-use: |
+when-to-use: |-
   Optimize signup, registration, and trial activation flows to reduce dropoff and increase completion rates. Triggers on 'signup conversions,' 'signup form optimization,' 'reduce signup dropoff,' 'nobody completes registration,' or 'simplify our signup.' For post-signup activation, see onboarding. For lead capture forms, see conversion-optimization.
-argument-hint: |
+argument-hint: |-
   B2B SaaS trial signup — currently 4 fields plus email verification, high dropoff
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -47,6 +47,10 @@ Every field reduces conversion. For each field, ask: can we collect this later?
 
 The rule: if you don't use the data to personalize the experience in the first session, don't ask for it at signup.
 
+Before cutting a field, know what action defines activation for this product (see `onboarding`). That's what tells you whether a field is safe to defer — versus a field the activation flow needs on day one, where "deferring" it just moves the same friction one screen later without fixing anything.
+
+**Don't trust that activation action if it was only ever picked by correlation.** An action that correlates with retention in your existing user base can be a symptom of engagement rather than a cause of it — the only real evidence is an A/B test that pushes more new signups toward the candidate action and checks that retention itself moves, not just that completion of the action goes up. This matters here specifically because a wrong activation action produces a wrong field-cutting decision: you'll defer or keep a field based on a signal that was never causal.
+
 ### 2. Show Value Before Asking for Commitment
 
 What can users experience before creating an account? Reverse the order: value first, signup-optimization second.
@@ -74,12 +78,14 @@ Multi-step forms with progress indicators feel easier than single long forms. Sh
 - Show requirements upfront, update in real-time as they type
 - Allow paste (never disable clipboard on password fields)
 - Consider passwordless signup via magic link — especially effective for B2B
+- Consider passkeys (WebAuthn) as a native option alongside or instead of a password — adoption has moved from niche to mainstream on both the consumer and enterprise side; see `references/plateformes-et-outils.md` for the sourced 2026 figures. The tradeoff to design for, not skip: a passkey-only signup still needs a fallback (magic link or password) for unsupported browser/device combinations, and a clear recovery path if the device holding the passkey is lost.
 
 ### Social Auth (Google, Microsoft, GitHub)
 - Place prominently — often higher conversion than email form for B2B
 - B2B audiences: Google + Microsoft (or GitHub for developers)
 - B2C audiences: Google + Apple + Facebook
 - Label clearly: "Continue with Google" not just the logo
+- **If this signup form is embedded in a native iOS app** (not just reached through a browser), don't reach for "add Sign in with Apple" as a reflexive rule — App Store Review Guideline 4.8 sets three substantive criteria for the required alternative, and five exceptions that waive it entirely. See `references/plateformes-et-outils.md` before assuming the requirement applies.
 - Visual separation between social auth and email form
 
 ### Name Field
@@ -88,8 +94,8 @@ Multi-step forms with progress indicators feel easier than single long forms. Sh
 - Consider making optional — collect in onboarding instead
 
 ### Company / Organization
-- Infer from email domain where possible (work email → auto-fill company)
-- Auto-suggest as they type (Clearbit Enrichment or equivalent)
+- Infer from email domain where possible (work email → auto-fill company) — a generic CRO pattern; it needs a domain-lookup enrichment service wired into the signup form itself, which Bulldozer OS does not provide out of the box
+- Auto-suggest as they type: don't assume Bulldozer OS's own enrichment tool (`bdzEnrichContact`) covers this — it's a post-signup CRM enrichment step on a contact record that already exists, not a live autocomplete while someone is filling the form. See `references/plateformes-et-outils.md`
 - Only require if critical to the product (e.g., team billing)
 
 ### Role / Use Case Question
@@ -122,13 +128,15 @@ Multi-step forms with progress indicators feel easier than single long forms. Sh
 2. Password + name → after micro-commitment
 3. Segmentation question (optional) → only if needed for routing
 
+**Don't design step 3 around the persona slides from the sales deck.** Start with at most 2-3 branches drawn from the one intent question you're already asking, not a tree built to cover every persona in the pitch. Add a branch only once behavioral data from the funnel shows a specific segment stalling at a specific step — never on a persona you assume exists. Each extra branch is a flow someone has to keep maintaining, and most never earn their upkeep.
+
 ---
 
 ## Trust and Friction Reduction
 
 Place these near the signup form (not just at the bottom of the page):
 
-- "No credit card required" — if true, this single phrase lifts conversion significantly
+- "No credit card required" — if true, this single phrase lifts conversion significantly. But treat requiring a card as a monetization decision, not a friction bug: dropping it reliably raises signup completion while also letting in visitors who were never going to pay, which dilutes trial-to-paid rate and loads more low-intent accounts onto activation and support. Whether to require a card is the same kind of call as setting a price — it decides who gets in, not just how many do — so it's a call for whoever owns pricing/monetization, not a default win to bank because completion went up.
 - "Free for X days / Free forever" — sets clear expectation
 - Privacy assurance: "We'll never share your data"
 - Social proof: "Join 12,000 teams already using [Product]"
@@ -149,7 +157,7 @@ Place these near the signup form (not just at the bottom of the page):
 
 - Appropriate keyboard types: `type="email"` for email, `type="tel"` for phone
 - Autofill support (`autocomplete` attributes)
-- Minimum 44px touch target height
+- Minimum touch target size: this is a web form, governed by WCAG 2.2 SC 2.5.8 (level AA) — not the native-app conventions (Apple HIG 44pt / Android Material 48dp) teams reach for by habit. Don't cite 44px as "the WCAG minimum": see `references/plateformes-et-outils.md` for the exact thresholds and why they differ.
 - Single column layout
 - Social auth buttons wider and easier to tap than email form
 
@@ -169,47 +177,37 @@ Place these near the signup form (not just at the bottom of the page):
 
 **Better alternative**: Delay verification until a meaningful action (first export, invite a teammate, publish something). Most users abandon verification-gated flows.
 
+**Where I won't apply that rule**: delaying verification is an abuse surface, not just a UX choice, the moment the unverified account can act on someone else outside itself — sending an invite email, publishing something publicly reachable, or starting a paid transaction. Those are exactly the actions "delay until a meaningful action" tells you to gate on, which is the point: gate verification on the first action that touches the outside world, not on every action, and not never.
+
 ---
 
 ## Recommended Form Copy Template
 
-```
-[Headline above form]
-Start your free trial — no card required
+Full field-by-field copy — headline, labels, placeholders, CTA, below-form links — is in `references/gabarit-formulaire.md`. Use it as the starting draft for the recommended field set in the `signup-audit-{product}.md` deliverable.
 
-[Form]
-Full name
-  Placeholder: "Alex Johnson"
+---
 
-Work email
-  Placeholder: "alex@company.com"
+## Measuring the Signup Funnel in Bulldozer OS
 
-Password
-  Placeholder: "8+ characters"
-  [Show/Hide toggle]
+Don't audit a signup form on assumptions alone — before proposing a change, pull the real numbers:
 
-[CTA Button]
-Create My Account →
+- `bdzGetCmsTrafficReport` gives one metric at a time for the page holding the form (Webflow sites, requires the Analyze add-on) — `metricScope` picks SESSION (default), USER, or PAGEVIEW per call, they aren't returned together. Pull SESSION for your baseline: 100 pageviews can be 40 sessions from 12 users, and comparing a submission count against pageviews instead of sessions makes the completion rate look worse than it is, since one visitor can load the page several times before submitting once.
+- `bdzListCmsForms` identifies the signup form by its `pageName` + `formElementId`, not by its display name: several forms on the same site routinely share a label like "Email Form."
+- `bdzListCmsFormSubmissions`, filtered on that `formElementId`, gives the actual submission count — combine it with the SESSION traffic report for a real page-to-submission rate instead of a guessed one. The tool returns raw submissions with no bot/spam flag: before reading a change in that count as a real completion-rate move, sanity-check it against the traffic report for the same window — a submission spike with no matching rise in sessions is more likely automated form-fill than a genuine lift.
+- On the HubSpot side, `get_content_analytics_report` (metric: SUBMISSIONS, needs a Pro or Enterprise portal) tracks the same submission volume from the CMS side. `get_campaign_attribution_reports` only reaches further than that for **closed-won deals** — it reports revenue and deal counts already attributed to a won deal, not movement through open pipeline stages. Don't describe it as connecting signups to "the pipeline": it has no visibility into a deal sitting in an open stage, only into what eventually closed won.
 
-[Below button]
-By continuing, you agree to our Terms and Privacy Policy.
-
-[Separator]
-— or —
-
-[Continue with Google]
-[Continue with Microsoft]
-
-[Below form]
-Already have an account? Sign in
-```
+This doesn't replace a session recording or field-level abandonment data (most CMS form tooling doesn't expose per-field drop-off) — but it replaces "we think dropoff is high" with an actual number before a fix is proposed.
 
 ---
 
 ## A/B Test Hypotheses
 
-**Test 1 — Social auth prominence**: Social auth buttons above email form vs. below. Hypothesis: above placement increases social auth usage by 30%+ and overall completion.
+**Test 1 — Social auth prominence**: Social auth buttons above email form vs. below. Hypothesis: above placement increases social auth usage and overall completion — measure the lift on your own traffic rather than importing a number from another product; a placement that wins on a B2C consumer signup can lose on a B2B trial where the visitor already trusts the brand from a sales conversation.
 
-**Test 2 — Field reduction**: Remove company field from signup entirely (collect in onboarding). Hypothesis: removes one field → 5–15% lift in completion.
+**Test 2 — Field reduction**: Remove company field from signup entirely (collect in onboarding). Hypothesis: fewer fields lift completion — true directionally, but the size depends on which field and what it costs downstream (a company field feeding lead routing or account-based sales isn't free to remove even if completion goes up).
 
-**Test 3 — Email verification delay**: Allow product access immediately, verify before export/publish/invite. Hypothesis: removes single biggest abandonment point in flows requiring immediate verification.
+**Test 3 — Email verification delay**: Allow product access immediately, verify before export/publish/invite. Hypothesis: removes a major abandonment point in flows requiring immediate verification.
+
+**Reading the result**: apply the same bar as any CRO test — 95% significance, 80% power, and a minimum two-week run to cover a full weekly cycle before deciding. Stopping early because a variant looks ahead is the most common way a signup test produces a false winner.
+
+**What a clean win still doesn't prove**: a test that clears that bar tells you completion moved, not that you fixed the right thing. Before shipping a field-removal or verification-delay change permanently, check it against activation (or paid conversion, if the product monetizes fast) over the following weeks — not just completion at signup. If completion is up but activation at 30 days hasn't moved, the friction you removed wasn't the one holding back the metric you actually care about; the fix was cosmetic, and the real blocker is still there, now with less data collected at the door to diagnose it.

@@ -1,24 +1,24 @@
 ---
-name: |
+name: |-
   team-tool-scaling
-description: |
+description: |-
   Audit and rationalize the GTM tech stack as the team scales — tool inventory, overlap detection, adoption scoring, cost-per-outcome calculation, keep/cut/consolidate decision framework, and migration sequencing. Triggers on 'tool audit,' 'tech stack review,' 'too many tools,' 'tool consolidation,' 'stack rationalization,' 'we have tool sprawl,' 'our tools don't talk to each other,' or 'we're renewing contracts, what should we cut.' For CRM configuration, see crm-setup. For org design, see org-design-hiring-roadmap.
-when-to-use: |
+when-to-use: |-
   Audit and rationalize the GTM tech stack as the team scales — tool inventory, overlap detection, adoption scoring, cost-per-outcome calculation, keep/cut/consolidate decision framework, and migration sequencing. Triggers on 'tool audit,' 'tech stack review,' 'too many tools,' 'tool consolidation,' 'stack rationalization,' 'we have tool sprawl,' 'our tools don't talk to each other,' or 'we're renewing contracts, what should we cut.' For CRM configuration, see crm-setup. For org design, see org-design-hiring-roadmap.
-argument-hint: |
+argument-hint: |-
   Series B, 30-person GTM team. €180K/year on 14 tools. LinkedIn Sales Nav, Apollo, ZoomInfo, Outreach, Salesloft, HubSpot, Salesforce, Gong, Chorus, Calendly, Chili Piper, Looker Studio, Tableau, and 2 content tools. Half the team uses 3-4 tools, the
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
 # Team & Tool Scaling
 
-> This is a Bulldozer skill. The average B2B GTM team runs 15+ tools. Most can cut 20–30% of their stack without losing any capability — and often improve it. Every tool that requires manual data entry between systems is a tool that creates reporting errors and rep friction. Every tool with <30% adoption is overhead with a price tag. The audit precedes the cut: data kills "but we need that" faster than any argument.
+> This is a Bulldozer skill. Two-thirds of martech-buying teams report juggling 16+ tools (Forrester Consulting research commissioned by TransUnion, Q4 2024, 325 US decision-makers) — GTM/RevOps stacks specifically run just as wide in practice. How much of that can be cut without losing capability is not something any named study has measured; treat "20–30%" as a directional expectation from the audit method below, not a benchmark to quote to a client. Every tool that requires manual data entry between systems is a tool that creates reporting errors and rep friction. Every tool with <30% adoption is overhead with a price tag. The audit precedes the cut: data kills "but we need that" faster than any argument.
 
 You are a Bulldozer RevOps operator auditing and rationalizing a GTM tech stack. Your job is to inventory tools by workflow function, detect overlaps, score adoption, calculate cost-per-outcome, apply a keep/cut/consolidate decision tree, and sequence any migrations without disrupting live revenue workflows.
 
@@ -31,6 +31,16 @@ You are a Bulldozer RevOps operator auditing and rationalizing a GTM tech stack.
 A `team-tool-scaling-{company}.md` file with: tool inventory by workflow category, adoption and overlap analysis, cost-per-outcome scorecard, keep/cut/consolidate decision for each tool, migration priority order, consolidation roadmap with timelines, and the target stack with benchmark cost.
 
 **Produce on first invocation. Complete the full audit before the decision. Running the decision tree without the data produces "but we like that tool" outcomes, not revenue-based ones.**
+
+---
+
+## When Not to Run the Full Audit
+
+**Three cases where the seven-step machinery is the wrong tool — route to a narrower check instead of running it anyway:**
+
+- **The real question is one tool's renewal, not stack-wide sprawl.** If the trigger is "should we renew Gong" or "can we drop Chorus," running the full inventory and overlap pass across the whole stack to answer a single-tool question delays the actual decision. Score that one tool on adoption (Step 2) and cost-per-outcome (Step 4) against its renewal date and stop there. Reserve the full audit for genuine sprawl — several tools flagged at once, or no one in the room can say what the stack costs in total.
+- **A headcount or motion change is already on the calendar.** Step 6's benchmarks are keyed to ARR stage and team size as they stand today. If the team is about to double, or a new motion (self-serve alongside outbound, for instance) launches next quarter, an audit run on today's numbers looks right on delivery day and wrong within the quarter. Either wait until after the change, or explicitly size the audit against the post-change headcount and motion mix — never hand over a stack sized for today as if it survives a change already scheduled.
+- **No one holds the authority to execute a cut.** The audit ends in a keep/cut/consolidate table; someone still has to sign the cancellation notice or the new contract. If the person requesting the audit can't name who holds budget and contract authority, the deliverable becomes a report nobody acts on. Name that person before running the full audit, not after handing them the recommendation.
 
 ---
 
@@ -55,6 +65,8 @@ A `team-tool-scaling-{company}.md` file with: tool inventory by workflow categor
 
 **Discovery checklist:** Pull all tool subscriptions from the credit card statement or finance system. Add tools people use that aren't in the formal list — shadow IT (individual LinkedIn Sales Nav subscriptions, personal Calendly accounts) is common and represents hidden spend.
 
+**Should Bulldozer OS itself get a row in this table?** Only if the client is actually paying for and using it as one of their own workflow tools — this audit is of the client's revenue stack, not of the agency's own tooling. If a Bulldozer OS capability genuinely substitutes for a subscription the client would otherwise keep paying (its GA4 report templates standing in for a separate BI tool, for instance), note that substitution where it belongs — Step 3 (Overlap Detection) or Step 6 (Target Stack) as an already-covered workflow — rather than adding it as a line item to score and renew here.
+
 ---
 
 ## Step 2: Adoption Scoring
@@ -75,27 +87,22 @@ A `team-tool-scaling-{company}.md` file with: tool inventory by workflow categor
 
 **Adoption below 30%:** The tool is either not solving a real workflow need, or there's a training gap. If the workflow need is real, invest in training before cutting. If reps have built workarounds and don't miss the tool on PTO, cut it at renewal.
 
+**A company-wide percentage hides who actually depends on the tool.** A tool at 15% aggregate adoption used exclusively by the three enterprise AEs who carry 60% of the pipeline is not a Score-1 cut candidate — it's a tool with a narrow, high-value user base, and the average is measuring the wrong denominator. Before scoring a tool this way, split usage by the segment that actually needs it (by pipeline or ARR contribution, not headcount): an aggregate blended across a large SDR team and a small enterprise pod will always read low for whatever only the smaller, higher-value pod uses, and read high for whatever only the larger headcount touches. Score each segment against the tool it depends on, not the tool against the whole team.
+
 ---
 
 ## Step 3: Overlap Detection
 
 **Map every tool's functionality against every other tool in the same workflow category.**
 
-**Common high-value overlaps:**
-
-| Overlap | Typical culprit | Resolution |
-|---------|----------------|-----------|
-| Two CRMs (Salesforce + HubSpot both active) | Acquisition / org change | Consolidate to one — never run two CRMs in production |
-| Two sequencing tools (Outreach + Salesloft) | Team preference drift | Run a head-to-head cost-per-booked-meeting comparison; retire the loser |
-| Two data enrichment tools (ZoomInfo + Apollo) | Different teams buying independently | Compare data quality for your ICP; keep one primary + one waterfall fallback |
-| Two meeting schedulers (Calendly + Chili Piper) | Department silos | If CRM has native meeting booking (HubSpot Meetings), consider eliminating both |
-| Two BI tools (Looker + Tableau) | Acquisition or org growth | Consolidate to one; native CRM dashboards often replace Looker Studio at <€5M ARR |
-| Two conversation intelligence tools (Gong + Chorus) | Team preference | One platform is sufficient; pick based on CRM integration quality |
+For the table of common high-value overlaps (typical culprit and resolution), read `references/overlap-and-cost-detail.md`.
 
 **Overlap scoring:**
 - Hard overlap (tools do identical things): eliminate one
 - Partial overlap (one tool does what the other does + more): evaluate total cost vs. gap coverage
 - Complementary (tools serve adjacent workflows): keep both if integration health is good
+
+**Never cancel the losing tool before the surviving tool's renewal is signed.** A live, comparable second contract is the single best negotiation lever against the tool being kept — the moment the alternative is cancelled, the survivor's vendor knows there's no credible walk-away option left at the next renewal. Sequence a head-to-head comparison so the losing tool's contract runs out naturally after the survivor's renewal closes, even once the decision itself is already made.
 
 ---
 
@@ -115,13 +122,11 @@ Activity contribution = Meetings booked, emails sent, sequences enrolled via thi
 Cost per outcome = Total tool cost ÷ Pipeline contribution (or primary activity)
 ```
 
-**Benchmark cost-per-outcome by tool type:**
-- Sequencing tool (Outreach/Salesloft): target <€200 cost per booked meeting
-- Enrichment tool (Apollo/ZoomInfo): target <€5 per verified contact added to CRM
-- Conversation intelligence (Gong): target indirect — measure % increase in quota attainment for coached vs. uncoached reps
-- Meeting scheduler: target <€25 cost per meeting booked (vs. manual scheduling)
+For the cost-per-outcome benchmarks by tool type and their caveat, read `references/overlap-and-cost-detail.md`.
 
 **If you can't calculate the cost-per-outcome:** the tool has no defined workflow contribution. That is itself a finding — tools without measurable output are candidates for elimination regardless of adoption rate.
+
+**The formula above prices the tool, not the switch.** It counts RevOps admin time and implementation cost, but not the ramp time every end user needs to relearn a replacement — a real, if temporary, productivity loss across the whole user base, not just the hours already counted for the person running the migration. It also assumes nothing else depends on the tool being cut. Before executing a Cut or Consolidate decision, map what else reads from or writes to it — a Zapier automation, a dashboard filter, a sequence trigger built on top of it. Treating consolidation as a license-cancellation exercise and only finding the dependency once it breaks is the single most common way a stack decision turns into a live incident; a tool that loses the cost-per-outcome comparison on paper can still be the safer one to keep this cycle if that map isn't done yet.
 
 ---
 
@@ -159,32 +164,15 @@ Cost per outcome = Total tool cost ÷ Pipeline contribution (or primary activity
 - **Consolidate**: Overlaps with another tool — migrate users and workflows, retire at next renewal
 - **Cut**: Low adoption, no measurable ROI, or fully replaced by a tool being kept
 
+**A named champion is not an exception to the score — it's a data point to weigh openly.** If a tool scores Cut but a top performer insists on keeping it, don't quietly override the tree to avoid the conversation, and don't let seniority alone reverse a documented score either. Weigh the retention risk of overriding against the cost of the exception, name the trade explicitly in the writeup, and tie any override to a fixed re-evaluation point — the tool's own renewal date, or the next time Step 2 is run — never leave it open-ended. An exception with no re-evaluation date is a decision avoided, not a decision made.
+
 ---
 
 ## Step 6: Target Stack by ARR Stage
 
 **Benchmark tech stacks by company size:**
 
-**Early Stage (<€5M ARR) — 5–7 tools, €30–80K/year:**
-- CRM: HubSpot Sales Hub Pro or Salesforce Starter
-- Enrichment: Apollo.io (email + firmographic, single tool)
-- Outbound sequencing: HubSpot Sequences (if already on HubSpot) or Instantly
-- Meeting scheduling: HubSpot Meetings (native, no extra cost)
-- Analytics: Native CRM dashboards (no BI tool needed)
-- Call recording: Fathom (free) or Gong (if team is ≥5 AEs and call coaching is strategic)
-
-**Growth Stage (€5–20M ARR) — 8–12 tools, €100–250K/year:**
-- CRM: HubSpot or Salesforce
-- Enrichment: Apollo + Clay (waterfall enrichment for outbound)
-- Outbound sequencing: Outreach or Salesloft (one, not both)
-- LinkedIn: LinkedIn Sales Navigator (Team)
-- Meeting scheduling: Chili Piper (for inbound routing) or HubSpot Meetings
-- Conversation intelligence: Gong
-- BI: Looker Studio connected to CRM (or native Salesforce Analytics)
-- ABM: LinkedIn Sponsored (no additional ABM platform needed until €15M+ ARR)
-
-**Scale Stage (€20M+ ARR) — 12–20 tools, €250–500K/year:**
-Add: Forecasting (Clari), advanced BI (Tableau or Metabase), ABM platform (6sense or Demandbase), advanced enrichment (ZoomInfo for enterprise contacts), territory management, CPQ
+For the benchmark stacks by ARR stage (Early, Growth, Scale: tools, annual spend, example tools) and the single-motion assumption, read `references/target-stack-by-arr.md`.
 
 ---
 
@@ -195,4 +183,19 @@ Add: Forecasting (Clari), advanced BI (Tableau or Metabase), ABM platform (6sens
 **Migration priority order:**
 1. Cut tools first (quick wins, no migration required — just cancel at renewal)
 2. Renegotiate contracts where appropriate (do this 3 months before renewal for maximum leverage)
-3. Consolidate overlapping tools (sequence by user impact: consolidate lowest
+3. Consolidate overlapping tools (sequence by user impact: consolidate the lowest-adoption tool into the survivor first — it has the fewest workflows to move and builds confidence in the target tool before touching a high-adoption team's daily workflow)
+4. Migrate tools that touch live pipeline data last (CRM, sequencing, forecasting) — these carry the highest disruption risk if a migration runs into trouble mid-quarter
+
+For the pre-consolidation checklist, the migration timeline template (decision, parallel run, cutover, read-only window) and the one-category-at-a-time rule, read `references/migration-sequencing.md`.
+
+---
+
+## Rules
+
+- Never run a migration and a quota-period close in the same window — the audit can start any time; the cut cannot.
+- Never cut a tool for low adoption alone without checking whether the workflow need is real. A training gap and a dead workflow produce the same login numbers (Step 2) — only a rep interview tells them apart.
+- Never consolidate two tools without a parallel-run period. A hard cutover with no fallback turns a stack decision into a live incident.
+- Never let a migration override a contract already signed — renegotiate at the next term instead of breaking terms to force a timeline.
+- Re-run this audit at least once a year, or at every ARR-stage transition (Step 6). The target stack for €5M ARR is undersized at €20M, and the reverse is just as true.
+- Never execute a Cut or Consolidate decision without mapping what else depends on the tool first (Step 4) — the automation, dashboard, or sequence trigger built on top of it is the failure that turns a clean audit into a live incident.
+- A stack rationalized once and never re-owned drifts back to the same sprawl. Close the audit by naming who owns the next purchase decision, not only who executed this one's cuts — see "No one holds the authority to execute a cut" above.

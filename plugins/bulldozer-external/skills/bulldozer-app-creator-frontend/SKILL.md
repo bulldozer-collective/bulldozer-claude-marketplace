@@ -1,7 +1,9 @@
 ---
-name: bulldozer-app-creator-frontend
-description: Build the screen of a Bulldozer App — an Angular front end, signed in against Bulldozer, scoped to the project the user picks, calling the Bulldozer API and the app's own service.
-when-to-use: |
+name: |-
+  bulldozer-app-creator-frontend
+description: |-
+  Build the screen of a Bulldozer App — an Angular front end, signed in against Bulldozer, scoped to the project the user picks, calling the Bulldozer API and the app's own service.
+when-to-use: |-
   Called by `bulldozer-app-creator`. Not invoked on its own.
 user-invocable: false
 allowed-tools:
@@ -10,9 +12,10 @@ allowed-tools:
   - Write
   - Edit
   - WebFetch
-effort: medium
+effort: |-
+  medium
 metadata:
-  forge: disabled
+  "forge": "disabled"
 ---
 
 # The screen

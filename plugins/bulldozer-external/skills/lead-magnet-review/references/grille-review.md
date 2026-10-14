@@ -11,7 +11,8 @@
 [B] chaque chiffre du document a une source identifiable (manifeste → sources[])
 [B] aucune donnée inventée, aucun ordre de grandeur "raisonnable" non sourcé
 [B] chaque testimonial a une source réelle (avis OS, contexte API, opérateur)
-[ ] chaque source dit bien ce que le document lui fait dire (périmètre, date, unité, population)
+[B] chaque source web citée a été réellement ouverte (WebFetch) et dit bien ce que le document lui
+    fait dire (périmètre, date, unité, population) — un extrait de recherche non ouvert ne compte pas
 [ ] les chiffres du client sont attribués au client, pas présentés comme des données de marché
 [ ] les [à compléter] restants sont listés au rapport (pas laissés silencieusement dans le PDF)
 [B] aucun [à compléter] dans une page destinée au lecteur final sans que l'opérateur l'ait acté
@@ -65,6 +66,8 @@ phrase ? ». Si la réponse varie d'un paragraphe à l'autre, le document a perd
 [ ] data-viz aux tokens client, source affichée, aucun défaut de librairie
 [ ] header/footer discrets, pagination juste, absents de la couverture
 [B] aucune couleur hors des 7 tokens et de leurs dérivés
+[B] accent brut jamais posé en texte à corps courant sans --accent-texte si sous le seuil WCAG 1.4.3
+    (4,5:1 en corps courant, 3:1 à partir de 18 pt / 14 pt gras) — mesurer contre le fond réel du bloc
 [B] logo = fichier réel du client (jamais une recréation approximative)
 [ ] testimonials mis en scène (attribution complète)
 ```
@@ -81,7 +84,8 @@ python3 scripts/check_alignements.py .        # sur les sources, avant toute con
 [ ] SVG dessinés « encre bord à bord » (x=0 à x=W)
 [ ] aucun titre ni note de source écrits DANS un SVG (ils vont au <figcaption>)
 [ ] titres de figure et titres de tableau au même style, à la même position (au-dessus)
-[B] aucun <caption> : boîte détachable, elle produit des titres orphelins (voir pannes-et-parades)
+[B] aucun <caption> : boîte distincte du corps du tableau, détachée même sous break-inside:avoid —
+    le titre se retrouve seul en bas de page, le tableau sur la suivante
 [ ] colonnes numériques alignées à droite, chiffres tabulaires
 [B] aucune couleur de texte SVG posée par attribut fill= sous une classe qui définit un fill
 [B] @font-face déclarés par graisse — une plage de police variable supprime tout le gras
@@ -120,15 +124,16 @@ la même grille de cartes. Deux livrables d'affilée se ressemblent alors, et le
 [ ] chaque forme est justifiable par le CONTENU du chapitre, pas par l'envie de varier
 ```
 
-Palette et coût en pages de chaque forme : `lead-magnet-design/references/blocs-composes.md`.
-
 > ⚠ **Deux faux positifs connus de `check_rythme.py`**, à identifier comme tels au lieu de les
 > « corriger » : la **page de données à fond perdu** (le script mesure la couverture d'encre et ne
 > sait exempter que la couverture) et l'**annexe des sources en deux colonnes**. Les signaler au
-> rapport avec la mention « faux positif », sans commande design associée.
+> rapport avec la mention « faux positif », sans commande design associée — et forcer leur exemption
+> dans l'appel (`--exempt 1,5,9`, numéros de page) plutôt que de laisser le script les recompter à
+> chaque relance. `--no-exempt` désactive toute exemption pour un contrôle strict si un doute demeure
+> sur l'auto-détection (couverture, dernière page) du script.
 
-**Les quatre leviers de comblement**, dans l'ordre (détail : `lead-magnet-design/references/standard-moderne.md`,
-point 12) : rendre coupable un bloc inutilement atomique · remonter un bloc de la page suivante ·
+**Les quatre leviers de comblement**, dans l'ordre : rendre coupable un bloc inutilement atomique ·
+remonter un bloc de la page suivante ·
 promouvoir une idée en pull-quote · **combler par une image de respiration**. Ce dernier est légitime,
 pas un pis-aller : il sert le remplissage, le rythme et le registre d'un seul geste — à condition que
 l'image porte une légende qui la relie au propos et se place à une rupture de mouvement.

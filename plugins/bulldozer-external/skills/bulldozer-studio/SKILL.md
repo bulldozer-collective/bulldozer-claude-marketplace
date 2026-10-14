@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   bulldozer-studio
-description: |
+description: |-
   Generate images and videos via the Bulldozer Studio using prompts and optional imported assets.
-when-to-use: |
+when-to-use: |-
   Use when the user wants to produce visual creative assets via Bulldozer — e.g., requests to generate, create, make, render, or produce images, videos, creatives, visuals, or ads.
 user-invocable: false
 allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__bdzCreateStudioJob
   - mcp__plugin_bulldozer_bulldozer__bdzImportStudioAsset
-effort: |
+effort: |-
   low
 metadata:
-  forge: disabled
+  "forge": "disabled"
 ---
 
 # Bulldozer Studio

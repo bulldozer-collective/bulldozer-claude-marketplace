@@ -1,9 +1,9 @@
 ---
-name: |
+name: |-
   bulldozer-seo-api
-description: |
+description: |-
   Fetch and analyze SEO data — domain overviews, organic keywords, and backlinks — for companies via the Bulldozer SEO MCP, including async analysis orchestration and multi-source result merging.
-when-to-use: |
+when-to-use: |-
   When the user asks about SEO metrics, organic traffic, keyword rankings, backlinks, domain authority, or competitive SEO data for a specific company or website tracked in Bulldozer.
 allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__bdzListCompanies
@@ -18,12 +18,12 @@ allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__bdzGetGscDomainAnalytics
   - mcp__plugin_bulldozer_bulldozer__bdzGetGscDomainInspections
   - mcp__plugin_bulldozer_bulldozer__bdzGetGscDomainSitemaps
-model: |
+model: |-
   sonnet
-effort: |
+effort: |-
   medium
 metadata:
-  forge: disabled
+  "forge": "disabled"
 ---
 
 # Bulldozer SEO API

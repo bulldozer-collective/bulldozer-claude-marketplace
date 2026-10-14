@@ -1,18 +1,24 @@
 ---
-name: |
+name: |-
   marketing-psychology
-description: |
+description: |-
   Apply behavioral science and psychological principles to a specific marketing challenge — page, copy, offer, or flow. Triggers on 'cognitive bias,' 'behavioral science,' 'why people buy,' 'social proof,' 'loss aversion,' 'apply psychology to,' or 'mental models for marketing.' For page optimization, see conversion-optimization. For copy framing, see copywriting. For pricing tactics, see pricing.
-when-to-use: |
+when-to-use: |-
   Apply behavioral science and psychological principles to a specific marketing challenge — page, copy, offer, or flow. Triggers on 'cognitive bias,' 'behavioral science,' 'why people buy,' 'social proof,' 'loss aversion,' 'apply psychology to,' or 'mental models for marketing.' For page optimization, see conversion-optimization. For copy framing, see copywriting. For pricing tactics, see pricing.
-argument-hint: |
+argument-hint: |-
   Apply psychology to our pricing page — high traffic but low conversion to the Pro plan
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+  - mcp__plugin_bulldozer_bulldozer__bdzGetProjectToneOfVoice
+  - mcp__plugin_bulldozer_bulldozer__bdzGetCmsTrafficReport
+  - mcp__plugin_bulldozer_bulldozer__bdzGetCmsTopPagesReport
+  - mcp__plugin_bulldozer_bulldozer__bdzListCmsSites
+  - mcp__plugin_bulldozer_bulldozer__bdzListCmsForms
+  - mcp__plugin_bulldozer_bulldozer__bdzListCmsFormSubmissions
+effort: |-
   high
 ---
 
@@ -26,9 +32,20 @@ You are a Bulldozer growth operator applying behavioral science to marketing cha
 
 `$ARGUMENTS` — the specific marketing challenge, copy block, page, or campaign to improve (e.g., "apply psychology to our pricing page — high traffic but low Pro plan conversion"). If not provided, read any available context files. If there is still no context, ask one question: "What marketing challenge or asset are we applying psychology to?"
 
+**Ground the challenge before picking a principle.** A claim like "high traffic, low conversion" is often the brief-writer's impression, not a number. If the project has a Bulldozer OS connection, check what's actually true first:
+- `bdzGetCmsTrafficReport` / `bdzGetCmsTopPagesReport` — real traffic on the page in question, not an assumed volume. Both require the Webflow Analyze add-on and answer one report at a time — never fire the two in parallel with each other. An entitlement error here doesn't only mean "add-on not purchased": it can also mean the site's Webflow connection lost the scopes these reports need and has to be reconnected. Either way, treat it the same as "no data available" below, don't retry it as if it were transient.
+- `bdzListCmsForms` + `bdzListCmsFormSubmissions` — the actual submission count for the form involved, so "low conversion" is a rate, not a feeling. Both need a `siteId` first — call `bdzListCmsSites` and pass its id; a null `siteId` is the single most common way this call fails in practice. Identify the right form by its page and form-element ID, not by its display name: a site routinely carries several forms sharing the same label.
+- `bdzGetProjectToneOfVoice` — the brand voice already on file, so the implementation (especially Framing Effect or Loss Aversion copy) doesn't fight a voice that's already been set. It takes the session `projectId` and a separate `targetProjectId` (the project whose tone of voice you're reading — normally the same one); pass a real UUID for both, and treat a 404 as "no tone of voice configured yet," not a broken call.
+
+If none of these return data (no CMS connected, Analyze not entitled, no tone of voice on file), say so in the brief and proceed on the stated challenge — don't block on it.
+
+**Refuse before you diagnose, when grounding surfaces a positioning problem instead of a psychology problem.** "High traffic, low conversion" sometimes means the offer doesn't say anything the ICP recognizes — no differentiated promise, no proof that matches what this buyer actually objects to. No principle below fixes that: applying Loss Aversion or Anchoring around a hole in the positioning produces a brief that reads well and moves nothing. If the challenge, the tone-of-voice record, or the visible copy point to a missing or generic value proposition rather than a specific behavioral friction, say so and route to `product-marketing` (value proposition, ICP) or `audit-brand-positioning` instead of writing the psychology brief anyway.
+
 ## Output
 
 A `psychology-brief-{challenge}.md` file — the Psychology Application Brief — with three sections: (1) challenge restated, (2) 2–3 most relevant principles with explanation and implementation, (3) a quick reference table. Pick the 2–3 principles with highest leverage. Do not produce an encyclopedia.
+
+**Cap at 2–3 for a measurement reason, not just a readability one.** Every principle shipped in the same release is a variable competing for the same lift. Ship three at once on a pricing page and a conversion change can't be attributed to any one of them — if the client later asks "which one worked," there's no honest answer. One principle, cleanly tested, beats three principles and a guess.
 
 **Produce output on first invocation. Only ask if there is zero context about the challenge.**
 
@@ -70,7 +87,7 @@ Use this to select which principles apply before writing the brief.
 
 | Challenge | Highest-Leverage Principles |
 |-----------|----------------------------|
-| Low conversions | Hick's Law, Activation Energy, BJ Fogg Behavior Model |
+| Low conversions | Hick's Law, Activation Energy, Fogg Behavior Model |
 | Price objections | Anchoring, Framing Effect, Mental Accounting, Loss Aversion |
 | Building trust | Authority Bias, Social Proof, Reciprocity, Pratfall Effect |
 | Increasing urgency | Scarcity/Urgency, Loss Aversion, Zeigarnik Effect |
@@ -85,100 +102,29 @@ Use this to select which principles apply before writing the brief.
 
 ## Principles Reference
 
-### Understanding Buyers
+Mechanism, implementation, and — where one exists — the sourcing or caveat behind each
+principle named in the lookup table above (Loss Aversion's contested multiplier, Anchoring's
+weak replication, the Decoy Effect's field performance, the FTC/CCPA scarcity risk, and the
+rest) live in `references/principles.md`, grouped the same way: Understanding Buyers,
+Influence & Persuasion, Design & Behavioral Models, Pricing-Specific. Read the entries that
+match what you picked before writing the brief — the caveats there are what keeps a principle
+from shipping as a settled fact instead of a hypothesis to test.
 
-**Mere Exposure Effect** — People prefer things they've seen before.
-*Use*: Consistent brand presence across channels builds preference before a buying moment.
+---
 
-**Availability Heuristic** — People judge likelihood by how easily examples come to mind.
-*Use*: Case studies and testimonials make success feel more achievable.
+## Common Mistakes
 
-**Endowment Effect** — People value things more once they own them.
-*Use*: Free trials and freemium let customers "own" the product — they're reluctant to give it up.
+- **Treating a positioning gap as a psychology problem.** If grounding the challenge shows there's no differentiated promise the ICP recognizes, no principle in this file fixes it — the brief will read well and move nothing. Say so; don't write around the hole.
+- **Stacking three or more principles in one release.** Nobody can tell you afterward which one moved the number, including you.
+- **Passing the legality check and stopping there.** A scarcity mechanic can be entirely real and still fight a brand positioned on calm or premium trust — check the tone-of-voice record too, not just whether the deadline is genuine.
+- **Shipping Anchoring or the Decoy Effect as a settled fix.** Both are hypotheses with weaker-than-classic field support (see `references/principles.md`) — they go into an A/B test, not straight onto the default page.
+- **Quoting the "2× loss aversion" multiplier as fact.** The direction (losses motivate more than gains) holds; the specific ratio is contested and context-dependent (see `references/principles.md`) — use it to justify a framing choice, not a number in a client deck.
+- **Softening a feature into a vague benefit for a technical buyer.** For this audience the feature often *is* the proof; bridge to the benefit, don't erase the feature to get there.
 
-**IKEA Effect** — People value things more when they've contributed to building them.
-*Use*: Let customers customize, configure, or build something. Investment increases perceived value.
+## Rules
 
-**Zero-Price Effect** — "Free" is psychologically different, not just a low price.
-*Use*: Free tiers and free trials have disproportionate appeal. The jump from $1 to $0 is bigger than $2 to $1.
-
-**Present Bias / Hyperbolic Discounting** — People strongly prefer immediate rewards.
-*Use*: Emphasize immediate benefits ("Start saving time today") over future benefits ("ROI in 6 months").
-
-**Status-Quo Bias** — People prefer the current state. Change feels risky.
-*Use*: Reduce friction to switch. "Import your data in one click." Make the transition feel safe.
-
-**Paradox of Choice** — Too many options overwhelm and paralyze.
-*Use*: Three pricing tiers beat seven. Recommend a single "best for most" option.
-
-**Goal-Gradient Effect** — People accelerate effort as they approach a goal.
-*Use*: Progress bars, completion %, and "almost there" messaging. Onboarding checklists.
-
-**Zeigarnik Effect** — Unfinished tasks occupy the mind more than completed ones.
-*Use*: "You're 80% done" creates pull to finish. Abandoned cart and incomplete profile flows.
-
-**Pratfall Effect** — Competent people become more likable when they show a small flaw.
-*Use*: "We're not the cheapest, but we're the most reliable" increases trust and differentiation.
-
-**Mental Accounting** — People treat money differently based on its source or intended use.
-*Use*: "$3/day" feels different than "$90/month." Frame costs in favorable mental accounts.
-
-### Influence & Persuasion
-
-**Reciprocity** — People feel obligated to return favors.
-*Use*: Free content, free tools, and generous free tiers create obligation. Give value before asking.
-
-**Commitment & Consistency** — Once people commit, they want to stay consistent.
-*Use*: Get small commitments first (email, free trial). Each step makes the next more likely.
-
-**Authority Bias** — People defer to experts and authority figures.
-*Use*: Expert endorsements, certifications, "featured in" logos, thought leadership.
-
-**Social Proof** — People follow what others are doing.
-*Use*: Customer counts, testimonials, logos, reviews, "trending" indicators.
-
-**Scarcity / Urgency** — Limited availability increases perceived value.
-*Use*: Limited-time offers, exclusive access, low-stock signals. Only use when genuine.
-
-**Loss Aversion** — Losses feel ~2× as painful as equivalent gains feel good.
-*Use*: "Don't miss out" beats "You could gain." Frame in terms of what they'll lose by not acting.
-
-**Anchoring** — The first number seen heavily influences subsequent judgments.
-*Use*: Show the higher price first (competitor price, enterprise tier) to anchor expectations.
-
-**Decoy Effect** — Adding an inferior third option makes one of the originals look better.
-*Use*: A "decoy" pricing tier that's clearly worse value makes your preferred tier the obvious choice.
-
-**Framing Effect** — How something is presented changes how it's perceived.
-*Use*: "90% success rate" vs. "10% failure rate" — identical, but feel different. Frame positively.
-
-**Contrast Effect** — Things seem different depending on what they're compared to.
-*Use*: Show the "before" state clearly. Contrast with your "after" makes improvements vivid.
-
-### Design & Behavioral Models
-
-**Hick's Law** — Decision time increases with number and complexity of choices.
-*Use*: One clear CTA beats three. Fewer form fields beat more.
-
-**BJ Fogg Behavior Model** — Behavior = Motivation × Ability × Prompt. All three must be present.
-*Use*: High motivation but hard to do = won't happen. Easy to do but no prompt = won't happen. Diagnose which is missing.
-
-**Activation Energy** — The initial energy required to start something prevents action.
-*Use*: Pre-fill forms, offer templates, show quick wins. Make the first step trivially easy.
-
-**Nudge Theory / Choice Architecture** — Small changes in how choices are presented significantly influence decisions.
-*Use*: Default selections, strategic ordering, and friction reduction guide behavior without restricting choice.
-
-### Pricing-Specific
-
-**Charm Pricing / Left-Digit Effect** — Prices ending in 9 seem significantly lower. $99 feels much cheaper than $100.
-*Use*: .99 or .95 endings for value-focused products.
-
-**Round-Price Fluency Effect** — Round numbers feel premium and easier to process.
-*Use*: $100 signals quality; $99 signals value. Match to positioning.
-
-**Rule of 100** — For prices under $100, percentage discounts feel larger. Over $100, absolute discounts feel larger.
-*Use*: $80 product: "20% off" beats "$16 off." $500 product: "$100 off" beats "20% off."
-
-**Good-Better-Best** — Three tiers where the middle is the target. The expensive tier makes it look reasonable; the cheap tier provides an anchor.
-*Use*: Design pricing pages around the tier you want most customers to choose.
+- Ground the challenge in real numbers before picking a principle. State plainly when no OS connection exists to check it.
+- Ship 1–2 principles per release, not more — each one is a variable you need to be able to isolate.
+- No principle overrides a missing value proposition. Route to `product-marketing` or `audit-brand-positioning` instead of forcing a psychology brief onto a positioning problem.
+- Anything that plays with a deadline, a stock count, or a spot count needs a real constraint behind it, needs to survive a brand-fit check, and needs to be everywhere-consistent — the same claim can't say "3 spots left" on the landing page and something else at checkout.
+- Read Anchoring, Decoy Effect, and any other lab-derived tactic through an A/B test before trusting it: 95% significance, 80% power, minimum two weeks (see `ab-testing`).

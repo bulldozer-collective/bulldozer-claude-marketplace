@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   attribution-funnel
-description: |
+description: |-
   Build a revenue attribution model and full-funnel analytics system — model selection, touchpoint mapping, CRM data requirements, channel ROI calculation, and a standing attribution report. Triggers on 'attribution model,' 'funnel analytics,' 'which channels drive revenue,' 'marketing attribution,' 'how do we measure ROI by channel,' 'what's driving our pipeline,' or 'our marketing metrics don't connect to revenue.' For weekly growth tracking, see weekly-growth-review. For cohort-level analysis, see cohort-mmm.
-when-to-use: |
+when-to-use: |-
   Build a revenue attribution model and full-funnel analytics system — model selection, touchpoint mapping, CRM data requirements, channel ROI calculation, and a standing attribution report. Triggers on 'attribution model,' 'funnel analytics,' 'which channels drive revenue,' 'marketing attribution,' 'how do we measure ROI by channel,' 'what's driving our pipeline,' or 'our marketing metrics don't connect to revenue.' For weekly growth tracking, see weekly-growth-review. For cohort-level analysis, see cohort-mmm.
-argument-hint: |
+argument-hint: |-
   B2B SaaS, €8M ARR, 60-day sales cycle, mix of outbound and inbound — using HubSpot. Currently only tracking last-touch, want to understand full-funnel contribution by channel.
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -52,13 +52,7 @@ Use **W-shaped (30/30/30/10)** — 30% to first touch, 30% to lead creation, 30%
 **Hybrid motion (outbound + inbound):**
 Create a "sales-sourced" vs. "marketing-sourced" attribution split. Attribute outbound deals (cold email, cold call, LinkedIn) to the sales team under a separate category. Then measure marketing-influenced revenue separately: what percentage of sales-sourced deals had marketing touchpoints (ad retargeting, content engagement, event attendance) in the journey?
 
-### What No Model Tells You
-
-Every attribution model has structural blindspots. Name them before presenting the results:
-- **Dark social** — Conversations in Slack communities, private LinkedIn DMs, word-of-mouth referrals. Unmeasurable by any touchpoint model. Use CRM source surveys: "How did you first hear about us?" as a data supplement.
-- **Offline touches** — Events, conference conversations, introductions through mutual connections. Track manually in CRM as offline touchpoints.
-- **Multi-stakeholder journeys** — In enterprise deals, different stakeholders engage with different channels. Account-level attribution is more accurate than contact-level for B2B.
-- **Early-stage brand** — Companies with low brand awareness and short histories have too few deals to produce statistically reliable attribution data. Below 50 closed deals, directional is the honest framing — not precise.
+For how each model runs in Bulldozer OS (`get_campaign_attribution_reports` parameters), the scope-block and five-condition under-count warnings, and the four structural blind spots every model has (dark social, offline touches, multi-stakeholder journeys, early-stage brand), read `references/model-selection-and-blindspots.md`. Read it before promising a model and before presenting results — name the blind spots to the client.
 
 ---
 
@@ -66,49 +60,13 @@ Every attribution model has structural blindspots. Name them before presenting t
 
 Define each stage, what triggers the stage transition, and the conversion benchmark for your segment.
 
-### Standard B2B Funnel (Sales-Led)
-
-| Stage | Definition | Trigger | B2B SaaS Benchmark |
-|-------|-----------|---------|-------------------|
-| **Awareness** | Account in ICP is aware of your company | First recorded touchpoint (ad impression, content view, LinkedIn engagement) | Not tracked directly — proxy: ICP accounts reached per campaign |
-| **MQL** | Lead matches ICP criteria and has shown intent | Form fill, demo request, content download with email, minimum engagement score | MQL→SQL conversion: 20–40% (lower end if marketing sets a loose MQL bar) |
-| **SQL** | Sales-qualified: pain confirmed, fit validated, next step agreed | Discovery call held, MEDDPICC fields partially filled, opportunity created in CRM | SQL→Opportunity conversion: 60–80% (if SQL definition is tight) |
-| **Opportunity** | Active deal in pipeline | Opportunity created in CRM with a real decision timeline | Opportunity→Proposal conversion: 50–70% |
-| **Proposal** | Proposal or commercial terms sent | Proposal document sent or verbal pricing discussion | Proposal→Close conversion: 25–40% |
-| **Closed-Won** | Contract signed | Signed contract or payment received | — |
-
-**Stage conversion by channel (track these per channel):**
-
-Each channel should have its own conversion rate at every stage. A channel that generates high MQL volume but low MQL→SQL conversion is producing quantity, not quality. The revenue contribution per MQL is the primary optimization signal.
-
-```
-Revenue contribution per MQL = ACV × MQL→SQL × SQL→Opportunity × Opportunity→Close
-Example: €30,000 × 30% × 75% × 35% = €2,363 per MQL
-```
-
-This calculation transforms "which channel drives the most leads" into "which channel drives the most revenue per lead" — different answer, different budget allocation.
+For the standard B2B funnel table (stage, definition, trigger, benchmark), the per-channel conversion rule, the revenue-per-MQL formula with its worked example, and the caveat on the benchmark column, read `references/funnel-stages-and-drop-off.md`.
 
 ---
 
 ## Data Requirements
 
-Attribution only works if the data exists. Audit before building the model.
-
-### CRM Requirements
-
-- [ ] **Source field on every contact** — First touch source (channel + campaign) captured at lead creation. This is the foundation of first-touch attribution. If source isn't populated on >80% of leads, first-touch attribution is unreliable.
-- [ ] **UTM parameters passing to CRM** — All inbound digital traffic must pass UTM source, medium, and campaign to the CRM contact record. Verify this with a test: create a test lead via a UTM-tagged link and confirm the field populates in CRM.
-- [ ] **Opportunity source field** — Beyond contact source, the opportunity should have a source field for outbound-created deals (so sales-sourced opportunities are attributed to the sales team, not "direct" or "unknown").
-- [ ] **Stage transition timestamps** — Each funnel stage transition must have a timestamp. Without timestamps, you can't calculate stage velocity (how long deals spend at each stage) or identify where deals stall.
-- [ ] **Closed Lost Reason field** — Required for funnel drop-off analysis. If Closed Lost Reason isn't filled on >70% of lost deals, you're flying blind on why pipeline converts at its current rate.
-
-### What to Do with Missing Data
-
-If UTM parameters aren't passing to CRM: implement immediately. It's a 2-hour technical fix with multi-year payoff. Until it's fixed, run attribution from campaign-level CRM reports (match lead creation date to campaign run dates) — imprecise but directional.
-
-If source field isn't populated on historical leads: add a CRM workflow that retroactively segments by email domain or first page viewed. Imperfect but recoverable.
-
-If Closed Lost Reason is empty: fix at the CRM level (make it a required field before a deal can be marked Closed Lost) and run a 30-minute rep session to back-fill the last 90 days.
+For the CRM requirements checklist (source field, UTM passing, opportunity source, stage timestamps, Closed Lost Reason) and what to do when each is missing, read `references/data-requirements.md`. Audit the data before building the model.
 
 ---
 
@@ -116,9 +74,9 @@ If Closed Lost Reason is empty: fix at the CRM level (make it a required field b
 
 For each active channel, calculate:
 
-1. **Channel spend** — All costs including tool costs, agency fees, and allocated headcount
-2. **Attributed pipeline** — Opportunities where this channel was the source (or significantly influenced, depending on model)
-3. **Attributed revenue** — Closed-won revenue attributed to the channel
+1. **Channel spend** — All costs including tool costs, agency fees, and allocated headcount. Source this from the ad platform connector (`bdzGetAdAnalytics`, per layer), not from HubSpot's campaign spend rollup. HubSpot's own attribution tool documents a spend property on the CAMPAIGN object (`hs_spend_items_sum_amount`) and even proposes `ROAS = revenue / hs_spend_items_sum_amount` — refuse that path anyway. On the one portal checked, reading that property required a permission grant the connector didn't have, and even where it's available it's a manually-maintained rollup someone in ops has to remember to fill in, not a system-of-record number the way the ad platform's own spend figure is. Verify the CAMPAIGN object's `readAccess` before ever wiring this — don't assume it matches DEAL's access just because both live in HubSpot. One more trap on `bdzGetAdAnalytics` itself: its `from` parameter documents its own default as "180 days ago" — call it without a date range for a single month's channel spend and it silently averages six months of delivery into one number instead. Always pass `from`/`to` bounded to the exact period this row is reporting on.
+2. **Attributed pipeline** — Opportunities where this channel was the source (or significantly influenced, depending on model). Pulled from open-stage DEAL records via `query_crm_data` or `search_crm_objects` — the attribution-model tool below only reports closed-won, so it cannot answer this row. Sum `amount_in_home_currency`, not `amount` — on a multi-currency portal, `amount` is the deal's own currency, and summing it across deals silently mixes currencies into one meaningless total. A third HubSpot tool touches the same data but doesn't replace either: `read_campaign_data` (operation `GET_ASSET_METRICS`, `assetType: DEAL`) returns name, stage, amount and close date for every deal tied to one campaign — confirmed in its own live schema — but it takes a single `campaignCrmObjectId`, not a channel or date-range filter. Use it to sanity-check one campaign's open deals, never as a substitute for the cross-campaign `query_crm_data`/`search_crm_objects` pull this row needs.
+3. **Attributed revenue** — Closed-won revenue attributed to the channel. Pull this as the `REVENUE` metric, never `DEAL_AMOUNT`. `REVENUE` is split across touchpoints according to the attribution model, which is exactly what "attributed to the channel" means; `DEAL_AMOUNT` is the deal's full value, deduplicated per deal, and grouping it by a non-deal dimension like channel makes the same deal's full value reappear under every channel that touched it — a €50k deal touched by three channels turns into €150k of "attributed revenue" if this mistake ships in a dashboard.
 4. **CAC by channel** — Channel spend ÷ new customers attributed to channel
 5. **Payback period by channel** — CAC ÷ (ACV × gross margin ÷ 12)
 
@@ -129,11 +87,11 @@ For each active channel, calculate:
 | [Outbound sales] | | | | | |
 | Total | | | | | |
 
-**Channel efficiency signal:**
-- Payback < 12 months: scale aggressively
-- Payback 12–18 months: maintain, optimize
-- Payback 18–24 months: test and optimize before scaling
-- Payback > 24 months: cut or fundamentally restructure
+**Channel efficiency signal:** a payback number only means something next to a benchmark for the same deal size and funding stage — a flat ladder built for no one in particular is worse than no ladder. The one sourced, dated reference point: the 2026 Aleph × Benchmarkit SaaS & AI Performance Benchmarks (342 companies, FY2025 actuals) puts median B2B SaaS CAC payback at 16 months, varying by roughly 2.5x depending on the cut — by ACV, sub-€5k ≈9 months, €10–25k ≈12, €25–50k ≈14, >€250k ≈24; by funding stage, Series A 10–12 months, Series B 14–18, Series C+ 18–24. A second, larger 2026 sample confirms the same shape without moving the numbers: Optifai's report (939 B2B SaaS companies, nearly triple Aleph × Benchmarkit's) converges on the same bands — roughly 11 months under €5k ACV, 22 months at €50–100k. Worth citing alongside Aleph × Benchmarkit as a second source, not a replacement for it — neither page was opened directly this pass, both are read from search summaries. Compare each channel's payback to the band matching this company's own ACV tier and funding stage, not to one fixed number:
+- At or below the matching band: scale aggressively
+- Within the matching band: maintain, optimize
+- Up to roughly 1.5× the matching band: test and optimize before scaling
+- Beyond that: cut or fundamentally restructure
 
 **The dual-model check:** Run both first-touch and last-touch simultaneously. If first-touch says content drives 40% of pipeline and last-touch says it drives 8%, the truth lies between. Content is building awareness that other channels convert. This gap informs how to think about investment — content is top-of-funnel investment that benefits all channels downstream, not a direct-response channel.
 
@@ -141,9 +99,35 @@ For each active channel, calculate:
 
 ## Funnel Drop-Off Diagnostics
 
-Conversion rate drops at specific stages signal specific problems:
+For the drop-off diagnostic table (stage, pattern, root cause, first investigation) and the rules for reading drop-off by channel and fixing one stage at a time, read `references/funnel-stages-and-drop-off.md`.
 
-| Stage | Drop-Off Pattern | Most Common Root Cause | First Investigation |
-|-------|-----------------|----------------------|---------------------|
-| MQL → SQL | <20% conversion | MQL definition too loose, wrong ICP, marketing not qualifying | Pull last 20 MQLs that didn't convert — what disqualified them? |
-| SQL → Opportunity | <50% conversion | Discovery calls not surfacing real pain, reps not updating CRM correctly | Spot-check 5 SQL-not-converted records — what happened?
+---
+
+## Standing Attribution Report
+
+A model rebuilt by hand each quarter gets rebuilt twice and then abandoned. The deliverable is a report that runs on a fixed cadence and lands in front of whoever allocates budget.
+
+**Cadence:** monthly for channel mix decisions, quarterly for model review. Never weekly — with a sales cycle longer than 30 days, weekly attribution numbers are noise, and reacting to them produces budget whiplash.
+
+For the monthly report template and where each number comes from in Bulldozer OS (ad analytics, GA4 report templates, HubSpot attribution reports) with the seven cautions on reading them, read `references/standing-report-template-and-sources.md`.
+
+### What the report must state out loud, every month
+
+- **Which model produced these numbers**, and the one thing it structurally cannot see.
+- **The data quality line** — percentage of leads with a populated source, percentage of Closed Lost with a reason. When either drops below the thresholds in Data Requirements, the numbers above it are directional at best, and the report says so rather than implying precision it doesn't have.
+- **One decision to make**, with the amount attached. A report that ends without a budget decision to take or refuse is a dashboard, not an attribution report.
+
+---
+
+## Rules
+
+- **Pick the model your data can support, not the one that sounds sophisticated.** Multi-touch attribution on leads with 40% source coverage produces a confident wrong answer, which is worse than an admitted approximation.
+- **Never present a single number as the channel's contribution.** Give the first-touch figure and the last-touch figure; the gap is the finding.
+- **No attribution decision on fewer than 30 closed deals in the window.** Below that, channel-level differences are sampling noise. Widen the window or state that the channel is unproven.
+- **Sales-sourced pipeline is a channel.** If outbound deals fall into "direct" or "unknown", marketing gets credited for the work of the sales team and the budget goes to the wrong place.
+- **Attribution informs budget, it does not decide it.** A channel with a long payback that opens an ICP segment nothing else reaches can be worth keeping — but say it explicitly, as a decision taken against the numbers, not by hiding them.
+- **When a channel's number is revenue split across channels, never substitute the deal's full value for it.** A metric built for "value by deal" (list deals, total a campaign) and a metric built for "value by channel" look interchangeable and are not — the first repeats a multi-touch deal's full value under every channel it touched, the second splits it. Using the wrong one doesn't fail loudly; it just inflates the report.
+- **A quiet drop in one channel's attributed revenue is a CRM-hygiene question before it's a channel-performance one.** Check whether contacts are being associated with the deal late (after close) before reallocating budget away from that channel — a process change on the sales side can look exactly like the channel going cold.
+- **"The object is accessible" does not mean "the query tool can read it."** On the HubSpot connector, `query_crm_data` can fail with a missing-scope error on a DEAL object that schema discovery reports as fully available. As of October 2026 that failure comes back as a connector message naming the missing scopes and a two-step fix, not a bare scope string — reconnect the HubSpot app and explicitly check the named permissions first (none are granted by default, and this step needs no admin); only escalate to the admin if a permission shows a lock icon, meaning it's already been disabled for this app and reconnecting won't change that. Don't jump straight to "ask the admin" on the first failure — that skips a self-service step that may be all that's needed.
+- **Confirm `get_campaign_attribution_reports` actually runs before naming a model in the deliverable.** The same `marketing.campaigns.read` scope that blocks CAMPAIGN spend fields can block this call entirely — every model, not just the ones weighted toward campaign data. A scope failure and a real zero-attribution month read identically on the page; the difference only shows up if the call is made and checked. This particular call does name its missing scope — but the exact wording isn't stable: the same gap has shown up as a raw HubSpot API string (`Insufficient scope: required "marketing.campaigns.read"`) and, confirmed live this pass, as a connector message spelling out the fix (reconnect and check the permission, escalate to an admin only if it's locked). Recognize the scope name under either wording rather than matching one fixed sentence, and don't extend "this call names its scope" to a HubSpot call this skill hasn't tested — other tools in the OS fail the same kind of permission gap with a generic "ask your administrator" message that names no scope at all.
+- **Never call `bdzGetAdAnalytics` without an explicit date range.** It silently defaults to a trailing 180 days, so a call meant to answer "what did we spend this month" instead answers a six-month average, with nothing in the response flagging the substitution.

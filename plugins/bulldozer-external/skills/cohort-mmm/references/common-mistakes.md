@@ -1,0 +1,11 @@
+# Common Mistakes
+
+- **Reading one cohort's move as a trend.** A single cohort with an unusual profile (a large deal, a one-off event) will not repeat — confirm a pattern across at least two to three consecutive vintages before recommending a budget change.
+- **Survivorship bias in the retention curve.** Older cohorts often look like they retain better simply because the ones that were going to churn already have — leaving only the more durable customers in the visible curve. A retention curve that looks like it's improving with age needs the underlying cohort count checked, not just the percentage.
+- **Blending CAC across channels when channel-level spend and attribution are available.** Blended CAC hides exactly the channel-level divergence the cohort table is built to surface.
+- **Comparing cohorts of very different sizes as if they were equivalent.** A 5-customer cohort and a 200-customer cohort do not carry the same weight — say so in the table rather than plotting them on the same line without comment.
+- **Ignoring gross margin in payback and LTV math.** MRR is not profit; using revenue instead of gross profit overstates payback speed and LTV, sometimes by a wide margin depending on the business's cost structure.
+- **Treating NRR as the whole story.** A rising blended NRR driven by expansion in a shrinking number of large accounts is concentration risk, not health — check GRR and logo count alongside NRR before calling a trend positive.
+- **Projecting LTV past the cohort's own observed history.** Extrapolating a 6-month cohort out to 5 years assumes the retention curve holds — flag the assumption and show the curve it's based on rather than presenting the projected number as fact.
+- **Treating "S&M spend" as media spend only.** This is the fastest way to make every channel's payback look better than it is — sales headcount, commissions, and tooling belong in the number too. Say which version of CAC is being used every time a payback figure is reported (see Step 3).
+- **Collapsing subscription status into a binary active/churned.** `past_due`, `unpaid`, and `paused` are distinct pre-churn states, not synonyms for either end of the binary — decide and document the policy once (see Step 1), then apply it identically across every cohort in the table.

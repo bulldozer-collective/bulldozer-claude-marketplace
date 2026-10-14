@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   case-study
-description: |
-  Produce a B2B case study — customer interview guide, before/how/after narrative structure, snapshot metrics box, and a publish-ready 1500-2000 word document with multi-format variants. Triggers on 'write a case study,' 'customer success story,' 'case study template,' 'client proof document,' 'before and after story,' or 'customer story for sales.' For win/loss intelligence from buyers, see win-loss-analysis. For general copywriting, see copywriting.
-when-to-use: |
-  Produce a B2B case study — customer interview guide, before/how/after narrative structure, snapshot metrics box, and a publish-ready 1500-2000 word document with multi-format variants. Triggers on 'write a case study,' 'customer success story,' 'case study template,' 'client proof document,' 'before and after story,' or 'customer story for sales.' For win/loss intelligence from buyers, see win-loss-analysis. For general copywriting, see copywriting.
-argument-hint: |
+description: |-
+  Produce a B2B case study — customer interview guide, before/how/after narrative structure, snapshot metrics box, and a publish-ready 1000-1500 word document with multi-format variants. Triggers on 'write a case study,' 'customer success story,' 'case study template,' 'client proof document,' 'before and after story,' or 'customer story for sales.' For win/loss intelligence from buyers, see win-loss-analysis. For general copywriting, see copywriting.
+when-to-use: |-
+  Produce a B2B case study — customer interview guide, before/how/after narrative structure, snapshot metrics box, and a publish-ready 1000-1500 word document with multi-format variants. Triggers on 'write a case study,' 'customer success story,' 'case study template,' 'client proof document,' 'before and after story,' or 'customer story for sales.' For win/loss intelligence from buyers, see win-loss-analysis. For general copywriting, see copywriting.
+argument-hint: |-
   SaaS company, customer reduced time-to-publish from 3 weeks to 2 days using our CMS. Customer is happy to be quoted, happy to share metrics, CMO and Head of Content both involved in the decision. Want a case study to use on the website and in sales d
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -28,9 +28,37 @@ You are a Bulldozer strategist producing a customer case study. Your job is to d
 
 ## Output
 
-A `case-study-{customer}-{date}.md` file with: interview guide (ready to send), snapshot metrics box, and the full case study in Problem → How → Results structure (1500-2000 words). Optionally: a 200-word excerpt for sales decks and a LinkedIn post variant.
+A `case-study-{customer}-{date}.md` file with: interview guide (ready to send), snapshot metrics box, and the full case study in Problem → How → Results structure (1000-1500 words — the story sets the length, not a target to hit; a simple single-stakeholder win can land at the low end, a multi-stakeholder enterprise rollout at the high end). Optionally: a 200-word excerpt for sales decks and a LinkedIn post variant.
 
 **Produce the interview guide immediately. Write the case study once interview data is available or from context provided.**
+
+---
+
+## Check Bulldozer OS Before You Schedule Anything
+
+Two things worth confirming against real data before the interview goes on anyone's calendar:
+
+**Is the timing claim real, or a guess?** The "3–6 months post-implementation" criterion below
+only works against an actual date. Pull the deal's `closedate` and `hs_is_closed_won` from
+HubSpot rather than estimating "about six months ago" — and scope the check to the pipeline
+this deal actually closed in. HubSpot portals commonly run several deal pipelines side by side,
+each with its own stages, so "closed won" in one pipeline doesn't carry the same timeline or
+meaning as in another.
+
+**Was the story already recorded?** A case-study-worthy quote is often already sitting in a
+call nobody flagged for this — a QBR, a renewal, a check-in. `bdzListWorkspaceLinks` (filtered
+to Claap links) takes only a `workspaceId`, not a project — a Bulldozer workspace belongs to
+the customer, shared across every project that customer runs, not scoped to the one in front of
+you. Two consequences, in opposite directions. First, attachment isn't automatic: a project can
+hold real customer calls in Claap that were never linked, so an empty result here doesn't mean
+nothing exists — search Claap directly by company or deal before concluding a fresh interview is
+needed. Second, a non-empty result can just as easily surface a recording from a *different*
+project or deal of the same customer — check the link's name, description, or Claap URL before
+citing its transcript as evidence for the customer this case study is actually about. Once a
+link exists, `bdzGetWorkspaceLinkTranscript` returns the transcript (status is PENDING until
+Claap delivers it, retried hourly) — useful for the customer's verbatim before-state language,
+though it still needs a human read for tone: Claap's own tagging surfaces objections and pain
+points, not case-study narrative.
 
 ---
 
@@ -48,65 +76,66 @@ The three failure modes that make case studies useless in a sales process:
 
 ## Customer Selection Criteria
 
+**If this is the third or fourth customer in a row that fails this table** — nobody has a
+measurable result, nobody has a real before-state to point to — stop treating it as a sourcing
+problem and start treating it as a positioning problem. A product without a differentiated,
+recognized promise produces customers who can't say what changed, because nothing distinct
+happened for them to notice. No amount of interview skill fixes that; it's a signal to route
+back to positioning work, not to lower the bar on which customers count as case-study material.
+
 Before running the interview, confirm the customer meets these criteria:
 
 | Criterion | Why it matters |
 |-----------|----------------|
 | Measurable result (at least 2–3 metrics) | Without numbers, the case study is a testimonial at best |
 | Clear before state (what was broken) | Contrast creates the narrative. No before = no story |
-| Champion willing to be named and quoted | Anonymized case studies convert at 40-60% of named ones |
+| Champion willing to be named and quoted | A named, recognizable company gives a rep something to point to — real leverage when the brand is known. But don't treat anonymized as a consolation prize by default: the trust gap is narrower than it looks once the story is specific enough (see below) |
 | Decision-maker relationship | The economic buyer's quote closes deals; the champion's quote opens conversations |
 | 3–6 months post-implementation | Long enough for results, fresh enough for recall |
 
+**A champion-only relationship is a sales signal, not just a case-study gap.** The champion
+drives a deal forward internally; only the economic buyer can kill it or sign it. If the account
+team never once got the economic buyer on a call across the entire deal cycle — not just for
+this interview, for the whole relationship — that's a single-threaded account, and it's worth
+flagging back to the rep as a retention risk independent of whether the case study gets written.
+Don't manufacture a buyer-side quote to paper over it, and don't treat the gap as this skill's
+problem to solve. A cheap way to check before ever picking up the phone: HubSpot's deal record
+carries `num_associated_contacts`, auto-filled by the CRM — a closed-won deal sitting at 1 after
+several months in pipeline is the single-threading signal in numeric form, worth a look before
+scheduling the interview at all. Where more than one contact is associated, `hs_buying_role`
+(a native Contact field, multi-select — Champion, Decision Maker, Budget Holder, Executive
+Sponsor, and five others) says in one lookup whether any of them is actually tagged past
+Champion, rather than counting contacts blind. It lives on the Contact, not the deal — a contact
+active on two deals can't carry a different role on each — so on an account with several deals
+in flight, confirm the role was set for *this* deal's relationship (the Contact:Deal association
+label, or Buying Groups on Sales Hub, is what scopes it there) before treating an absent role as
+"no economic buyer relationship exists" rather than "nobody logged it."
+
 **Who not to approach:** Customers currently in renewal negotiations, customers on a performance improvement plan, customers whose champion left the company, any deal where the relationship with the rep ended badly.
+
+**When anonymized is still worth writing.** Refusing to write anything without a name goes too
+far the other way, and the trust gap is narrower than most marketers assume: a 2025 survey of
+811 B2B buyers, sellers, and marketers (UserEvidence, "The Evidence Gap Report") found buyers
+trust an anonymous-but-*independently-verified* testimonial almost as much as a named one — 60%
+versus 64%. That "verified" is doing real work in their number: a trusted third party confirming
+the customer and the result are real, not just a story dressed up as anonymous. The same report
+found trust drops to 44% for an anonymous story with no such verification — the near-parity is
+earned by the verification, not by anonymity itself, which is exactly why the specificity below
+(metrics, before-state) has to carry the trust-building work a verification badge would otherwise
+do. Anonymized is worth the interview when the metrics and before-state are
+specific enough on their own that a prospect in the same situation still recognizes themselves
+— industry, company size, and the shape of the problem carry the recognition instead of the
+logo. It stops being worth it when the story is *also* thin: a modest, unremarkable result with
+no name attached has nothing left to make it land. And when the customer is a brand a prospect
+would actually recognize, don't settle for anonymous on the first no — that recognition is
+doing real work, worth a second ask (legal review, a narrower quote-only approval) before
+downgrading the format.
 
 ---
 
 ## Interview Guide
 
-**Scheduling:** 45 minutes. Tell them the process upfront: you handle all the writing, they approve before anything publishes. The case study takes 45 minutes of their time total. Most refusals come from people expecting to write something themselves.
-
-**Recording:** Always record with permission. Verbatim quotes from the transcript are the highest-trust elements of any case study. Paraphrased quotes convert worse because they read like marketing copy.
-
----
-
-### Interview Script
-
-**Opening (5 min):**
-"Thanks for doing this. To set expectations: I'll handle all the writing, I'll send you a draft for review before anything goes live, and nothing publishes without your sign-off. The goal is to tell your story accurately so other companies in your situation can see what's possible. Let me start with some context."
-
-**Company and role (5 min):**
-- "Tell me a bit about [company] — what do you do, who do you serve, and roughly what size is the team?"
-- "What's your role, and what were you responsible for when this project started?"
-
-**The before state (10 min):**
-- "Walk me through what the situation looked like before you started using [product]. What was the specific problem you were trying to solve?"
-- "Can you put a number on it? How many hours, how many people, how much was it costing?"
-- "What had you tried before? What didn't work and why?"
-- "How was this problem affecting your team day-to-day? What did it feel like?"
-- "What finally made you decide to look for a solution at that point, rather than earlier?"
-
-**The decision (5 min):**
-- "What other options did you evaluate? What else was on the shortlist?"
-- "What specifically made you choose [product] over the alternatives?"
-- "Was there a moment when the decision became clear? What happened?"
-
-**Implementation (5 min):**
-- "Walk me through how you got started. How long did it take to be up and running?"
-- "Were there any surprises — positive or negative — during implementation?"
-- "What support did you need? Who from your team was involved?"
-
-**Results (10 min):**
-- "What's changed since you started using [product]? What's the most significant result you can point to?"
-- "Can you give me specific numbers?" *(Pause and wait. Do not fill the silence.)*
-- "In what time frame did you see those results?"
-- "What's the biggest 'I didn't expect that' moment you had?"
-- "How has this changed your team's day-to-day? What are they spending that recovered time on now?"
-
-**Closing (5 min):**
-- "If you were talking to someone in your exact situation 12 months ago, considering whether to do what you did — what would you tell them?"
-- "What would you tell them to watch out for?"
-- "Is there anything I haven't asked that you think is important for us to capture?"
+For the interview scheduling rules and the full interview script (opening promise, question sequence, closing question), read `references/interview-guide.md` before running or preparing the interview.
 
 ---
 
@@ -116,71 +145,35 @@ Before running the interview, confirm the customer meets these criteria:
 
 ---
 
-### 1. Headline + Snapshot Box
-
-The headline leads with the result: *"How [Customer] Cut Invoice Processing Time by 94%"* — not *"[Customer] Partners with [Company] to Transform Operations."*
-
-The snapshot box appears immediately below the headline, before the narrative begins. It travels when the case study gets forwarded in Slack.
-
-```
-┌─────────────────────────────────────────────────┐
-│  [Customer Company]                              │
-│  Industry: [X] · Size: [Y employees]            │
-├─────────────────────────────────────────────────┤
-│  94%  reduction in processing time              │
-│  $127K  saved in first 12 months                │
-│  2 days  to full implementation                 │
-└─────────────────────────────────────────────────┘
-```
-
-Three metrics maximum. The first is the headline metric (most impressive). The second is financial (gives CFOs a number). The third is ease-of-adoption (handles the "is this realistic for us?" objection).
+For the section-by-section structure — 1. Headline + Snapshot Box, 2. The Problem, 3. How They Did It, 4. The Results (with word counts), 5. Pull Quotes — and the format variants derived from the approved long-form version, read `references/case-study-structure.md` before drafting.
 
 ---
 
-### 2. The Problem (300-400 words)
+## Rules
 
-Describe the before state in the customer's words, not yours. The goal: the ideal prospect reads this section and thinks *"that's exactly what we're dealing with."*
-
-Structure:
-- Company context (2 sentences — industry, size, what they do)
-- The specific situation before: what was broken, how broken, in what numbers
-- What they'd tried: previous attempts, why they failed
-- The tipping point: what made them start looking for a solution at that particular moment
-- At least one direct quote from the customer about how the problem felt
-
-**Anti-pattern to avoid:** Describing the problem in vendor language. "They lacked visibility into their operational metrics" is vendor language. "Every Monday morning, the ops team spent 4 hours pulling numbers from three different spreadsheets just to answer a question the CEO asked the week before" is customer language.
-
----
-
-### 3. How They Did It (300-400 words)
-
-Not a product brochure. The customer is the protagonist — your product is the vehicle.
-
-Structure:
-- Why they chose this solution (what tipped the decision, what the evaluation process was)
-- How they got started (implementation timeline, who was involved, what was harder or easier than expected)
-- How they use it now (specific workflows, specific features used by name — not "they used the platform" but "they used the Rules Engine to automate X")
-- Adoption experience (did the team embrace it? was there resistance? how was it handled?)
-
-**Objection handling opportunity:** Implementation, change management, and user adoption are the three fears every buyer carries. Address all three here, directly and honestly. "Implementation took 2 weeks, not the 1 week we hoped for, because we had 5 years of legacy data to migrate" is more credible than "seamless implementation."
-
----
-
-### 4. The Results (400-500 words)
-
-Lead with the most impressive metric. Then layer.
-
-Structure:
-- Headline metric (with timeframe)
-- Secondary metrics (financial, team, customer impact)
-- Quote from the economic buyer (not just the champion)
-- The compound effect: what is the team doing with the recovered time/money?
-- What's next: how they plan to expand or build on what they've accomplished
-
-**The "what's next" close:** Ending a case study with a forward-looking statement signals momentum — this isn't a one-time fix but a compounding investment. It also handles the "will this still work 12 months from now?" objection implicitly.
-
----
-
-### 5. Pull Quotes
-
-Extract 2–3 strong quotes from the transcript and format them as pull quotes 
+- **Nothing publishes without written customer sign-off.** The interview script's opening
+  promise — "nothing goes live without your approval" — is the one line in this whole process
+  that cannot bend for a deadline.
+- **No numbers, no case study.** If the customer won't share at least one hard metric, this is
+  a testimonial, not a case study — write it as one, or don't approach that customer for this
+  format at all.
+- **The economic buyer's quote is what closes, not the champion's.** If only the champion is
+  available for interview, get their best material and flag in the draft that a buyer-side
+  quote is missing — don't manufacture one to fill the gap.
+- **A case study is a real customer, full stop.** No composite customer built from several
+  accounts, no AI-generated stand-in presented as if they were quoted, no synthesized "typical
+  result" dressed up as a specific one — a buyer who catches one fake number stops trusting
+  every other one in the document. This isn't a US-only risk: the FTC's ban on fake
+  AI-generated testimonials has been enforced since October 2024, and in the EU the AI Act's
+  transparency obligations for AI-generated content (Article 50, in force since August 2026,
+  fines up to €15M or 3% of global turnover) treat a fabricated testimonial paired with
+  AI-generated imagery as high-risk consumer deception even when labeled "AI-generated." Write
+  for whichever jurisdiction the customer sits in — only the enforcement body changes, not the
+  rule against fabricating.
+- **One case study, one set of source material.** Every format variant traces back to the same
+  approved transcript and long-form draft. If a new claim shows up in the LinkedIn version
+  that isn't in the approved case study, it hasn't been approved — cut it or send it back for
+  sign-off.
+- **A case study that reads like a product brochure has failed**, regardless of how accurate
+  it is. If the customer's voice disappears for more than a paragraph at a time, rewrite from
+  the transcript, not from the previous draft.

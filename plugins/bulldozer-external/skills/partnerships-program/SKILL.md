@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   partnerships-program
-description: |
+description: |-
   Design and launch a B2B partnerships program — partner type selection, deal economics, standard terms, deal registration, enablement, operating cadence, and 12-month ramp. Triggers on 'partnerships program,' 'partner channel,' 'build a partner program,' 'reseller program,' 'referral program,' 'co-sell motion,' 'channel partners,' or 'we want partnerships to drive revenue.' For affiliate programs specifically, see affiliate-program. For co-marketing motions, see co-marketing.
-when-to-use: |
+when-to-use: |-
   Design and launch a B2B partnerships program — partner type selection, deal economics, standard terms, deal registration, enablement, operating cadence, and 12-month ramp. Triggers on 'partnerships program,' 'partner channel,' 'build a partner program,' 'reseller program,' 'referral program,' 'co-sell motion,' 'channel partners,' or 'we want partnerships to drive revenue.' For affiliate programs specifically, see affiliate-program. For co-marketing motions, see co-marketing.
-argument-hint: |
+argument-hint: |-
   B2B SaaS, €8M ARR, proven repeatable sales playbook — want to launch a referral + co-sell partner motion targeting digital agencies and complementary SaaS vendors, targeting 20% of ARR from partners in 18 months
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -47,6 +47,13 @@ Before designing the program, verify these prerequisites are met. If they're not
 
 **If prerequisites aren't met:** Build the sales playbook first. Partners amplify what's already working — they don't fix what isn't.
 
+**Decline these partners even when the checklist above is met — they cost the same onboarding hours as a good fit and produce none of the pipeline:**
+- A prospective partner who asks for exclusivity (territory, vertical, or "first right of refusal") before they've registered a single deal. Exclusivity is earned by producing, not negotiated on the way in — see Step 3.
+- A partner whose customer base only nominally overlaps your ICP ("we have some clients who might fit"). A logo on the partner page from a non-overlapping base is a vanity signature, not a pipeline source.
+- A partner who wants to be listed without committing a named person and a certification timeline on their side. If nobody is accountable for selling you, nobody will.
+
+This is the same discipline as the prerequisites checklist, applied partner by partner instead of once at program launch — a partnerships motion that signs everyone who's willing dilutes the team's support capacity across partners who were never going to produce.
+
 ---
 
 ## Step 1: Partnership Thesis
@@ -61,22 +68,13 @@ Not "partnerships are good for us" — that's a hope, not a thesis.
 **The thesis also answers:**
 - What portion of resources (sales ops, marketing, CS) are we prepared to allocate to support partners? (Rule of thumb: if you want 20% of revenue from partners, allocate 20% of relevant cross-functional resources.)
 - What type of partner leader does this thesis require? A co-sell motion builder is a different person than a marketplace/integration builder.
+- What are we choosing *not* to do with that budget? The real comparison for a partnerships investment is rarely a competitor's channel program — it's what the same headcount and MDF budget would produce as one or two more direct AEs. If the thesis can't say why a dollar in partner enablement outperforms a dollar in direct pipeline at the current stage, it isn't ready to fund.
 
 ---
 
 ## Step 2: Partner Type Selection
 
-**Selection framework:**
-
-| Factor | Referral | Reseller | Technology (Integration) | SI / Agency |
-|--------|---------|---------|--------------------------|------------|
-| ACV required | Any | >€5K | Any | >€15K |
-| Product complexity | Low | Low-Medium | Medium | High |
-| Sales cycle to support | Short | Medium | Varies | Long |
-| Setup investment | €5K–20K | €30K–80K | €30K–100K (eng) | €50K–150K |
-| Time to first deal | 1–3 months | 6–12 months | 3–9 months | 6–18 months |
-| Deal control | You close | Partner closes | Indirect | Partner leads |
-| Commission structure | 10–25% one-time | 20–40% recurring | Revenue share varies | 15–30% + implementation |
+For the selection framework table (referral / reseller / technology / SI-agency by ACV, complexity, setup, time to first deal, commission) and its caveat, read `references/partner-type-and-terms.md`.
 
 **Recommended starting point for most B2B SaaS:**
 
@@ -95,31 +93,7 @@ Start with referral partners. Build the referral motion first: prove that third-
 
 The worst outcome: signing two flagship partners with bespoke negotiated terms, then trying to retrofit a program. Every subsequent partner negotiates from a different starting point, your sales team can't predict what they get when they bring a partner deal, and your finance team has a reconciliation nightmare.
 
-**Standard term categories:**
-
-**Revenue share:**
-- Referral (introduction + step back): 10–15% of first-year contract value, paid once within 30 days of customer first payment
-- Referral (stays involved in deal): 15–25% of first-year contract value
-- Reseller (manages full sales cycle): 20–40% recurring margin on deals they source and close (not co-sell deals)
-- Co-sell (partner assists, you close): 10–15% of first-year contract value
-
-**MDF (Market Development Funds):**
-- Budget 1–3% of partner-sourced revenue annually
-- Require a quarterly plan with measurable conversion path before releasing funds
-- Use tranche release: 50% upfront on plan approval, 50% on execution milestones + pipeline evidence
-- Never release MDF for "events" without a clear lead generation and follow-up plan attached
-
-**Deal registration:**
-- First-to-register wins (no duplicate protection on unregistered deals)
-- Registration requires minimum information: target account name, qualified contact, use case/trigger, dated next step
-- Protection window: 90 days for mid-market, 180 days for enterprise
-- Renewal requires evidence of progress (meeting held or MAP milestone completed)
-- Registration decision within 48 hours of submission — slow approvals kill partner motivation
-
-**Term length:**
-- Standard: 1-year agreement, auto-renewing
-- Termination: 90-day notice (ensures deals in flight complete properly)
-- Non-compete clause: typically waived for referral, required for exclusive reseller arrangements
+For the standard term categories (revenue share, MDF, deal registration, term length, exclusivity, AE compensation on partner-sourced deals) and the ranges caveat, read `references/partner-type-and-terms.md`.
 
 ---
 
@@ -129,21 +103,7 @@ Avoid tiers until you have 10+ active partners. Before that, tiers are administr
 
 Once you have 10+ partners, design tiers around **productive behaviors that predict revenue** — not vanity metrics:
 
-**Tier criteria (assign weights):**
-- Partner-sourced qualified pipeline (last 12 months) — 40%
-- Closed-won revenue from partner deals (last 12 months) — 30%
-- Active certifications (sales + product) — 15%
-- Joint customer satisfaction on partner-managed accounts — 15%
-
-**Never tier on:** Training completions without evidence of selling, number of registered employees, events attended, or other inputs with no output correlation.
-
-**Tier benefits (make benefits reduce cost to sell, not just signal status):**
-
-| Tier | Benefits |
-|------|---------|
-| **Gold** (top 20% by pipeline + revenue) | Dedicated partner success manager, prioritized SE support for joint deals, co-marketing budget, fast-track deal registration (24h), access to roadmap briefings |
-| **Silver** (next 30%) | Pooled partner success team, standard SE support, deal registration (48h), joint case study eligibility |
-| **Bronze** (remainder) | Self-serve portal access, standard deal registration (72h), quarterly webinar updates |
+For the tier criteria and weights, what never to tier on, tier benefits and offboarding, read `references/tiering-and-deal-registration.md`.
 
 ---
 
@@ -151,23 +111,7 @@ Once you have 10+ partners, design tiers around **productive behaviors that pred
 
 **Deal registration is the mechanism that protects partner investment while preserving your ability to manage quality.**
 
-**Partner submission (required fields):**
-1. Target account name and website
-2. Primary contact: name, title, email
-3. Use case or trigger (what problem / what prompted them to look)
-4. Dated next step (meeting scheduled, intro agreed — not "plan to reach out")
-5. Partner's role in the deal (referral only, or staying involved)
-
-**Your team's review process (48-hour SLA):**
-- Verify account is not in existing direct pipeline or CRM
-- Verify contact is not already in an active conversation with your sales team
-- Confirm account fits ICP criteria
-- Approve or reject with explanation
-
-**Conflict resolution rules:**
-- Partner-registered deal vs. direct prospect already in pipeline: notify partner, honor existing direct relationship, offer goodwill gesture (MDF credit)
-- Two partners register the same account: first-to-register wins, notify second partner within 24 hours
-- Partner-registered deal where you initiated the contact first: your deal, partner receives nothing — communicate this clearly in the program agreement to prevent disputes
+For the required submission fields, the 48-hour review process, the source-tag test and conflict resolution rules, read `references/tiering-and-deal-registration.md`.
 
 ---
 
@@ -175,10 +119,47 @@ Once you have 10+ partners, design tiers around **productive behaviors that pred
 
 **Partners can only sell what they understand.** Enablement is not a one-day orientation — it's the ongoing program that keeps partners current as your product and competitive landscape evolve.
 
-**Enablement curriculum (certification required before first deal registration):**
+For the certification curriculum (levels, content, duration, gate) and recertification, read `references/enablement-and-operating-cadence.md`.
 
-| Level | Content | Duration | Gate |
-|-------|---------|----------|------|
-| **Certified partner** | Product overview, ICP definition, qualification framework, demo (basic) | 4–6 hours async + 1 live session | Quiz + mock discovery call with partner success team |
-| **Advanced partner** | Competitive positioning, full demo, objection handling, QBR framework | Additional 4 hours + 2 live sessions | Live deal review with partner success team |
-| **Joint sales certified** | Full co-sell motion, 
+---
+
+## Step 7: 12-Month Ramp Plan
+
+**The ramp plan exists because "we launched the program" is not the same as "the program produces revenue."** Most B2B SaaS partner programs take 6 to 12 months to reach meaningful revenue — the plan below sequences the work so that gap is deliberate, not a surprise the leadership team discovers in month 9.
+
+| Quarter | Focus | Milestones | Exit signal |
+|---------|-------|-----------|-------------|
+| **Q1** | Foundation | Standard terms signed off internally, deal registration process live, first 5–10 partners recruited by invitation (not open sign-up), enablement curriculum built | Terms, tracking, and first cohort exist before any partner is asked to sell |
+| **Q2** | First signatures and first deals | First cohort certified, first deals registered, first partner-sourced meeting held | At least one partner has registered a real, dated deal — not a hypothetical account |
+| **Q3** | Prove the motion | First partner-sourced deals close, conversion rate from registered deal to closed-won is measurable, enablement gaps surfaced in Q2 are fixed | You can state a real number for "partner-sourced deals that closed," not an estimate |
+| **Q4** | Scale what worked | Tiering activated (once 10+ active partners exist), MDF program opens for top performers, recruitment expands past the invited cohort using what worked in Q1–Q3 | The motion that produced Q3's closed deals is repeatable with a second cohort, not dependent on the first partners' individual relationships |
+
+**The signal to watch inside each quarter is time-to-first-deal, not headcount of signed partners.** A partner who registers a first real deal within roughly 90 days of certification is the partner worth investing further enablement time in. A partner who is still "getting ramped up" past that window with no registered deal rarely becomes productive later — the fix is a direct conversation about fit, not more training.
+
+*The 90-day mark is a directional figure repeated across 2026 partner-tech vendor content, not a number from an audited, named study — treat it as a starting point to calibrate against your own first cohort's actual data, not a deadline to defend in a board deck. Be equally skeptical of newer, more precise-looking partner-program stats circulating in 2026 (specific active-seller-rate percentages tied to "automated enablement," revenue multipliers): they trace to the same kind of vendor content, dressed up with a real-sounding report name attached after the fact.*
+
+**If Q2 produces signed partners but zero registered deals, stop recruiting and fix enablement or targeting before adding more partners.** Adding partners on top of a broken first step multiplies the same failure instead of fixing it.
+
+---
+
+## Step 8: Operating Cadence
+
+**A partnerships program that only meets when something is wrong will only ever discuss what's wrong.** Set the cadence before the first partner is live, at four levels — each with a different audience and a different question to answer:
+
+For the cadence table (weekly, monthly, QBR, renewal), internal reporting and how to track deal registration and partner-sourced pipeline in the CRM, read `references/enablement-and-operating-cadence.md`.
+
+---
+
+## Rules
+
+- **Never build the program before the prerequisites in this document are met.** Partners amplify a working direct motion; they don't build one for you.
+- **Never negotiate bespoke terms for the first partners and try to standardize later.** Every partner after that negotiates from a different starting point, and finance inherits the reconciliation problem permanently.
+- **Never open public partner sign-up before the invited cohort has proven the motion.** Recruitment scales what already works — it doesn't discover what works.
+- **Never add a tier system before 10+ active partners exist.** Tiers are overhead on a program that hasn't proven it needs administration.
+- **Never let deal registration approvals sit past the SLA.** A partner who waits a week for a yes/no stops registering deals.
+- **Never keep recruiting past Q2 if the first cohort has zero registered deals.** Fix enablement or targeting first — more partners will not fix a broken first step.
+- **Never run partner pipeline review as a meeting separate from the regular sales pipeline review.** What isn't on the same dashboard as direct revenue gets deprioritized under pressure.
+- **Never assume the CRM already has a field for partner attribution.** Verify the property exists before designing deal registration around it.
+- **Never grant exclusivity to a partner who hasn't closed a deal through the standard process.** Exclusivity is earned by producing pipeline, not negotiated on the way in.
+- **Never let an AE and a partner both get paid full rate on the same deal without a decision made in advance.** Decide the commission split before the first partner-sourced deal closes, not after an AE notices.
+- **Never carry a partner past a second consecutive below-bar QBR on hope alone.** If the fix agreed at the first QBR was actually delivered and pipeline still didn't move, offboard gracefully — don't wait for a third chance to confirm what the second one already showed.

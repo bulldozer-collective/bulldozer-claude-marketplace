@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   affiliate-program
-description: |
-  Design and launch a B2B SaaS affiliate program — commission model selection, attribution window calibration to sales cycle length, partner type segmentation (content / consulting / agency / customer advocates), tracking platform requirements, launch sequencing, and governance rules. Triggers on 'affiliate program,' 'referral program,' 'build an affiliate channel,' 'partner commissions,' 'affiliate tracking,' 'how should we pay affiliates,' or 'we want to add affiliates.' For broader partnership strategy, see partnerships-program.
-when-to-use: |
-  Design and launch a B2B SaaS affiliate program — commission model selection, attribution window calibration to sales cycle length, partner type segmentation (content / consulting / agency / customer advocates), tracking platform requirements, launch sequencing, and governance rules. Triggers on 'affiliate program,' 'referral program,' 'build an affiliate channel,' 'partner commissions,' 'affiliate tracking,' 'how should we pay affiliates,' or 'we want to add affiliates.' For broader partnership strategy, see partnerships-program.
-argument-hint: |
+description: |-
+  Design and launch a paid B2B SaaS affiliate/partner program — commission model selection, attribution window calibration to sales cycle length, partner type segmentation (content / consulting / agency / customer advocates), tracking platform requirements, launch sequencing, and governance rules. Triggers on 'affiliate program,' 'build an affiliate channel,' 'partner commissions,' 'affiliate tracking,' 'how should we pay affiliates,' or 'we want to add affiliates.' For a simple customer-referral loop with no external partner network to manage, see referral-program instead. For broader (non-commission) partnership strategy, see partnerships-program.
+when-to-use: |-
+  Design and launch a paid B2B SaaS affiliate/partner program — commission model selection, attribution window calibration to sales cycle length, partner type segmentation (content / consulting / agency / customer advocates), tracking platform requirements, launch sequencing, and governance rules. Triggers on 'affiliate program,' 'build an affiliate channel,' 'partner commissions,' 'affiliate tracking,' 'how should we pay affiliates,' or 'we want to add affiliates.' For a simple customer-referral loop with no external partner network to manage, see referral-program instead. For broader (non-commission) partnership strategy, see partnerships-program.
+argument-hint: |-
   Series A SaaS, €8K ACV, 3-month average sales cycle, no existing affiliate program. Target: 10–15% of new ARR from affiliate channel within 12 months. ICP: RevOps and sales leaders. Best partners: consultants and agencies who serve those buyers.
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -31,6 +31,18 @@ You are a Bulldozer partnerships operator designing a B2B affiliate program. You
 A `affiliate-program-{company}.md` file with: commission model recommendation with economic rationale, attribution window calibration, partner type definitions and tier structure, tracking platform selection, partner portal requirements, recruitment sequence, and governance rules. Produces a ready-to-launch program spec.
 
 **Produce on first invocation. Define commission structure and attribution window before recruitment. Recruiting partners into a program with a 30-day cookie and mid-cycle ACV deals is setting them up to fail.**
+
+---
+
+## Before You Build This
+
+A paid affiliate program is the wrong tool in three recurring situations — say so instead of producing a spec that will misfire:
+
+- **No retention data yet.** Recurring-share commissions and the clawback window (Step 1) are calibrated against how long a customer actually stays. Pre-PMF, or with fewer than a handful of cohorts past their first renewal, there is nothing real to calibrate against — any number written down is a guess wearing a spreadsheet. Fix that first, or launch with a flat one-time bounty and revisit the model once retention is observed.
+- **A single enterprise-only motion.** A company closing a handful of $50K+ deals a year through a small, named enterprise sales team doesn't have the deal volume to make a scaled, self-serve affiliate program worth the tracking and governance overhead (Steps 4–6). A short list of named strategic partners is a partnerships-program problem, not an affiliate-program one.
+- **A pure customer-referral ask.** "Customers referring customers" with no consultants, agencies, or content partners to recruit is `referral-program` — simpler mechanics, no tiered commission, no deal registration.
+
+If none of these apply, proceed.
 
 ---
 
@@ -68,7 +80,7 @@ The tier structure self-segments: your best partners identify themselves by perf
 
 **This is the structural decision that determines whether your affiliates trust your program.**
 
-If your attribution window is shorter than your actual sales cycle, you are systematically underpaying partners who influence deals that take longer than the window to close. One SaaS company that extended its window from 30 to 45 days — after discovering its actual average sales cycle was 38 days — reported a 22% increase in affiliate-attributed revenue the following quarter. They weren't getting more deals; they were crediting deals that had already been happening uncredited.
+If your attribution window is shorter than your actual sales cycle, you are systematically underpaying partners who influence deals that take longer than the window to close — not because fewer deals are happening, but because deals that were already closing are landing outside the window and going uncredited. Most affiliate programs across all categories still default to windows well under 60 days, which is a fine default for impulse or self-serve purchases and a bad one for anything with a multi-touch sales process; the fix is to measure the actual sales cycle first (Step 1 data, not the platform's default) and set the window to match it.
 
 **Attribution window by sales cycle:**
 
@@ -81,41 +93,13 @@ If your attribution window is shorter than your actual sales cycle, you are syst
 
 **For enterprise deals:** Click-based attribution is insufficient. Any deal with a sales cycle longer than 90 days needs a manual referral registration mechanism — the affiliate submits the company name and contact before the deal enters your CRM. The first-registered affiliate holds the deal, not the last-click.
 
-**Multi-touch attribution for B2B (best practice):** Use position-based attribution — 40% credit to first-touch affiliate, 40% to last-touch, 20% split across middle touchpoints. This rewards both discovery (affiliate who introduced the product) and conversion (affiliate who closed the final objection) rather than pure last-click, which disadvantages long-cycle referrers.
+**Multi-touch attribution for B2B (best practice):** Use position-based attribution, which rewards both discovery (the affiliate who introduced the product) and conversion (the affiliate who closed the final objection) rather than pure last-click, which disadvantages long-cycle referrers. If the CRM is HubSpot, this is a named native option: Marketing Hub's attribution reporting exposes it as the `U_SHAPED` model, selectable without building a manual weighting by hand. Treat the commonly-cited 40% first-touch / 40% last-touch / 20% middle-touch split as the general shape of position-based attribution, not as HubSpot's own documented weighting — HubSpot's own tool guidance names its eight attribution models (`U_SHAPED` among them) without publishing their internal weights, and the 40/20/40 figure traces only to third-party blogs, never a primary HubSpot source.
 
 ---
 
 ## Step 3: Partner Type Definitions
 
-**Not all affiliates are equal.** B2B affiliate programs segment partners by trust level, deal influence, and expected conversion quality. One-size-fits-all commission structures overpay low-quality partners and underpay high-value ones.
-
-**Partner Type 1: Consultants and Advisors**
-Who they are: Independent consultants who advise your ICP buyers on tooling, process, or strategy. They make product recommendations as part of their client work.
-Why they convert: Buyers trust advisor recommendations. A consultant who says "you need this tool" produces a qualified, motivated buyer — not a lead who needs to be educated.
-Commission: Higher rate (25–30%) or custom, because conversion quality is higher.
-Attribution: Require deal registration (consultant submits company + contact name before the deal enters pipeline).
-Volume expectation: Low volume, very high quality.
-
-**Partner Type 2: Agencies**
-Who they are: Agencies serving your ICP who use your product in client delivery or recommend it as part of their tech stack advisory.
-Why they convert: Agencies can influence entire client portfolios — one agency relationship can produce 5–15 referrals over 12 months.
-Commission: Recurring share (agencies have a recurring incentive to send clients who stay).
-Attribution: Agency-specific referral link + deal registration for enterprise clients.
-Volume expectation: Medium volume, high quality when the agency is ICP-aligned.
-
-**Partner Type 3: Content Publishers and Review Sites**
-Who they are: B2B comparison sites (G2, Capterra, TrustRadius), category newsletters, YouTube reviewers, and bloggers who rank for "[your category] tools" or "best [category] software."
-Why they convert: These affiliates reach buyers in active research mode. A review post ranking for "[your product] vs [competitor]" intercepts a high-intent buyer mid-decision.
-Commission: Standard rate (20–25%) — high volume but variable quality.
-Attribution: Standard click-through + 90-day cookie window.
-Volume expectation: Highest volume, variable quality (lower than advisor/agency).
-
-**Partner Type 4: Customer Advocates**
-Who they are: Existing customers who refer peers at other companies.
-Why they convert: Peer recommendations convert at the highest rate of any referral source in B2B — buyers trust peers who've already implemented the solution.
-Commission: Consider non-cash rewards (account credits, feature access, gift cards) rather than cash to keep them feeling like advocates rather than salespeople.
-Attribution: Unique referral link per customer, shorter cookie window acceptable (30 days) because these leads are already warm and move faster.
-Volume expectation: Low-medium volume, highest conversion rate.
+For the four partner types (consultants and advisors, agencies, content publishers and review sites, customer advocates) with who they are, why they convert, commission, attribution and volume expectation, read `references/partner-types.md`.
 
 ---
 
@@ -123,24 +107,52 @@ Volume expectation: Low-medium volume, highest conversion rate.
 
 **Choose tracking platform at launch. Manual tracking breaks at 20 affiliates and becomes unmanageable at 50.**
 
-**Required capabilities for B2B SaaS:**
-- Recurring-revenue commission engine (calculates monthly commission based on customer billing events, not one-time conversions)
-- Long attribution windows: configurable from 30 to 365+ days per deal type
-- Subscription-event integration with billing platform (Stripe, Chargebee, Recurly) — commission triggers on payment, not on form fill
-- Manual deal registration: affiliate can submit company + contact name for enterprise deals outside click-window
-- Partner portal: affiliate sees their links, clicks, conversions, and payout status without contacting your team
-- Fraud detection: identify self-referrals, suspicious traffic patterns, cookie stuffing
-- CRM integration: affiliate deal registration syncs to HubSpot/Salesforce so sales team sees referral source
-
-**Platform options by stage:**
-- Pre-product-market-fit / first 10 partners: Rewardful or PartnerStack Starter — quick to set up, Stripe-native, sufficient for simple recurring commission
-- 10–100 partners (growth stage): PartnerStack or Impact.com — multi-currency, more partner type configuration, stronger analytics
-- 100+ partners / complex program: Impact.com, Partnerize, or TUNE — enterprise attribution, multi-tier, deep CRM sync
-
-**Avoid:** Generic affiliate plugins (AffiliateWP, Post Affiliate Pro) — they're built for e-commerce and don't handle recurring SaaS commissions, long attribution windows, or CRM-connected deal registration.
+For the required tracking capabilities, platform options by program stage, how not to pick by category label, and the third-party cookie caveat, read `references/tracking-platforms.md`.
 
 ---
 
 ## Step 5: Program Launch Sequence
 
-**Launch order: build before recruiting. Partners who sign up to a broken tracking setup leave and don't 
+**Launch order: build before recruiting. Partners who sign up to a broken tracking setup leave and don't come back — and word travels fast inside the tight communities (consultant Slack groups, agency partner networks) that B2B affiliate programs actually depend on.**
+
+**Phase 1 — Build, before any partner sees the program:**
+- Finalize commission model, attribution window, and clawback terms (Steps 1–2) in writing.
+- Configure the tracking platform end to end: billing integration live, a test conversion fires correctly, partner portal accessible. For the first handful of partners, before committing to a paid platform, a dedicated Bulldozer OS lead list per partner (with the partner name written into each lead's free-text source field) is enough to track who sent what — a real interim substitute for a partner portal, not a replacement for one once volume grows past a few partners.
+- Write the partner agreement — commission terms, payment schedule, deal registration process, and the governance rules below (Step 6). Not a marketing one-pager: a document a consultant's or agency's ops team will actually read before signing.
+- Produce a one-page "why partner with us" brief per partner type (Step 3). A consultant and a review site need different pitches.
+
+**Phase 2 — Warm recruitment, 2–4 weeks, invite-only:**
+- Recruit from existing relationships first: customers who've already referred someone informally, consultants and agencies already in your network, any advisor who's mentioned the product unprompted.
+- Onboard these partners manually — walk them through the portal, confirm their first link fires correctly, use their feedback to fix tracking gaps before opening recruitment further.
+- Target the first 5–10 active partners from warm relationships before any public program page goes live. This phase is where tracking bugs surface; better they surface with people who'll tell you directly than with strangers who'll just leave.
+
+**Phase 3 — Structured recruitment, month 2 onward:**
+- Open recruitment to partner types in the order of expected quality (Step 3): consultants and agencies first via direct outreach, then content publishers and review sites, then a public partner page for inbound applications.
+- Review every application manually before approval. A link generated automatically for anyone who signs up is a fraud vector, not a growth channel.
+- Sales owns qualification once a partner-sourced lead enters the CRM. A deal registration is a source tag, not a qualified opportunity — it still goes through the same champion/decision-maker check as any other pipeline entry, so the affiliate credit doesn't end up attached to a deal that was never real.
+- Track partner activation, not partner count. A partner with a live link who has referred zero leads after 60 days needs a check-in call, not a reminder email.
+
+**Ongoing — governance cadence:**
+- Monthly: review payout accuracy, check flagged conversions, confirm no attribution dispute is left open.
+- Quarterly: review tier thresholds against actual partner performance, retire inactive partners, revisit commission economics against updated retention data.
+
+---
+
+## Step 6: Governance Rules
+
+For the full governance rules (brand bidding, self-referral and channel conflict, coupon and cashback extensions, deal registration disputes, AE commission, termination and clawback enforcement, payment terms, tax forms), read `references/governance-rules.md`. Write them before the first partner signs.
+
+---
+
+## Rules
+
+- **Never launch tracking and recruitment on the same day.** Prove the tracking works on 5–10 warm partners before a single public application is approved.
+- **The attribution window is a promise, not a guess.** Calibrate it to the measured sales cycle (Step 2), not to whatever a tracking platform defaults to.
+- **No clawback clause, no program.** Every commission structure needs a reversal mechanism for early cancellations, or affiliates are paid to send customers who won't stick around.
+- **A commission plan without a governance section isn't finished.** Brand bidding, self-referral, and dispute resolution belong in the spec, not in an FAQ written after the first complaint.
+- **Manual review beats automatic approval for the first 90 days.** An open sign-up page before tracking and terms are proven invites fraud, not growth.
+- **Recurring share aligns incentives; a flat one-time bounty doesn't.** When the commission model is in doubt, default to the one that pays affiliates for retention, not just for a first conversion.
+- **A partner-sourced lead is not a qualified opportunity until sales says so.** Deal registration tags the source; it doesn't skip qualification.
+- **Don't build this without retention data, or for a single enterprise-only motion.** See "Before You Build This" — an affiliate program calibrated on guesses, or built for a business with no deal volume to recruit against, is a spec that will misfire on launch.
+- **Build the CRM partner-attribution field before the first deal registration, not after.** On HubSpot there is no native property for it — a custom deal property has to exist before sales can see where a deal came from.
+- **No round number of partners says when to name a dedicated owner.** Don't wait for a specific partner count or commission volume before making the program someone's named responsibility. The reliable signal is whether it now generates co-selling work and dispute adjudication (Step 6) that a marketing generalist running it as a quarter of their job can't keep up with — not a threshold on a chart.

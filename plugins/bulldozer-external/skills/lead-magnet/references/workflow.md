@@ -10,13 +10,14 @@ Tout vit dans un dossier de mission, pour que rien ne dépende de la mémoire de
 
 ```
 lead-magnet-[client]-[slug-theme]/
-├── cadrage.md                  ❷ le brief validé (contrat d'entrée)
+├── cadrage.md                  ❷ le brief validé (contrat d'entrée) — porte le mode : os | hors-base
 ├── contexte-api.md             ❶ ce que l'OS a renvoyé + les trous relevés
+│                                 (mode hors-base : ce que le site validé a donné, page par page)
+├── brandbook-[client].md       ❶ les 7 tokens + le logo, avec leurs sources (lu tel quel par ❹ et ❺)
 ├── contenu.md                  ❸ le draft en blocs typés
 ├── manifeste-contenu.json      ❸ l'interface fond → assets → design
 ├── plan-assets.json            ❹ commandes de visuels + fichiers produits
 ├── assets/                     ❹ images, SVG, graphiques, logo client
-├── brandbook-[client].md       ❺ les 7 tokens + le logo, avec leurs sources
 ├── lead-magnet.html            ❺ la source (livrable)
 ├── lead-magnet.pdf             ❺ le PDF (livrable)
 ├── review-1.md / review-2.md   ❻ les rapports de review
@@ -28,20 +29,42 @@ inclus). Rien d'important ne vit uniquement dans la conversation.
 
 ## ❶ Contexte client
 
-1. `bulldozer:bulldozer-project-chooser` → `(customerId, projectId)`.
-2. Les 9 appels de contexte (détail : `contexte-api.md`), consignés dans `contexte-api.md` du dossier.
-3. Noter les **trous** : brique vide, réponse d'erreur, données visiblement périmées.
+1. `bulldozer:bulldozer-project-chooser` → `(customerId, projectId)`. Client absent de la liste :
+   chercher par nom avant de conclure (raison sociale, orthographe).
+2. **Mode OS** — les 9 appels de contexte (détail : `contexte-api.md`), consignés dans `contexte-api.md`
+   du dossier.
+   **Mode hors-base** — client confirmé + **site validé explicitement par l'opérateur**, puis lecture du
+   site pour reconstruire les mêmes briques (procédure : `contexte-api.md`, section « Mode hors-base »).
+3. **Extraire la charte** (protocole `charte-extraction.md`, 7 tokens + logo) et écrire
+   `brandbook-[client].md` — avant de passer au cadrage, pas après la rédaction.
+4. Noter les **trous** : brique vide, réponse d'erreur, données visiblement périmées, page absente
+   du site.
 
-**GATE 1 (bloquante)**
+**GATE 1 (bloquante) — mode OS**
 ```
 [ ] customerId + projectId résolus (jamais devinés)
 [ ] tone of voice récupéré (ou trou noté pour le cadrage)
 [ ] ICP profiles listés (ou trou noté)
 [ ] value proposition + positionnement récupérés (ou trous notés)
 [ ] fichiers projet listés — logo client repéré ou absence notée
+[ ] brandbook-[client].md écrit (7 tokens + logo, sources citées)
 [ ] liste écrite des briques manquantes à poser au cadrage
 ```
-Pas de projet → **arrêt** : « je ne peux pas produire de lead magnet sans projet OS résolu ».
+
+**GATE 1 bis (bloquante) — mode hors-base**
+```
+[ ] recherche OS réellement faite (chooser + recherche par nom), et infructueuse
+[ ] nom du client confirmé par l'opérateur
+[ ] URL du site officiel VALIDÉE explicitement par l'opérateur (jamais déduite)
+[ ] site lu : positionnement, promesse, vocabulaire, ton, preuves, lecteur visé
+[ ] logo récupéré depuis le site (niveau consigné, via logo-resolver)
+[ ] brandbook-[client].md écrit (7 tokens + logo, sources citées)
+[ ] source de chaque brique consignée (page + date de lecture)
+[ ] mode `hors-base` écrit dans le cadrage
+```
+Client non identifié, ou site non validé → **arrêt** : on ne produit pas un document à la charte d'une
+entreprise qu'on n'a pas confirmée. C'est le seul arrêt qui reste côté contexte — l'absence du projet
+dans l'OS, elle, n'arrête plus rien.
 
 ## ❷ Cadrage (validation humaine n°1)
 
@@ -54,7 +77,7 @@ Une salve unique (voir `cadrage.md`), puis on écrit `cadrage.md` dans le dossie
 [ ] ICP cible choisi parmi les profils API (ou décrit par l'opérateur si l'OS est vide)
 [ ] objectif business + CTA final explicites
 [ ] langue confirmée
-[ ] longueur cible (défaut 12–20 pages)
+[ ] longueur cible (défaut 8–16 pages)
 [ ] REGISTRE VISUEL arbitré par l'opérateur (R8) — jamais déduit
 [ ] trous de contexte arbitrés : comblés par l'opérateur, ou actés « à compléter »
 [ ] OK explicite de l'opérateur sur le cadrage
@@ -79,7 +102,9 @@ Déléguer à `lead-magnet-content` avec `cadrage.md` + `contexte-api.md`.
 
 ## ❹ Assets
 
-Déléguer à `lead-magnet-assets` avec `contenu.md` + `manifeste-contenu.json`.
+Déléguer à `lead-magnet-assets` avec `contenu.md` + `manifeste-contenu.json` + `brandbook-[client].md`
+(déjà produit à ❶ — les visuels se commandent à la palette réelle du client, jamais à une couleur par
+défaut en attendant le design).
 
 **GATE 4 (bloquante)**
 ```
@@ -98,11 +123,13 @@ Déléguer à `lead-magnet-assets` avec `contenu.md` + `manifeste-contenu.json`.
 ## ❺ Design
 
 Déléguer à `lead-magnet-design` avec `contenu.md` + `manifeste-contenu.json` + `plan-assets.json` +
-le contexte client (pour l'extraction de charte).
+`brandbook-[client].md` (déjà produit à ❶). Design **applique** ce brandbook, il ne le réextrait pas —
+sauf divergence suspectée avec le site (refonte entre-temps, incohérence visible), auquel cas il
+réextrait et consigne l'écart.
 
 **GATE 5 (bloquante)**
 ```
-[ ] brandbook-[client].md : 7 tokens extraits du CSS de production, avec leur source
+[ ] brandbook-[client].md : déjà produit à ❶, reconfirmé sans divergence avec le site de production
 [ ] logo = fichier réel du client (niveau consigné), jamais une recréation approximative
 [ ] lead-magnet.html : autoporté (CSS inline, règles @page)
 [ ] lead-magnet.pdf généré et OUVERT/inspecté page par page

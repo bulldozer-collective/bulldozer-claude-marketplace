@@ -1,7 +1,9 @@
 ---
-name: bulldozer-app-creator-backend
-description: Build the service of a Bulldozer App — REST routes, its own data, its own files and long tasks — and the manifest that declares what it does.
-when-to-use: |
+name: |-
+  bulldozer-app-creator-backend
+description: |-
+  Build the service of a Bulldozer App — REST routes, its own data, its own files and long tasks — and the manifest that declares what it does.
+when-to-use: |-
   Called by `bulldozer-app-creator`. Not invoked on its own.
 user-invocable: false
 allowed-tools:
@@ -11,9 +13,10 @@ allowed-tools:
   - Edit
   - Agent
   - AskUserQuestion
-effort: medium
+effort: |-
+  medium
 metadata:
-  forge: disabled
+  "forge": "disabled"
 ---
 
 # The service

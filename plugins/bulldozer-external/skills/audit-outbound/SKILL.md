@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   audit-outbound
-description: |
+description: |-
   Full diagnostic of a B2B outbound system — cold email, LinkedIn sequences, cold calling, and multi-channel cadences. Triggers on 'outbound audit,' 'why are my reply rates dropping,' 'cold email not working,' 'diagnose my outbound,' 'sequence audit,' or 'outbound is broken.' For ABM-specific audits, see account-based-marketing. For email deliverability only, see cold-email.
-when-to-use: |
+when-to-use: |-
   Full diagnostic of a B2B outbound system — cold email, LinkedIn sequences, cold calling, and multi-channel cadences. Triggers on 'outbound audit,' 'why are my reply rates dropping,' 'cold email not working,' 'diagnose my outbound,' 'sequence audit,' or 'outbound is broken.' For ABM-specific audits, see account-based-marketing. For email deliverability only, see cold-email.
-argument-hint: |
+argument-hint: |-
   Cold email to mid-market HR SaaS — reply rate dropped from 4% to 1.2% over 8 weeks, sending 200 emails/day across 3 domains
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -24,7 +24,15 @@ You are a Bulldozer sales operator running an outbound diagnostic. Your job is t
 
 ## Input
 
-`$ARGUMENTS` — channel(s) in use, volume, context (reply rate, bounce rate, meetings booked trend). If not provided, read any available sequence or config files. Ask once if channel, volume, and current metrics are completely unavailable.
+`$ARGUMENTS` — channel(s) in use, volume, context (reply rate, bounce rate, meetings booked trend).
+
+If the project has Lemlist connected in Bulldozer OS, pull the real numbers instead of asking for them:
+- `bdzListLemlistCampaigns` for the active campaigns, then `bdzListLemlistSequences` (per campaign) for the actual step count, step type (email, LinkedIn invite, call, etc.) and delay between steps — this is Layer 4's raw material, not something to estimate from memory.
+- `bdzListLemlistLeads` (per campaign, filterable by lead state) for how many leads are contacted vs. replied vs. not interested.
+- `bdzListLeadLists` / `bdzListLeadListLeads` for the lead lists behind the campaign and their review state (`LEAD_MEMBERSHIP_STATE_TO_REVIEW` / `_ACCEPTED` / `_REJECTED`) — this is Layer 2's raw material.
+- `bdzListSignals` for any signal configured on the project — the fastest way to check whether a list is trigger-driven or a static filter.
+
+If none of this is connected, or the numbers still don't cover reply rate/bounce rate/meetings trend, ask once for what's missing rather than guessing.
 
 ## Output
 
@@ -53,35 +61,7 @@ If Layer 1 is broken, fix it before touching Layer 2. Rewriting copy on a blackl
 
 **The most common root cause of reply rate decline that teams blame on copy.**
 
-### Domain Health
-- SPF, DKIM, DMARC records: all three must be properly configured. Missing DMARC = deliverability risk at scale
-- Domain age: sending domains under 60 days in age must be in active warm-up. Under 90 days = treat as probable cause of any deliverability issue
-- Blacklist status: check all sending domains against Spamhaus, SURBL, and Barracuda. One major blacklist listing can suppress inbox placement across the entire ICP. (Use MXToolbox: covers 100+ lists)
-- Sender Score: target 85–100. Below 70 = active deliverability problem
-
-### Warm-Up Status
-Proper warm-up schedule:
-- Week 1: 5 emails/day/mailbox
-- Week 3: 10–20 emails/day/mailbox
-- Full ramp: max 25 cold outbound emails/day/mailbox
-
-Sudden volume spikes — even on healthy domains — trigger algorithmic spam filters. Flag any week where volume increased >20% without a corresponding warm-up extension.
-
-### Inbox Placement
-Bounce rate and spam complaint rate do not tell you where email is landing. Use a seed list test (GlockApps or Mailgenius) to get actual placement data across Gmail, Outlook, and Yahoo.
-
-- Target: >85% inbox placement
-- <80%: active infrastructure problem — do not scale sends
-- Check Google Postmaster Tools for domain reputation (requires a Google Workspace sending domain)
-
-### Bounce & Complaint Rates
-| Metric | Healthy | Investigate | Critical |
-|--------|---------|-------------|---------|
-| Bounce rate | <2% | 2–5% | >5% |
-| Spam complaint rate | <0.08% | 0.08–0.3% | >0.3% |
-| Open rate | >40% | 25–40% | <25% |
-| Reply rate | >5% | 2–5% | <2% |
-| Positive reply rate | >50% of replies | 30–50% | <30% |
+For the full Layer 1 checklist (domain health, the November 2025 Gmail/Yahoo rejection rules, warm-up status, inbox placement, and the bounce / complaint / reply rate thresholds table), read `references/layer-1-deliverability.md` before auditing any sending domain.
 
 ---
 
@@ -89,20 +69,7 @@ Bounce rate and spam complaint rate do not tell you where email is landing. Use 
 
 **The most common source of outbound underperformance — teams blame copy but the real problem is list.**
 
-### ICP Alignment
-- Pull the current active lead lists. What % of contacts match the stated ICP (industry, company size, role, buying trigger)?
-- Compare the ICP definition on paper to the last 5 closed-won deals: do they match? ICP drift (lists that have wandered from the original segment) is the fastest way to tank reply rates without touching a word of copy
-- Flag roles that are off-target: sending to "Marketing Manager" when the buyer is "VP Sales" = structural mismatch
-
-### List Quality
-- B2B contact data decays at 22–30% annually. A list built 12 months ago has roughly 25% bad contacts
-- Verify emails before send: real-time verification reduces bounce risk. Catch-all domains are risky — treat them as Tier 2 if sender reputation is under pressure
-- Data completeness: are first names, companies, and relevant context fields populated for personalization? Generic merge tags ("Hi {FirstName},") on bad data = "Hi ,"
-- Duplicate contacts: are the same contacts in multiple sequences simultaneously? This triggers spam complaints and confuses reply handling
-
-### Market Saturation
-- How many times has this contact list been contacted in the last 90 days? Over-contacted lists produce diminishing returns regardless of copy quality
-- If the TAM for the segment is <5,000 companies, the list may be exhausted — time to expand the ICP or move to a new segment
+For the full Layer 2 checklist (ICP alignment and trigger-driven lists, list quality and data decay, market saturation and end-of-sequence handling), read `references/layer-2-targeting.md` before auditing a list.
 
 ---
 
@@ -117,6 +84,8 @@ Read the first sentence of the first email. Can it be sent to 100 different comp
 - **Signal-based opener** ("Saw your Series B announcement last week — typically signals a push to professionalize the outbound motion...") = recipient-specific. Expected reply rate: 5–12%
 
 Bulldozer standard: at minimum one signal per email (funding, hiring, content published, product launch, competitor mention, role change).
+
+**A finding that recommends "add merge tags" is not a fix — refuse it.** Inserting `{FirstName}` and `{CompanyName}` into a generic template is cosmetic, not personalization; recipients recognize the pattern instantly, and it does not move an opener from the generic bucket above into the signal-based one. The only fix that counts here is swapping the opener for one built on a real signal — if none exists for that account, the honest finding is "no signal, no send," not "personalize more."
 
 ### Value proposition clarity
 Three checks on the core value prop:
@@ -136,8 +105,11 @@ If any check fails, the positioning is a category cliché — not a reason to re
 ## Layer 4: Sequence Structure & Execution
 
 ### Step count and timing
-- 58% of all replies come from the first email. The remaining 42% from follow-ups
+Pull the actual sequence via `bdzListLemlistSequences` (per campaign) rather than reconstructing it from what the team remembers building — it returns the real step count, type (email, LinkedIn invite, call, etc.) and delay in days between steps.
+
+- Most replies come from the first email, with a shrinking share from each subsequent step — the exact split isn't stable enough across sources to quote as a fixed percentage
 - Optimal sequence length: 4–6 steps. Beyond 6 with no positive signal = generating spam complaints, not replies
+- **A dead sequence does not get fixed by adding a 7th touch.** If steps 1–5 produced no positive reply, the finding is upstream — Layer 2 targeting or Layer 3 offer — not "not enough touches." Refuse to recommend extending a sequence that has already run its course; the fix is rebuilding the list or the opener, not adding volume to the one that isn't working
 - Step spacing: 3–5 business days between early touches, widening to 7–10 days for later steps. Tighter spacing (1–2 days) signals desperation and gets flagged as spam
 - Send timing: 8–11 AM in the recipient's time zone (not the sender's). Sending at 9 AM your time when the prospect is in a different zone = 3 AM arrival = opens at the wrong moment, if at all
 
@@ -151,8 +123,8 @@ Each follow-up must introduce something new:
 A follow-up that says "bumping this to the top of your inbox" with no new information trains prospects to ignore subsequent steps.
 
 ### Channel mix
-Single-channel outbound (email only) underperforms multi-channel by 2–3x. Check:
-- Is LinkedIn enriching the sequence? (Connection request before email = warm context, +40% reply lift)
+Single-channel outbound (email only) underperforms multi-channel outbound, but the size of the gap is not settled: the "2x–4x" range repeated across agency blogs has no underlying data behind it, a named operator (Quickmail's founder, Jeremy Chatelaine) puts the real lift closer to +50%, and an isolated case study (ColdIQ, sequencing LinkedIn ahead of email rather than combining both) reports 2.4x on a single campaign — not a benchmark. Don't promise a multiplier to a client; the only part corroborated across sources is the direction — multi-channel beats single-channel. Check:
+- Is LinkedIn enriching the sequence? (A connection request before the first email gives warm context going in — the exact reply-rate lift this produces isn't consistently reported across sources, so don't quote one)
 - Is cold calling integrated for high-value accounts?
 - Are video messages used for Tier 1 prospects?
 
@@ -213,3 +185,9 @@ Over-reliance on cold email alone — especially as inbox competition increases 
 - **Positive reply rate is the true north, not raw reply rate.** High reply rate with low positive rate means the message is polarizing, not resonating.
 - **Never scale sends on a domain under 90 days without a documented warm-up log.** If the log doesn't exist, the warm-up didn't happen.
 - **Follow-ups that don't add new value accelerate unsubscribes.** If there's nothing new to say, stop the sequence.
+- **Never promise a reply-rate number.** The benchmarks above are diagnostic reference points, not commitments — a fix plan that tells a client "this will get you to 8%" is a guess dressed up as a forecast. State direction and evidence, not a target percentage.
+- **Cosmetic personalization is not a Layer 3 fix.** Merge tags on a generic template don't change the finding — the fix is a real signal or a smaller, more targeted list, never "add more merge fields."
+- **A sequence past 6 steps with no positive signal needs a new list or a new offer, not a 7th touch.** More volume on broken targeting produces complaints, not replies.
+- **Retire a domain once damage is confirmed — don't nurse it.** Warm-up prevents damage; it doesn't reliably reverse it once Postmaster Tools flags the domain (Compliance Status "Needs work" on the spam-rate signal) or a placement test lands in spam. Move volume to fresh infrastructure instead of repeating the cycle on the same domain.
+- **Don't leave a domain on a closed-loop warm-up pool.** A shared automated warm-up tool that only ever emails itself is an increasingly recognizable, discounted pattern — blend in real sends within the first couple of weeks.
+- **A completed sequence with no reply is a decision, not a pause.** Move the lead out of active rotation in the OS — a list with no defined exit for non-responders just gets recontacted blind and rots quietly.

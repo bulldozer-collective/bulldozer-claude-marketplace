@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   linkedin-ads
-description: |
+description: |-
   Set up and optimize LinkedIn ad campaigns for B2B demand generation, lead generation, and ABM targeting using job title, company, and seniority signals. Triggers on 'LinkedIn ads,' 'LinkedIn campaign,' 'sponsored content,' 'LinkedIn lead gen,' or 'B2B paid social.' For cross-platform strategy, see paid-strategy. For Meta campaigns, see meta-ads.
-when-to-use: |
+when-to-use: |-
   Set up and optimize LinkedIn ad campaigns for B2B demand generation, lead generation, and ABM targeting using job title, company, and seniority signals. Triggers on 'LinkedIn ads,' 'LinkedIn campaign,' 'sponsored content,' 'LinkedIn lead gen,' or 'B2B paid social.' For cross-platform strategy, see paid-strategy. For Meta campaigns, see meta-ads.
-argument-hint: |
+argument-hint: |-
   Enterprise SaaS targeting VP of Sales at 200-1000 person companies, $15k/mo budget
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -36,7 +36,7 @@ A `linkedin-ads-plan-{product}.md` file with: campaign structure, audience targe
 
 ## LinkedIn Ads Reality Check
 
-**LinkedIn CPMs are 3–5x higher than Meta.** Expect $30–$80 CPM for most B2B audiences. CPL of $50–$300 is common. This is not a vanity metric — LinkedIn is genuinely expensive. Use it only when:
+**LinkedIn CPMs are 3–5x higher than Meta, and the range is wide.** Broad B2B targeting (director+ titles, mid-size companies) tends to sit far below narrow enterprise or C-suite targeting, where CPM can run several times higher — the same account can see $30 CPM on one campaign and $150+ on another, purely from audience breadth. Treat any single number here as a rough starting point, not a target: once the account has spend history, read the real CPM/CPC/CPL from the account itself (see "Reading Real Performance from Bulldozer OS" below) rather than benchmarking against outside blog aggregates, which disagree with each other by 2–5x for the same segment. CPL of $50–$300 is common. This is not a vanity metric — LinkedIn is genuinely expensive. Use it only when:
 
 - ACV > $5,000 (economics justify the CPL)
 - Job title or company is the primary targeting criterion (no other platform matches this)
@@ -44,21 +44,13 @@ A `linkedin-ads-plan-{product}.md` file with: campaign structure, audience targe
 
 If ACV is <$5k or your ICP is reachable via interest targeting on Meta, start with Meta. LinkedIn for the wrong product type is a money incinerator.
 
+**The B2B lag is the trap, not the CPL.** A lead can look expensive and still be the cheapest path to real revenue, or look cheap and be worthless — CPL only measures the top of a funnel that, in B2B, routinely takes 60–120+ days to resolve into a closed deal. Judging a LinkedIn campaign on CPL alone at the 2-week or even 30-day mark is judging the wrong number: it tells you whether the ad and offer are working, not whether the pipeline behind them is real. Use early CPL/CTR to catch a broken ad fast; hold the actual go/no-go call for when enough of the sales cycle has played out to see SQL rate or, ideally, closed-won.
+
 ---
 
 ## Ad Formats
 
-| Format | Best for | CPM range |
-|--------|----------|-----------|
-| **Sponsored Content (single image)** | Brand awareness, thought leadership | $30–$60 CPM |
-| **Sponsored Content (video)** | Complex product explanation, stories | $25–$55 CPM |
-| **Carousel ads** | Feature showcases, case studies | $35–$65 CPM |
-| **Message Ads (InMail)** | Direct outreach, event invitations | Per-send pricing |
-| **Lead Gen Forms** | Lead capture (no landing page) | CPL-optimized |
-| **Conversation Ads** | Interactive multi-step engagement | Per-send pricing |
-| **Document ads** | Gated content (whitepapers, reports) | $35–$65 CPM |
-
-**Start with Sponsored Content + Lead Gen Forms**: Lowest friction path from impression to lead. Form data pre-fills from LinkedIn profile — dramatically higher completion rate than external landing pages.
+The ad format comparison table (best use and CPM range per format) is in `references/formats-and-bidding.md` (section "Ad Formats"). Read it when choosing formats.
 
 ---
 
@@ -66,37 +58,21 @@ If ACV is <$5k or your ICP is reachable via interest targeting on Meta, start wi
 
 ### Primary Targeting Dimensions (Use These First)
 
-| Dimension | Recommended use |
-|-----------|----------------|
-| **Job title** | Most precise. Target exact titles: "Director of Operations," not just "Operations" |
-| **Job function** | Broader — use when multiple titles hold the same role |
-| **Seniority** | Combine with function: "VP+ in Finance" |
-| **Company size** | Critical for B2B — 51–200, 201–500, 501–1000 etc. |
-| **Industry** | Combine with seniority to filter out small companies in the industry |
-
-**Audience size target**: 50,000–300,000 for most campaigns. Below 50k = too narrow to learn. Above 500k = too broad for B2B precision.
-
-**Warning**: LinkedIn's "Skills" targeting is notoriously inaccurate — users self-report skills they don't have. Stick to job title, function, seniority, and company attributes.
+The primary targeting dimensions and how to use them are in `references/audience-targeting.md` (section "Primary Targeting Dimensions"). Read it before choosing targeting.
 
 ### Matched Audiences (Retargeting + ABM)
 
-| Audience type | How to build | Use for |
-|--------------|-------------|---------|
-| **Website visitors** | LinkedIn Insight Tag | Retarget all visitors with case studies |
-| **Account list** | Upload CSV of target companies | ABM — show ads only to your named accounts |
-| **Contact list** | Upload email list | Retarget known contacts, suppress converted customers |
-| **Lead Gen Form openers** | Auto-created | Retarget engaged prospects |
-| **Video viewers** | Auto-created | Move video viewers to conversion offer |
+Matched Audiences for retargeting and ABM (what to upload, sizes, how to use them) are in `references/audience-targeting.md` (section "Matched Audiences"). Read it when building a retargeting or ABM audience.
 
-**ABM approach**: Upload your top 50–200 target account list as a Matched Audience. Layer job title/seniority targeting on top. This creates a laser-focused ABM campaign that only shows to decision-makers at your target accounts.
+### Predictive Audiences and Audience Expansion — Two Different Levers
 
-### Audience Expansion — Use Carefully
-
-LinkedIn's "Audience Expansion" lets the algorithm find lookalike profiles. Can work well for mature campaigns with conversion data. Disable it during initial testing — you want to know exactly who saw your ads.
+The difference between Predictive Audiences and Audience Expansion, and when to use each, is in `references/audience-targeting.md` (section "Predictive Audiences and Audience Expansion"). Read it before turning either lever on.
 
 ---
 
 ## Campaign Structure
+
+**A note on naming**: LinkedIn is mid-way through renaming its campaign hierarchy in the UI — "Campaign Group" is becoming "Campaign," and the old "Campaign" is becoming "Ad set." The rollout is staggered, so two accounts (or two people on the same account) can see different labels at the same time; the underlying API objects haven't changed. Use whichever term the client's own UI shows them, and don't assume the structure below has moved — it hasn't, only the label on the middle tier has.
 
 ```
 Campaign Group: [Product] B2B Demand Gen
@@ -118,7 +94,7 @@ Campaign Group: [Product] B2B Demand Gen
 
 ### Sponsored Content Copy
 
-**Primary text structure** (keep under 150 characters for mobile):
+**Primary text structure** (keep the hook under ~150 characters — mobile truncates there even though the field itself accepts up to ~255):
 ```
 [Hook: Problem or contrarian claim]
 [1-2 sentence bridge to your solution]
@@ -168,14 +144,7 @@ Use for: event invitations, exclusive offers, high-touch ABM outreach.
 
 ## Bidding
 
-**Start with Maximum Delivery** (LinkedIn's auto-bid) — LinkedIn optimizes for your campaign objective. Monitor for 2 weeks, then switch to Manual Bidding if CPC is too high.
-
-**Manual CPC target**: $8–$15 for most B2B audiences. Below $8 and impressions drop; above $15 is usually inefficient.
-
-**LinkedIn Campaign Budget**:
-- Daily minimum: $10/day (LinkedIn enforced)
-- Recommended minimum: $100/day ($3,000/mo) per campaign for meaningful learning
-- Below $3k/mo total: Not enough volume to optimize; wait until budget is larger or use Meta instead
+The three Campaign Manager bid strategies and when to use each are in `references/formats-and-bidding.md` (section "Bidding"). Read it before setting bids.
 
 ---
 
@@ -184,39 +153,48 @@ Use for: event invitations, exclusive offers, high-touch ABM outreach.
 Required for retargeting and conversion tracking.
 
 - [ ] Insight Tag installed on all pages (via tag manager or directly in `<head>`)
-- [ ] Conversion events created: form submissions, page visits
+- [ ] Conversion events created: form submissions, page visits — pick the closest current category (LinkedIn consolidated MQL/SQL-style categories into a single "Qualified Lead" category; don't invent a custom MQL/SQL split that no longer maps cleanly)
 - [ ] Matched audiences created from website visitors (30, 90, 180 days)
 - [ ] Account list uploaded (if running ABM campaigns)
 - [ ] Test conversion verified before launching conversion campaigns
+- [ ] Status checked through Bulldozer OS rather than guessed from the dashboard — see below
+- [ ] Attribution windows set deliberately, not left on default — LinkedIn tracks a post-click window (default 30 days) and a view-through window (default 7 days) as two separate settings, each independently adjustable to 1/7/30/90 days. A long B2B sales cycle without a matching post-click window undercounts conversions that arrive late; a wide view-through window on a low-consideration offer can inflate the conversion count with people who never clicked. Know which window a number is using before comparing it to anything else.
+- [ ] Conversions API (CAPI) considered alongside the tag, not instead of it — a separate server-to-server channel that recovers conversions the browser tag misses (ad blockers, cookie loss) and is the only path to pass back offline/CRM outcomes — a closed deal, a sales-qualified lead — so LinkedIn can optimize toward revenue instead of form fills alone. Worth setting up for any account with a real B2B sales cycle behind the ad account. Not confirmed against a LinkedIn page read directly this pass (LinkedIn's own docs were unreachable from this environment) — several independent 2026 sources describe it as live and standard practice, converging enough to flag it here, not enough to promise an exact setup path.
+
+---
+
+## Reading Real Performance from Bulldozer OS
+
+What Bulldozer OS can read back from a registered LinkedIn ad account (import jobs, Insight Tag status, per-campaign and per-ad metrics, running creatives, live targeting, audience demographics, lead form submissions, comments and reactions) is in `references/performance-and-optimization.md` (section "Reading Real Performance from Bulldozer OS"). Read it before analysing results, and register the account first if it isn't yet.
 
 ---
 
 ## Optimization Guide
 
-**If CPL is too high**:
-1. Narrow audience (too broad targeting = low relevance)
-2. Test new ad creatives (problem-led vs. outcome-led)
-3. Switch to Lead Gen Form instead of landing page (typically 30–50% lower CPL)
-4. Test lower-friction offer (content download vs. demo request)
-
-**If CTR is low (<0.4%)**:
-- Hook isn't stopping the scroll — test new opening line
-- Visual is generic stock photo — test screenshot or data visualization
-- Ad fatigue — check frequency (>3 per week per person = refresh needed)
-
-**If form fill rate is low (<5% of LGF openers)**:
-- Form asks too many fields — remove phone number
-- Offer isn't specific enough — improve headline and description
-- Privacy policy needs updating
+The diagnosis guide (CPL too high, CTR low, form fill rate low) and the volume check to make before reacting are in `references/performance-and-optimization.md` (section "Optimization Guide"). Read it when a campaign underperforms.
 
 ---
 
 ## 30-Day Launch Plan
 
-**Week 1**: Set up Insight Tag. Create matched audiences (website visitors, contact list). Launch 1 campaign with ABM account list + 2 Sponsored Content ads. Set at $3,000/mo.
+**Week 1**: Register the ad account in Bulldozer OS if it isn't already. Set up Insight Tag. Create matched audiences (website visitors, contact list). Launch 1 campaign with ABM account list + 2 Sponsored Content ads. Set at $3,000/mo.
 
-**Week 2**: Monitor CPM, CTR, CPL. Check audience demographics in reporting — is the right seniority/title seeing ads? Add negative keywords if wrong audience is targeted.
+**Week 2**: Pull real CPM/CTR/CPL from the OS import rather than eyeballing the Campaign Manager dashboard. Check the campaign's live targeting read-back — is the right seniority/title actually being served, not just what was configured at launch? Fix targeting drift if the two don't match.
 
 **Week 3**: Test Lead Gen Form ad vs. landing page ad with same creative. Compare CPL.
 
-**Week 4**: Kill bottom performer (LGF vs. landing page). Reallocate budget to winner. Begin testing second creative angle.
+**Week 4**: Kill bottom performer (LGF vs. landing page). Reallocate budget to winner. Begin testing second creative angle. **This kill decision is about CPL and form-fill rate, not about ROI** — 30 days of spend is nowhere near enough of the sales cycle to know which format actually produced pipeline. Cutting the CPL loser is fine; declaring the CPL winner "worked" for the business is a separate, later call.
+
+---
+
+## Rules
+
+- **Read the account before you read a benchmark.** Once the account is registered in Bulldozer OS, its own CPM/CPC/CPL is the number that matters — the ranges in this skill are a starting point for an account with no history, not a target to defend once real data exists.
+- **Don't compare or conclude below a few dozen conversions.** Cost Cap vs. Maximum Delivery, two ad angles, two audiences — a difference under that volume is noise dressed up as a signal. Wait for volume, or widen the campaign until you have it.
+- **CPL is a leading indicator in B2B, not the verdict.** A cheap lead that never becomes a customer isn't a win, and an expensive one that closes isn't a loss. Hold the real go/no-go call for when enough of the sales cycle has played out to see SQL rate or closed-won — judging ROI off 30 days of CPL is judging the wrong number.
+- **Check the ABM list math before committing budget.** A Matched Audience only activates above roughly 300 matched members — a thin named-account list can fall under that floor and simply never deliver. Widen the list or the seniority range before launch, don't discover it after.
+- **Creative is the lever, structure is the plumbing.** A sharper hook or a new angle moves CPL more than another round of bid-strategy tinkering will. Budget the review calendar accordingly — most accounts under-invest in copy and over-invest in re-checking bids.
+- **Every campaign gets a stop rule before it gets a budget.** A CPL ceiling and a time box, decided before launch — not discovered after the spend already happened.
+- **Know which attribution window a number is using before trusting it.** Post-click and view-through are separate, independently adjustable settings — a number that blends them, or uses the wrong one for the sales cycle, isn't comparable to anything.
+- **A benchmark without a source doesn't go in the plan.** State a CPM/CPL/CPC range as a starting point to validate against the account's own numbers — never as an industry fact to defend in front of a client.
+- **Confirm the tag is alive before trusting anything it feeds.** "Installed" isn't a status — check the account's real Insight Tag status (absent, never called back, gone stale, blocked, or active) before reading conversions, retargeting audiences, or attribution off it. A stale or blocked tag produces numbers that look like a performance problem but are actually a tracking problem.

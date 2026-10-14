@@ -138,13 +138,15 @@ flottent au milieu ; l'image de clôture est déjà utilisée ailleurs.
   « décorative » ajoutée en cours de route.
 - Test : basculer les tokens vers une autre charte doit produire le même document, cohérent, sans
   retouche. Si un bloc casse, c'est qu'il avait une couleur en dur.
+- Si l'accent brut échoue au contraste en couleur de texte à corps courant (< 18 pt / 14 pt gras),
+  utiliser `--accent-texte` (voir `charte-extraction.md`) — jamais une autre couleur, jamais à l'œil.
 
 ## 9. Rythme éditorial — jamais de mur de texte
 
 - **Jamais plus de 3-4 paragraphes de prose consécutifs** sans rupture visuelle.
 - **Chaque double page mélange au moins 2 types de blocs.**
 - Se contrôle sur le PDF, page par page — le script
-  `lead-magnet-review/scripts/check_rythme.py` automatise le repérage.
+  `scripts/check_rythme.py` automatise le repérage.
 - Si le contenu ne fournit pas de quoi rompre, le problème est **en amont** : le signaler à
   `lead-magnet-content`, ne pas inventer un bloc décoratif.
 
@@ -230,7 +232,7 @@ d'alignement, mais il voit un document « mal fichu ».
 
 ```bash
 # 1. statique, sur les sources, avant la première conversion
-python3 ../lead-magnet-review/scripts/check_alignements.py .
+python3 scripts/check_alignements.py .
 ```
 
 ```
@@ -267,6 +269,7 @@ alignée à gauche.
 [ ] data-viz aux tokens client, source affichée
 [ ] header/footer présents, discrets, absents de la couverture
 [ ] aucune couleur hors tokens et dérivés
+[ ] accent brut jamais posé en texte à corps courant sans --accent-texte si sous 4,5:1
 [ ] aucune séquence > 4 paragraphes de prose sans rupture
 [ ] chaque double page mélange ≥ 2 types de blocs
 [ ] aucune page < 2/3 remplie (hors couverture, ouvertures, CTA)

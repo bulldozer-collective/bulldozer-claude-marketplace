@@ -25,7 +25,8 @@ jusqu'à la livraison.
 4. **Ce que ça doit déclencher** — objectif business et CTA de la dernière page :
    [proposer le plus probable au vu des objectifs projet] ?
 5. **Langue** — [langue détectée du projet] ?
-6. **Longueur** — 12–20 pages par défaut. OK ou autre format ?
+6. **Longueur** — 8–16 pages par défaut (un document court et précis bat un document long sur un sujet
+   flou). OK ou autre format ?
 7. **Registre visuel** (R8) — couverture photographique / illustrée, ou couverture typographique ?
    Et à l'intérieur : des images d'ambiance en plus des graphiques, ou uniquement des graphiques ?
    (défaut proposé : **couverture visuelle**, et graphiques seuls dans le corps)
@@ -37,10 +38,36 @@ jusqu'à la livraison.
 10. **Contraintes** — sujets à éviter, chiffres imposés, deadline, éléments fournis (verbatims,
     données internes, photos) ?
 11. **Diffusion** — PDF + HTML seuls, ou je publie aussi une **URL** (page en ligne avec le PDF
-    téléchargeable) ?
+    téléchargeable — diffusion, pas capture : voir « Publication en URL » du master si l'objectif est
+    de faire remonter des contacts) ?
 12. **Trous côté OS** — il me manque [liste des briques vides]. Tu me les donnes, ou je marque
     « à compléter » dans le document ?
 ```
+
+## En mode hors-base : deux questions AVANT la salve
+
+Quand le client n'est pas dans l'OS, deux points se règlent **avant** le cadrage — ils conditionnent
+tout le reste, y compris les réponses aux questions ci-dessus :
+
+```markdown
+Je ne trouve pas [client] dans le Bulldozer OS (cherché dans tes projets et par nom). On peut le faire
+quand même en partant de son site.
+
+A. **Le client** — c'est bien [client] ? Donne-moi le nom exact, tel qu'il doit apparaître dans le
+   document.
+B. **Le site** — j'ai trouvé :
+   — `site-a.fr` — [raison sociale, activité, pays]
+   — `site-b.com` — [raison sociale, activité, pays]
+   Lequel est ton client ? (ou colle-moi l'URL si aucun des deux)
+```
+
+Puis on lit le site, et **seulement ensuite** on envoie la salve — enrichie de ce qu'on y a trouvé, pour
+que l'opérateur corrige au lieu de tout fournir. La question 12 devient alors : « voilà ce que j'ai tiré
+de son site (ton, lecteur visé, positionnement) — qu'est-ce que je corrige ? »
+
+Ces deux questions ne se fusionnent pas avec la salve : présenter des candidats de site **et** demander
+l'angle éditorial dans le même message produit une réponse qui en oublie une moitié. Procédure complète :
+`contexte-api.md`, section « Mode hors-base ».
 
 ## Pourquoi demander les assets réels au cadrage (question 8)
 
@@ -52,7 +79,7 @@ Ce qui change concrètement selon la réponse :
 
 | Fourni | Sinon |
 | ------ | ----- |
-| Logo vectoriel / PNG HD | échelle `logo-resolver`, niveau consigné — **jamais un monogramme redessiné** |
+| Logo vectoriel / PNG HD | résolu selon le protocole `charte-extraction.md`, niveau consigné — **jamais un monogramme redessiné** |
 | Fichiers de police | recherche en local (`~/Library/Fonts`) puis fallback de même classe, consigné |
 | Texture / matière de charte | aucune texture plutôt qu'un grain procédural simulé |
 | Photos des interlocuteurs | pas de bloc `contacts`, ou bloc sans photo — **jamais un portrait généré** |
@@ -61,7 +88,7 @@ Ce qui change concrètement selon la réponse :
 
 Utiliser le nom, le logo et la charte d'un partenaire engage le client. La chaîne ne le décide jamais
 seule : accord non confirmé → document monomarque. Si l'accord est acté, la mise en œuvre suit
-`lead-magnet-design/references/co-branding.md` — partage de territoire, pas juxtaposition de logos.
+`co-branding.md` (annexe de `lead-magnet-design`) — partage de territoire, pas juxtaposition de logos.
 
 ## Le registre visuel n'a pas de défaut silencieux (R8)
 
@@ -82,7 +109,7 @@ justement pourquoi ça se demande.
 
 | Élément | Défaut | Quand demander quand même |
 | ------- | ------ | ------------------------- |
-| Longueur | 12–20 pages | l'opérateur a parlé d'un format court/long |
+| Longueur | 8–16 pages | l'opérateur a parlé d'un format court/long, ou le sujet est un livre blanc de recherche/données propriétaires (alors plus long se justifie) |
 | Nombre de chapitres | jugement éditorial de `lead-magnet-content` (≥ 3) | jamais — c'est éditorial, pas administratif |
 | Format | A4 portrait, PDF + HTML | le client veut un format d'écran |
 | Ton | `bdzGetProjectToneOfVoice` | la réponse API est vide |
@@ -115,7 +142,8 @@ C'est ce fichier qui est passé en entrée de `lead-magnet-content`, `-assets`, 
 ```markdown
 # Cadrage — [Client] · [Titre]
 
-- **Projet OS** : customerId `…` · projectId `…`
+- **Source du contexte** : `os` — customerId `…` · projectId `…`
+  *(ou : `hors-base` — client absent de l'OS · site validé par [opérateur] le [date] : https://…)*
 - **Thématique** : […]
 - **Angle** : […] (ce qui distingue ce document d'un article générique sur le sujet)
 - **Titre** : […] (source : opérateur | choisi parmi 3 propositions le [date])
@@ -124,7 +152,7 @@ C'est ce fichier qui est passé en entrée de `lead-magnet-content`, `-assets`, 
 - **Objectif business** : […]
 - **CTA final** : [action exacte + lien/contact]
 - **Langue** : […]
-- **Longueur cible** : [12–20] pages
+- **Longueur cible** : [8–16] pages
 - **Registre visuel** (R8) : [couverture visuelle | couverture visuelle + ambiance | typographique assumé]
 - **Ton de voix** : [résumé de bdzGetProjectToneOfVoice]
 - **Positionnement à respecter** : [ce que le document doit démontrer / ne pas promettre]

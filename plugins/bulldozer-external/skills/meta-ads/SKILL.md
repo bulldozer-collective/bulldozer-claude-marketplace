@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   meta-ads
-description: |
+description: |-
   Set up, structure, and optimize Meta (Facebook + Instagram) ad campaigns for demand generation, lead generation, and DTC conversion. Triggers on 'Meta ads,' 'Facebook campaign,' 'Instagram ads,' 'Meta campaign setup,' or 'Facebook advertising strategy.' For cross-platform strategy, see paid-strategy. For Google Ads, see google-ads.
-when-to-use: |
+when-to-use: |-
   Set up, structure, and optimize Meta (Facebook + Instagram) ad campaigns for demand generation, lead generation, and DTC conversion. Triggers on 'Meta ads,' 'Facebook campaign,' 'Instagram ads,' 'Meta campaign setup,' or 'Facebook advertising strategy.' For cross-platform strategy, see paid-strategy. For Google Ads, see google-ads.
-argument-hint: |
+argument-hint: |-
   DTC skincare brand, $15k/mo budget, want to scale from awareness to DTC purchase
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -25,6 +25,10 @@ You are a Bulldozer growth operator working on Meta (Facebook + Instagram) adver
 ## Input
 
 `$ARGUMENTS` — product/offer, target audience, budget, and objective (e.g., "B2B SaaS lead gen, targeting HR managers, $20k/mo, want demo requests"). If not provided, read any available context files before asking. Only ask if the objective and budget are completely absent.
+
+**If the project already has a Meta ad account registered in Bulldozer OS**, don't ask the client for numbers you can pull yourself: call `bdzListRegisteredAdAccounts` (filter `platform=INTEGRATION_PLATFORM_META`) to find the account, then `bdzGetAdAnalytics` (`target=AD_ANALYTICS_TARGET_LAYER_1_ALL`, `adAccountId`, `platform=INTEGRATION_PLATFORM_META`) for campaign-level cost/CPL/CPA history. Ground the plan in what the account actually did, not in what the client remembers.
+
+**Pass `from` explicitly.** When `from` is omitted, `bdzGetAdAnalytics` defaults to 180 days back — a plan grounded in that call without a `from` is grounded in a 6-month blended average, not the account's current state. For a diagnostic of what's happening now, pass `from` at 30–60 days; only widen the window on purpose (e.g., to size a lookalike seed or judge a full quarter).
 
 ## Output
 
@@ -45,12 +49,14 @@ Campaign (objective)
 ├── Ad Set 2: Warm audience — website visitors
 │   ├── Ad A: Case study / social proof
 │   └── Ad B: Objection handling
-└── Ad Set 3: Lookalike audience — customers
+└── Ad Set 3: Lookalike / Advantage+ audience — customers
     ├── Ad A: Direct conversion offer
     └── Ad B: Trial / free offer
 ```
 
 **Rule**: Maximum 5 ads per ad set. More than that splits the learning phase signal too thin.
+
+**When budget can't feed the full structure, cut ad sets before cutting creative variety.** Structure reallocates spend; creative is what actually moves the result. A $3k/mo account run as one ad set with 3 real angles beats the same $3k spread across the textbook 3-ad-set structure with 1 angle each — three underfed ad sets each stall in learning, and none of them ever tells you which message works.
 
 ### Campaign Objectives (Choose One)
 
@@ -60,7 +66,10 @@ Campaign (objective)
 | **Traffic** | Driving page visits | Clicks (cheap, low-intent) |
 | **Engagement** | Growing social following | Video views, reactions |
 | **Leads** | Lead gen forms | Form fills (native or website) |
+| **App Promotion** | Driving mobile app installs or in-app events | Installs, app events, or app value (the only objective that can optimize for installs — no other objective supports them) |
 | **Sales** | E-commerce or self-serve SaaS | Purchase events |
+
+These are Meta's current campaign objectives (ODAX, 6 objectives in place since 2023 — the old "Conversions" and "Lead Generation" objective names from before 2022 no longer exist in Ads Manager). If this plan has any mobile-app component, route it through App Promotion — it's easy to miss in a table built around web/DTC funnels, but it's a distinct sixth objective, not a setting inside Sales or Traffic. For e-commerce specifically, the automated flow built on top of the Sales objective is now called **Advantage+ Sales Campaigns** (renamed from "Advantage+ Shopping Campaigns" / ASC in 2025); by 2026 the legacy Shopping flow can no longer be created new, and Advantage+ Sales also covers lead gen and app installs, not just checkout.
 
 **Avoid Traffic objective for conversion campaigns** — clicks are cheap but Meta doesn't optimize for purchase or signup intent.
 
@@ -68,90 +77,13 @@ Campaign (objective)
 
 ## Audience Strategy
 
-### Cold Audiences (New Prospects)
-
-**Interest targeting**:
-- Layer 2–3 interests together (OR logic): one interest = too broad; 5+ interests = too narrow to scale
-- Combine interests with behavioral signals: "Engaged shoppers" + "Small business owners"
-- Advantage+ Audience: Let Meta's algorithm find the audience based on your pixel data. Use when you have 50+ pixel conversion events — often outperforms manual interest targeting.
-
-**Broad targeting**: For accounts with mature pixels (500+ events), running with no interest targeting and letting the algorithm optimize. Counterintuitive but effective when the pixel has sufficient data.
-
-### Warm Audiences (Retargeting)
-
-| Audience | Window | Message approach |
-|----------|--------|-----------------|
-| All website visitors | 30–90 days | Broad social proof or reminder |
-| Pricing page visitors | 7–14 days | Urgency, objection handling, comparison |
-| Product/feature pages | 14–30 days | Case studies, demos |
-| Video viewers (75%+) | 30 days | Move to consideration content |
-
-**Exclusion rules** (always set these):
-- Existing customers
-- Recent converters (7–14 day window)
-- Bounced visitors (<10 seconds on site)
-
-### Lookalike Audiences
-
-**Build from best signals, in order of quality**:
-1. Paying customers (highest quality — optimize for LTV)
-2. Qualified leads or trial users
-3. Website converters
-4. Email list (all subscribers — lower quality than customers)
-5. Video viewers (lowest quality — early use only)
-
-**Lookalike size**: 1–2% for highest similarity, 3–5% for reach. Test both. Don't go above 5% — too diluted.
+For the full audience playbook (cold audiences and the broad / Advantage+ default, warm audience windows and exclusion rules, lookalike sources and sizes, and building the audience through Bulldozer OS tools), read `references/audience-strategy.md` before choosing any targeting.
 
 ---
 
 ## Creative Strategy
 
-### The 3-Second Rule
-
-If the first 3 seconds don't hook the viewer, the rest of the ad doesn't matter. Design the hook first.
-
-**Hook types that work**:
-- Bold problem statement: "Stop [common pain]"
-- Unexpected visual or statistic
-- Pattern interrupt (weird, surprising, contrarian)
-- Direct address to ICP: "If you're a [role] who [problem]..."
-
-### Creative Hierarchy (Test in This Order)
-
-1. **Concept/angle** — biggest impact lever (problem-led vs. outcome-led vs. social proof-led)
-2. **Hook/headline** — stop the scroll
-3. **Visual style** — polished vs. UGC vs. screenshot
-4. **Body copy length** — short vs. medium vs. long
-5. **CTA copy** — last lever to test
-
-Test concept first. Never test CTA copy before validating the concept works.
-
-### Creative Formats
-
-| Format | When to use | Specs |
-|--------|-------------|-------|
-| Single image | Product, offer, social-content proof | 1080x1080 (square) or 1080x1920 (vertical) |
-| Carousel | Multiple products, feature list, before/after | 1080x1080 per card |
-| Video (15–30 sec) | Complex products, storytelling, UGC | 1080x1920 vertical |
-| Collection | E-commerce catalog | Auto-generated from product feed |
-
-**Key insight**: Native/UGC-style content (selfie video, screen recording, text overlay) often outperforms polished studio creative. Test both — don't assume either wins.
-
-### Ad Copy Framework
-
-**Primary text** (above the image):
-- Lead with the hook (problem, claim, or question)
-- 1–3 short paragraphs maximum
-- Include social proof (customer count, review quote, stat)
-- End with CTA
-
-**Headline** (below the image):
-- Value proposition in one line
-- Include the offer if there is one
-- No more than 40 characters visible on mobile
-
-**Description** (optional):
-- Reinforcing detail or secondary benefit
+For the 3-second rule and hook types, the creative testing hierarchy, the creative formats table with specs, the Advantage+ Creative note and the ad copy framework (primary text, headline, description), read `references/creative-strategy.md` before briefing or reviewing creative.
 
 ---
 
@@ -163,29 +95,19 @@ Test concept first. Never test CTA copy before validating the concept works.
 | After 50+ events | Cost cap | Control CPA while scaling |
 | Scaling (proven campaigns) | Bid cap | More control, less scale |
 
-**Learning phase**: Campaigns need 50 conversion events per week to exit the learning phase. If your objective is purchase and you're getting 5/week, optimize for an upstream event (add to cart, lead) to get more signal.
+**Learning phase**: an ad set exits the learning phase once it accumulates roughly 50 optimization events within a **rolling 7-day window** — it's not a lifetime total, and an ad set that drops back under that pace can slip back into "Learning Limited." If your objective is purchase and you're getting far fewer than that per week, optimize for an upstream event (add to cart, lead) to get more signal, then move the optimization event up-funnel back to purchase once the account has more conversion history.
 
-**Budget changes**: Change budgets by ≤20% every 3–5 days. Larger changes reset the learning phase.
+**Value Optimization is a separate case, not a lower bar.** An Advantage+ Sales ad set bidding on predicted lifetime value (pLTV) rather than raw purchase count can start stabilizing its value model on roughly 30–50 *high-value* purchase events per week — but that's the model settling in, not the ad set exiting standard delivery, which still runs against the same ~50-event benchmark above. Don't read early pLTV stability as a signal to treat the ad set as fully out of learning.
+
+**Budget changes**: Change budgets by ≤20% every 3–5 days. Changes above that threshold reset the learning phase; audience, optimization-event, and bid-strategy changes reset it too.
+
+**Refuse daily account tinkering.** Staying inside the ≤20%/3–5 days ceiling doesn't make daily check-ins safe — reacting to one bad day (or one good one) inside a still-thin sample is the fastest way to keep an account permanently in Learning Limited without ever resetting cleanly. Review cadence should match conversion volume, not the calendar: a low-volume account earns a decision every few days, not every morning.
 
 ---
 
 ## Optimization Guide
 
-**If CPA is too high**:
-1. Check landing page first — is the problem post-click?
-2. Tighten audience (too broad = low-quality visitors)
-3. Test new creative angles (concept, not just copy)
-4. Check ad relevance diagnostics (quality, engagement, conversion rate rankings)
-
-**If CTR is low (<1% for feed, <0.5% for video)**:
-- Creative isn't stopping the scroll → test new hooks
-- Audience mismatch → try different targeting
-- Ad fatigue → check frequency (>3x per week = refresh needed)
-
-**If frequency is high (>3.5) with poor results**:
-- Expand audience
-- Refresh creative (new concepts, not just variations)
-- Pause for 2–4 weeks if audience is exhausted
+For the optimization procedure (pulling real numbers, stop-loss, and the diagnostic checklists when CPA is too high, CTR is low or frequency is high), read `references/optimization-guide.md` before changing anything on a live account.
 
 ---
 
@@ -203,21 +125,35 @@ Test concept first. Never test CTA copy before validating the concept works.
 
 - [ ] Meta Pixel installed on all pages
 - [ ] Events verified: PageView, Lead, Purchase (or equivalent)
-- [ ] Conversions API (CAPI) set up for server-side tracking
+- [ ] Conversions API (CAPI) set up for server-side tracking, deduplicated against the pixel (same event ID on both sides)
+- [ ] Event Match Quality (EMQ) checked in Events Manager — Meta scores each event source 0–10 on how well it can match a real Meta account; there is no separate "redundancy" metric, EMQ is the number to watch
 - [ ] UTM parameters on all ad URLs
 - [ ] Custom audiences created from customer list and pixel data
 - [ ] Test purchase or lead event fires before launching conversion campaigns
 
-**Why CAPI matters**: iOS 14+ killed ~30% of pixel data. Conversions API sends events server-side, recovering lost signal. Set up CAPI before running conversion campaigns.
+**Why CAPI matters**: browser-side tracking alone has been unreliable since Apple's iOS 14 privacy changes and the general rollback of third-party cookies and ad blockers — the exact share of events lost varies too widely by source to cite a single number. Conversions API sends events server-side, independent of the browser, and recovers a meaningful share of that lost signal. Set up CAPI before running conversion campaigns, and check EMQ rather than assuming CAPI is "working" just because it's installed.
 
 ---
 
 ## 30-Day Launch Plan
 
-**Week 1**: Set up pixel + CAPI. Create custom audiences. Launch 1 campaign with 3 ad sets (cold interest, broad, retargeting) with 3 creative angles each.
+**Week 1**: Set up pixel + CAPI. Create custom audiences. Launch 1 campaign with 3 ad sets (cold interest or Advantage+ suggestions, broad/no-suggestion, retargeting) with 3 creative angles each.
 
 **Week 2**: Monitor learning phase. Check for early signals — which creative concepts are getting engagement? Don't optimize yet.
 
-**Week 3**: Kill bottom 50% of creatives by CPL/CPA. Increase budget on winners by 20%. Launch 2 new creative tests.
+**Week 3**: Pull ad-level performance (`bdzGetAdLayer3Creatives` + `bdzGetAdAnalytics` at `AD_ANALYTICS_TARGET_LAYER_3_ALL`) instead of reading Ads Manager by hand. Kill bottom 50% of creatives by CPL/CPA. Increase budget on winners by ≤20%. Launch 2 new creative tests.
 
-**Week 4**: Evaluate full-funnel CPA. If at or near target, begin scaling. If 2x+ target, audit landing page and audience before increasing spend.
+**Week 4**: Evaluate full-funnel CPA against the account's own history (pulled via `bdzGetAdAnalytics` with `from` set to the launch date, `AD_ANALYTICS_TARGET_LAYER_1_ALL`), not a generic benchmark — and if the objective is Leads, remember this is a CPL read, not yet a revenue read (see Optimization Guide). If at or near target, begin scaling. If past the stop-loss agreed with the client, pause and audit landing page and audience with the account paused, not while it keeps spending.
+
+---
+
+## Rules
+
+What a senior operator on this account refuses to do, regardless of how impatient the client gets:
+
+- **No universal CPL/CPA target.** A cost-per-result only means something against this account's own funnel (margin, deal size, sales cycle) — never quote a benchmark from another account or another vertical as this one's target.
+- **No decision on a handful of events.** Exiting the learning phase (~50 events/7-day window) means the platform has enough signal to keep optimizing — it does not mean you have enough sample to declare a creative, audience, or campaign a winner or a loser.
+- **No daily hand on the account during learning.** Reacting to single-day noise inside a still-thin sample is how an account gets stuck in Learning Limited without ever resetting cleanly. Match review cadence to conversion volume, not the calendar.
+- **No CPA verdict without knowing the read window.** A read pulled without an explicit `from` is a 180-day blended average — never let it stand in for "how is this doing right now."
+- **No treating a 30-day lead-gen CPA as a revenue verdict.** In B2B, the deal can close weeks or months after the lead — a high CPL is real grounds to fix the funnel, not yet grounds to call the channel unprofitable.
+- **No open-ended spend past the agreed stop-loss.** The pause is the default action once the ceiling is crossed; auditing happens with the campaign paused, never funded by more live spend "just to see."

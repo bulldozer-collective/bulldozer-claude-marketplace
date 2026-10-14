@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   team-assessment
-description: |
+description: |-
   Audit a GTM or revenue team — skills gap analysis, role clarity assessment, quota attainment review, capacity model, and a prioritized action plan. Triggers on 'team assessment,' 'skills gap analysis,' 'assess my team,' 'do we have the right people,' 'team audit,' 'sales team performance review,' 'where is my team weak,' or 'our team is not scaling.' For hiring roadmap, see org-design-hiring-roadmap. For budget planning, see budget-resources-planning.
-when-to-use: |
+when-to-use: |-
   Audit a GTM or revenue team — skills gap analysis, role clarity assessment, quota attainment review, capacity model, and a prioritized action plan. Triggers on 'team assessment,' 'skills gap analysis,' 'assess my team,' 'do we have the right people,' 'team audit,' 'sales team performance review,' 'where is my team weak,' or 'our team is not scaling.' For hiring roadmap, see org-design-hiring-roadmap. For budget planning, see budget-resources-planning.
-argument-hint: |
+argument-hint: |-
   Series B SaaS, 8-person GTM team: 3 AEs, 2 SDRs, 1 RevOps, 1 marketing generalist, 1 CS. ARR €3.2M. Only 1 of 3 AEs hit quota last quarter. SDR to SQL conversion at 9%. Need to know who to retain, who to upskill, and what role to hire next.
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -25,6 +25,8 @@ You are a Bulldozer operator running a GTM team assessment. Your job is to diagn
 ## Input
 
 `$ARGUMENTS` — current team roster (roles, tenures, quota status), recent performance data (quota attainment %, conversion rates by stage, pipeline coverage), known issues (rep performance, team cohesion, process breakdowns). If not provided, read available context files. Ask once if team roster and performance data are completely absent.
+
+**Inside a Bulldozer project, check before asking blind:** `bdzListProjectTeams` → `bdzGetProjectTeam` / `bdzListProjectTeamMembers` for an already-logged roster (jobTitle, experienceLevel JUNIOR–EXEC, aiLevel, timeAllocation) before requesting it from the client — these tools carry no manager/reportsTo field, so reporting lines still have to be asked directly. If HubSpot is the connected CRM, `query_crm_data` can pull `dealstage`, `closedate`, `amount_in_home_currency`, and `pipeline` (default DEAL properties) to ground attained revenue and open pipeline for Step 2 instead of asking for them cold — quota per rep is never a default CRM property and still has to come from the client.
 
 ## Output
 
@@ -44,6 +46,16 @@ Assess in this order: process → data → technology → people. Most apparent 
 | **Data** | Can people trust the numbers they're working with? | Pipeline forecast is off by >30%; CRM adoption <80% |
 | **Technology** | Are tools helping or creating friction? | Reps bypass CRM; tools with no defined owner |
 | **People** | Skills, capacity, and incentive alignment | Quota attainment <60%; ramp time >6 months |
+
+---
+
+## When Not to Run the Full Audit
+
+**Three cases where the 4-pillar machinery is the wrong tool — route elsewhere instead of running it anyway:**
+
+- **One rep, one bad quarter, no repeated pattern.** A single rep missing quota once is a 1:1 and a pipeline review, not a team-wide audit. Run the full assessment when the miss repeats across a rep for 2+ quarters, or across multiple reps in the same quarter — that's the threshold that turns an individual result into a team finding.
+- **The team already knows the fix and it has an owner and a date.** If leadership can already name the broken handoff and someone is already fixing it, producing five scorecards to confirm what's already being acted on is filling out a framework for its own sake — check in on the existing fix instead of re-diagnosing it.
+- **The capacity or attainment gap traces to the market, not the team.** If quota attainment is below the "systemic" threshold (Step 2) across every rep regardless of tenure, skill score, or ramp status, the first thing to rule out is whether the ICP itself is validated — see `icp-builder` — and whether the positioning being sold actually holds up against the market (`audit-brand-positioning`). No amount of coaching, restructuring, or hiring against a broken ICP fixes a market-fit problem; it just delays finding it. **Do not let this audit produce a hiring or coaching recommendation for a team selling into an unvalidated or drifted ICP** — flag the ICP question first, and treat the team-level findings as provisional until it's answered.
 
 ---
 
@@ -80,28 +92,12 @@ Score interpretation:
 
 **The quota attainment rate tells you whether the problem is the people, the quotas, or the system.**
 
-**Industry benchmark:** Average B2B SaaS quota attainment is 47%. If your attainment is below 40%, the quota is likely unrealistic for the current stage. If attainment is below 30%, the problem is systemic (process, ICP, pipeline volume, or quota setting method).
+**Industry benchmark:** Average B2B SaaS quota attainment sits at roughly 42–45% (down from a 55–65% baseline before 2022) — RepVue's rep-reported Cloud Sales Index, the named source behind this range, most recently put it at 44.2% in Q1 2026 (≈58,500 rep ratings across ≈250 companies) and 43.6% in Q2 2026, a slight pullback after a brief climb but still inside the range this skill has tracked since 2025 (42.7% in Q2 2025, 43.2% in Q3 2025) — eight straight quarters stuck in the low 40s — lower for enterprise (38–45%), higher for SMB (50–58%). As of this review, Q3 2026 still has not been published — RepVue's own publication cadence stayed active in the meantime (a Q2 2026 report release was confirmed roughly a month after that quarter closed), so a Q3 figure is plausible within weeks rather than overdue. Treat this as directional, not an audited figure: RepVue's own site could not be fetched directly to confirm these figures (network access to repvue.com is blocked from this environment, same as in prior passages), so the numbers above rest on secondary aggregators citing the index, not a direct read of it. If your attainment is below 40%, the quota is likely unrealistic for the current stage. If attainment is below 30%, the problem is systemic (process, ICP, pipeline volume, or quota setting method) — 2026 GTM practitioner commentary converges specifically on ICP misalignment as a common driver at this level, distinct from and easy to mistake for a rep-skill problem: a rep working a poorly-fit segment can execute every step correctly and still miss, because the accounts themselves were never going to convert at the assumed rate.
 
-**Attainment analysis format:**
+For the attainment analysis table and the pattern-identification table (pattern, diagnosis, action), read `references/quota-attainment-analysis.md` (section "Attainment analysis format and pattern identification") when reviewing attainment.
+**When this pattern conflicts with the Step 4 capacity model, the capacity model wins — with one condition.** The pattern table above is a diagnosis of *why* attainment looks the way it does; the capacity model (Step 4) is a forecast of whether the team can hit the target regardless of why. If the pattern says "quota too high" but the capacity model still shows a real gap even after quota is re-set to a defensible level, the gap is real and the pattern finding doesn't cancel it — write both. The condition: never let the capacity model's gap override a pattern finding of "insufficient pipeline volume" or "ICP misalignment" (see "When Not to Run the Full Audit" above) — a capacity gap caused by too few adressable accounts isn't closed by adding headcount, it's closed by fixing the top of funnel or the market segment first.
 
-| Rep | Quota | Attained | % | Tenure | Ramp complete? | Pipeline coverage (last quarter) |
-|-----|-------|---------|---|--------|---------------|-------------------------------|
-| | | | | | | |
-
-**Pattern identification:**
-
-| Pattern | Diagnosis | Action |
-|---------|-----------|--------|
-| All reps below 60% | Quota too high or pipeline insufficient | Review quota-setting method + pipeline coverage ratio |
-| Some reps at 100%+, others at <30% | Performance distribution issue | Coach bottom performers; understand what top performers do differently |
-| New reps underperforming | Ramp too long or onboarding insufficient | Audit ramp program; check if new reps have pipeline to work |
-| Tenured reps declining | Motivation, territory, or product-market concern | 1:1 investigation; check if territory has changed |
-
-**Pipeline coverage check:**
-- Pipeline coverage ratio = total open pipeline ÷ quarter revenue target
-- Target: 3–4x coverage for a quarter to close
-- If coverage is <2x: the problem is top-of-funnel volume, not rep skill
-- If coverage is >4x but attainment is low: the problem is deal quality, not volume
+For the pipeline coverage check (coverage formula, win-rate-implied target, 2026 shift, and how to read low vs. adequate coverage), read `references/quota-attainment-analysis.md` (section "Pipeline coverage check").
 
 ---
 
@@ -109,42 +105,7 @@ Score interpretation:
 
 **Map the skills required for each role against current team capability.** This reveals where to coach vs. where to hire.
 
-**Skills to assess per role:**
-
-For AEs:
-- Discovery quality (does the rep uncover real pain or surface-level symptoms?)
-- Champion building (can the rep identify and develop an internal champion?)
-- Multi-threading (does the rep build relationships beyond the single contact?)
-- Closing mechanics (does the rep have a clear next-step discipline?)
-- CRM hygiene (do their deal records reflect the actual state of the deal?)
-
-For SDRs:
-- Prospecting research quality (are they reaching the right person with the right message?)
-- Personalization depth (are messages generic or signal-based?)
-- Objection handling (can they get past the first "not interested"?)
-- Pipeline building consistency (are they building a predictable weekly volume?)
-
-For RevOps:
-- CRM architecture knowledge (can they build and maintain the systems?)
-- Reporting capability (can they produce the reports leadership actually asks for?)
-- Cross-functional alignment (do they bridge sales, marketing, and CS effectively?)
-- Process documentation (is everything they've built documented for continuity?)
-
-**Skills gap matrix format:**
-
-| Role | Person | Skill A | Skill B | Skill C | Skill D | Skill E | Overall |
-|------|--------|---------|---------|---------|---------|---------|---------|
-| | | 1–5 | 1–5 | 1–5 | 1–5 | 1–5 | |
-
-Score interpretation:
-- 4–5: Strength — leverage and recognize
-- 2–3: Development opportunity — coaching or training within 60 days
-- 1: Critical gap — either intensive coaching with clear timeline or replacement consideration
-
-**Assessment methods:**
-- Direct observation: join calls, review email sequences, review CRM records — not self-reported scores
-- Output review: pipeline data, conversion rates by stage, CRM field completeness
-- Peer and manager input: where do people naturally go for help? Who is sought out vs. avoided?
+For the skills to assess per role (AE, SDR, RevOps), the skills gap matrix format, the score interpretation, the coaching-to-replacement threshold and the assessment methods, read `references/skills-gap-matrix.md` when building the matrix.
 
 ---
 
@@ -152,27 +113,7 @@ Score interpretation:
 
 **Capacity planning answers: can the current team hit the revenue target?**
 
-**Revenue capacity formula:**
-
-```
-Effective capacity = Number of reps × Attainment-adjusted productivity
-Attainment-adjusted productivity = Quota per rep × Historical attainment %
-
-Example:
-3 AEs × €600K quota × 75% attainment = €1.35M effective capacity per quarter
-If quarterly revenue target is €1.2M → capacity is sufficient (but tight)
-If quarterly revenue target is €1.8M → capacity gap of €450K → need 1 additional AE
-```
-
-**Ramp time impact:**
-- A new AE hired today typically reaches full productivity in 3–6 months
-- Factor partial productivity during ramp: a rep hired in January at 3-month ramp contributes at 0% in Q1, 50% in Q2, 100% in Q3
-- If you need revenue in Q3, the hiring decision must happen in Q1
-
-**Attrition modeling:**
-- B2B sales attrition average: 25–35% annually
-- Every rep who leaves creates a productivity gap: departing rep's declining output + replacement rep's ramp time
-- At 30% attrition, 2 of 6 reps will leave this year — factor their replacement ramp into the capacity model
+For the revenue capacity formula with a worked example, the ramp-time impact and the attrition modeling, read `references/capacity-model.md` when building the capacity model.
 
 ---
 
@@ -202,8 +143,38 @@ If quarterly revenue target is €1.8M → capacity gap of €450K → need 1 ad
 |----------|-------|-----------|--------|-------|---------|
 | P1 | [e.g., AE quota attainment at 35%] | [e.g., pipeline coverage ratio 1.8x] | [e.g., Increase SDR outbound volume + add inbound MQL capacity from demand gen] | Head of Sales + Marketing | 30 days |
 | P1 | | | | | |
+| P2 | [e.g., MQL follow-up rate at 40% within 12h] | [e.g., SDRs distrust MQL quality, work them last] | [e.g., Re-align MQL definition with Marketing; add lead-score field visible to SDR] | RevOps + Marketing | 60 days |
 | P2 | | | | | |
+| P3 | | | | | |
 
 **Prioritization framework:**
 - P1: Fixes that unlock revenue in the current quarter (pipeline gap, immediate role clarity issues)
-- P2: Fixes that build capacit
+- P2: Fixes that build capacity or close a skills gap, but don't move this quarter's number (skills coaching, handoff documentation, CRM field cleanup)
+- P3: Fixes that require a new hire, a new tool, or a process rebuild — sequence these last because they take a full quarter or more to land, and starting them doesn't excuse deferring P1/P2
+
+**Sequencing rule:** never put a hire in P1. A headcount request masks a system fix that could land in 30 days for free. If the capacity model in Step 4 shows a genuine gap even after the process, data, and technology fixes are made, the hire becomes a P2 or P3 item — planned, not reactive.
+
+---
+
+## Common Mistakes
+
+For the list of common mistakes to avoid, read `references/checklist-and-mistakes.md` (section "Common Mistakes") before drafting the action plan.
+
+---
+
+## Quality Checklist
+
+Before delivering the assessment, confirm:
+
+Before delivering the assessment, run the full quality checklist in `references/checklist-and-mistakes.md` (section "Quality Checklist") and confirm every item.
+
+---
+
+## Rules
+
+- **Diagnose the system before the person.** A rep who skips CRM fields, misses quota, or has a low conversion rate is a symptom until proven otherwise — trace it through process, data, and technology (Steps in the 4-Pillar order) before concluding it's a skills or motivation problem.
+- **A skills gap matrix built on self-report is not a skills gap matrix.** If the scores in Step 3 came from a survey the reps filled out themselves, the matrix measures confidence, not skill. Re-score from call review, CRM output, and manager/peer input before using it to justify coaching or replacement decisions.
+- **Never open with a hiring recommendation.** Structural fixes are faster and cheaper than headcount changes — that's the operating assumption behind this whole audit (see the framing note at the top of this skill). A capacity gap earns a hire only after the cheaper fixes are already in the plan.
+- **Refuse to sign off on a team-level fix — coaching, restructuring, or a hire — for a team whose attainment problem traces to the market, not the team.** If Step 2's below-30%-across-the-board signal is present, the honest deliverable names the ICP question as the real P1 and treats every other row as provisional until it's answered — not a five-scorecard plan that assumes the market segment was never in question.
+- **The action plan is the deliverable, not the scorecards.** The 4-pillar audit, the role clarity scores, the skills matrix, and the capacity model exist to produce Step 6 — a leadership team that gets five scorecards and no prioritized, owned, dated plan hasn't been given something they can act on.
+- **Every root cause in the action plan must be traceable to a specific step above.** If you can't point to which pillar, pattern, or handoff a P1 row comes from, it's an opinion dressed as a finding — cut it or go find the evidence.

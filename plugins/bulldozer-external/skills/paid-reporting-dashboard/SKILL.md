@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   paid-reporting-dashboard
-description: |
-  Builds the paid advertising reporting system for a B2B GTM team: UTM taxonomy, offline conversion upload, CRM attribution integration, dashboard connecting ad spend to pipeline and closed revenue, and benchmark scorecards with 30/90/180-day ROAS windows.
-when-to-use: |
-  Trigger when the user asks: 'set up our paid reporting dashboard', 'connect ad spend to revenue', 'build our UTM taxonomy', 'what campaigns are working?', 'our paid reporting only shows impressions', 'we need a paid attribution setup'. Not for audience segmentation → use audience-architecture. Not for attribution model selection → use attribution-funnel.
-argument-hint: |
+description: |-
+  Builds and maintains the paid advertising reporting system for a B2B GTM team: UTM taxonomy, offline conversion upload, CRM attribution integration, a multi-platform dashboard connecting ad spend to leads, lead quality, pipeline and closed revenue (with period-over-period comparison), and benchmark scorecards with 30/90/180-day ROAS windows.
+when-to-use: |-
+  Trigger when the user asks to set up, update, fix, or rebuild a paid/ads reporting dashboard — including: 'set up our paid reporting dashboard', 'update our ad performance dashboard', 'connect ad spend to revenue', 'build our UTM taxonomy', 'what campaigns are working?', 'our paid reporting only shows impressions', 'we need a paid attribution setup', 'track our leads across Google and LinkedIn in one dashboard', 'build a multi-channel ad performance dashboard with period-over-period comparison', 'audit the quality of the leads our ads are producing'. Also trigger on any request comparing ad performance across multiple ad accounts/platforms, or one period against another. Not for audience segmentation → use audience-architecture. Not for attribution model selection → use attribution-funnel.
+argument-hint: |-
   Series B SaaS, €80K/quarter on Google + LinkedIn. GA4 + HubSpot. Reporting only shows impressions and CPL. Leadership wants to see pipeline and closed revenue attribution per campaign before the next budget cycle in 3 weeks.
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -52,43 +52,13 @@ Most B2B teams have Layer 1–2 and skip 3–5. The result: the algorithm optimi
 
 ## Layer 1: UTM Taxonomy
 
-**A consistent UTM standard is the foundation of all attribution.** Without it, GA4 and CRM source data becomes fragmented within 30 days of launch as different team members build campaigns with different naming patterns.
-
-**Required UTM parameters (mandatory for every paid link):**
-
-| Parameter | Definition | Example values |
-|-----------|-----------|----------------|
-| `utm_source` | Platform | `google`, `linkedin`, `meta`, `reddit` |
-| `utm_medium` | Channel type | `cpc`, `paid-social`, `display`, `remarketing` |
-| `utm_campaign` | Campaign name | `search-brand-q2`, `linkedin-icp-awareness-q2` |
-| `utm_content` | Ad creative variant | `ad-headline-a`, `creative-cto-persona` |
-| `utm_term` | Keyword (Search only) | `crm-software-smb` |
-
-**Naming convention rules:**
-- Lowercase only — GA4 is case-sensitive; `Google` and `google` are two sources
-- Hyphens only, no spaces or underscores — spaces break URL encoding
-- Include quarter in campaign name — enables QoQ comparison without date filters
-- No abbreviations that aren't in the shared glossary
-
-**GCLID (Google Click Identifier):** Enable auto-tagging in Google Ads so GCLID passes automatically with every click. GCLID enables server-side conversion matching even when UTM parameters are blocked by browser privacy settings. Configure GCLID pass-through in your CRM (HubSpot: Settings → Marketing → Ad Tracking → enable GCLID).
-
-**CRM UTM capture:** Every form submission should write the current session's UTM parameters to the contact record. In HubSpot, hidden form fields capture these automatically when the HubSpot tracking code is installed. Verify this is working: submit a test form with UTM-tagged URL and check the contact record for source fields.
+For the full UTM taxonomy (required parameters, naming rules, GCLID auto-tagging, the re-launch trap, CRM UTM capture), read `references/utm-and-crm-attribution.md`.
 
 ---
 
 ## Layer 2: CRM Attribution Configuration
 
-**Every lead in the CRM needs an original source that never changes.** This is the field that enables closed-won analysis by channel.
-
-**HubSpot configuration:**
-- `Original Source` and `Original Source Drill-down 1/2`: Set by HubSpot automatically on contact creation — do not overwrite these fields
-- Custom property `Ad Campaign` (text, read-only after creation): stores utm_campaign value at lead creation
-- Custom property `Ad Source` (text, read-only after creation): stores utm_source + utm_medium
-- Custom property `First Touch Date` (date): timestamp when contact was created with a paid source
-
-**The read-only rule is critical.** If reps or automation can overwrite the original source, attribution degrades within weeks. Lock these fields at creation in CRM settings (HubSpot: Properties → field-level permissions → no edit after creation).
-
-**80% data match target:** Run a monthly audit — what % of contacts in your CRM have the `Original Source` field populated? Target: >80%. Anything below signals tracking gaps (UTMs missing on some campaigns, form submissions not capturing source, API-created contacts without source data).
+For the HubSpot configuration of original-source properties, the read-only rule and the data match target, read `references/utm-and-crm-attribution.md`.
 
 ---
 
@@ -98,24 +68,9 @@ Most B2B teams have Layer 1–2 and skip 3–5. The result: the algorithm optimi
 
 Offline conversions send CRM lifecycle stage changes back to the ad platforms as conversion signals. When a lead becomes an MQL, SQL, or Closed-Won deal, the ad platform learns which ads, audiences, and keywords produce those outcomes — not just which produce form fills.
 
-**Result:** Smart Bidding shifts from optimizing for form fills to optimizing for SQLs and revenue. This typically produces 30–50% lower cost per SQL within 60–90 days of implementation.
+**Result:** Smart Bidding shifts from optimizing for form fills to optimizing for SQLs and revenue — once it has enough of them to learn from (see the volume floor in the Benchmark Scorecard below). No public source ties a specific cost-per-SQL improvement percentage to this switch; treat the payoff as directional — better signal in, better spend allocation out — not as a number to promise leadership before you've measured it on this account.
 
-**Google Ads offline conversion setup:**
-1. Create conversion actions in Google Ads: one per CRM milestone (`MQL`, `SQL`, `Opportunity`, `Closed-Won`)
-2. Assign conversion values reflecting deal economics:
-   - MQL: €50 (low signal)
-   - SQL: €200
-   - Opportunity: €500
-   - Closed-Won: actual deal value (or ACV estimate)
-3. Connect via HubSpot/Salesforce native Google Ads integration or Google Ads Conversion Import API
-4. Switch bidding to Target ROAS or Maximize Conversion Value once you have 30+ offline conversions/month
-
-**LinkedIn Ads offline conversion setup:**
-1. In Campaign Manager → Conversions → Create Conversion
-2. Select "Lead Gen Form" or "Website" conversion type → add CRM stage triggers via LinkedIn integration or manual CSV upload
-3. Attribution window: set to 90 days (not the 30-day default)
-
-**Validation:** After 30 days, verify that offline conversions are appearing in Google Ads campaign performance. If import shows 0 conversions, debug the GCLID pass-through (most common failure point).
+For the Google Ads and LinkedIn offline conversion setup steps, the Bulldozer OS path and the 30-day validation, read `references/offline-conversions-setup.md`.
 
 ---
 
@@ -123,7 +78,7 @@ Offline conversions send CRM lifecycle stage changes back to the ad platforms as
 
 **Connect the deal to the original ad source, not just the most recent touchpoint.**
 
-In HubSpot, every deal has an associated contact. The contact has an `Original Source` field. If you've configured CRM attribution correctly (Layer 2), every deal is already associated with an ad source — query it with a custom deal report.
+In HubSpot, every deal has an associated contact. The contact has an `Original Source` field. If you've configured CRM attribution correctly (Layer 2), every deal is already associated with an ad source. Bulldozer OS can pull this directly with a SQL-style query against the DEAL object (`query_crm_data`) — group by Deal Source for the report below, or by `DATE_TRUNC` for a monthly cohort — instead of building a UI report by hand. **Test this on a throwaway query before building the report on it.** On a portal missing the right scope, `query_crm_data` fails outright on exactly this GROUP BY/DATE_TRUNC pattern — `Insufficient scope: required "crm.hubsql.execute reporting.full.read reporting.full.admin marketing.campaigns.revenue.lite.read marketing.campaigns.revenue.full.read"` — and it fails the same way whatever object or fields you query, not only on financial aggregation. If it fails, that's not the connector broken: name the missing scope to the client's HubSpot admin, and fall back to `search_crm_objects` filtered by Deal Source (paginate, aggregate client-side) — slower, but it works without that scope. One rule that matters either way: aggregate on the currency-converted deal amount (`amount_in_home_currency`), not the raw `amount` — a portal holding deals in more than one currency will silently mix them in the total otherwise.
 
 **Required deal-level attribution fields:**
 - `Deal Source` (single-select): inherits from associated contact's Original Source at deal creation — do not let reps change this
@@ -138,43 +93,43 @@ In HubSpot, every deal has an associated contact. The contact has an `Original S
 
 **4 dashboards, each for a different audience and decision cadence.**
 
-### Dashboard 1: Executive (Weekly, CEO / Board)
-
-Purpose: Paid investment → pipeline → revenue
-
-| Metric | Formula | Target |
-|--------|---------|--------|
-| Pipeline from paid (30-day) | Sum of deal values created where Deal Source = paid, current month | Match % of revenue target from paid channel |
-| Pipeline from paid (90-day) | Same filter, last 90 days | 5–10x ad spend |
-| 180-day ROAS | Closed-won ARR (Deal Source = paid, last 180 days) ÷ ad spend | 4.5–8.5x for B2B SaaS |
-| Cost per SQL | Total ad spend ÷ SQLs with paid source | €350–750 mid-market |
-| CAC payback period | CAC ÷ (MRR × gross margin %) | 5–11 months |
-
-**Why 180-day ROAS:** B2B SaaS average sales cycle is 84 days. Evaluating paid ROI at 30 days systematically understates performance — most deals from this month's ads haven't closed yet. 180 days is the minimum window that captures the majority of revenue from a given ad period.
-
-### Dashboard 2: Pipeline Attribution (Weekly, Marketing + RevOps)
-
-- Pipeline by paid channel (Google / LinkedIn / Meta / other) — current quarter vs. last quarter
-- MQL → SQL conversion rate by original source — which channels produce leads that close?
-- Lead volume by campaign × lifecycle stage — are campaigns producing pipeline or just form fills?
-- Cost per SQL by campaign — which specific campaigns are worth scaling?
-
-### Dashboard 3: Campaign Performance (Daily, Paid Media)
-
-- Spend, impressions, clicks, CTR by campaign
-- Form fills and cost per form fill by campaign
-- Offline conversions (MQL, SQL) by campaign — the leading indicator of pipeline quality
-- Audience overlap and frequency cap monitoring
-
-### Dashboard 4: Channel Mix (Monthly, CMO)
-
-- Budget allocation vs. pipeline attribution by channel — are we spending in proportion to what produces revenue?
-- Win rate by original source — which channels produce buyers vs. browsers?
-- CAC by channel — what does it cost to acquire a customer from each channel?
-- Quarter-over-quarter trend by channel
+For the four dashboard specifications (metrics, formulas, targets, which targets are sourced, OS tools to use), read `references/dashboard-specs.md`.
 
 ---
 
 ## Benchmark Scorecard
 
-**Set these thresholds before the quarter, not during it.** Thresholds changed in response to current per
+**Set these thresholds before the quarter, not during it.** Thresholds changed in response to current performance defeat the point of having them — you can no longer tell whether a channel improved or whether the bar just moved to match whatever happened last month.
+
+**Escalation bands, derived from the Dashboard 1 targets above.** Same caveat as there: only the CAC payback row is backed by a named source — treat the ROAS, pipeline-multiple and cost-per-SQL bands as a placeholder until your own trailing data replaces them.
+
+| Metric | Healthy | Investigate | Critical |
+|--------|---------|-------------|----------|
+| 180-day ROAS | ≥4.5x | 3–4.5x | <3x |
+| Cost per SQL | €350–750 | €750–1,000 | >€1,000 |
+| CAC payback period | ≤18 months | 18–24 months | >24 months |
+| MQL → SQL conversion (by source) | Within 20% of the best-performing channel | 20–40% below | >40% below |
+
+**Investigate** means: pull the campaign-level breakdown (Dashboard 3) before touching budget — a channel-level number in the Investigate band is often one or two campaigns dragging the average down, not the whole channel underperforming. Before touching budget at the campaign level either, rule out a creative problem wearing a channel problem's clothes: one fatigued or off-message ad dragging down an otherwise sound audience and bid setup looks identical to a bad channel on this scorecard, and the fix is a new creative test, not a smaller budget (see `ad-creative` for how to run that test — this scorecard shows where the money went, not why an ad did or didn't convert). **Critical** means: the reallocation conversation happens at the next review, not at the next quarter — and two Critical reads in a row for the same channel, above the volume floor both times, is the trigger to actually move the budget at that second review, not a third data point to wait for. A stopping rule that only ever gets discussed and never pulled isn't one.
+
+**The volume floor applies before any of this.** A channel with fewer offline conversions per month than Smart Bidding needs to exit learning (~30–50 conversions/month per campaign) hasn't generated enough signal for the ad platform to optimize on, let alone for this scorecard to judge. Below that floor, the only correct action is to keep spending and wait — moving budget off a channel because its 180-day ROAS looks weak with 8 offline conversions in the window is reading noise as signal. There is no equally solid published floor for the CRM-side metrics (cost per SQL, MQL→SQL rate) — treat a channel with fewer than a handful of closed or qualified deals in the period the same way: wait for volume before concluding, rather than applying a borrowed number.
+
+---
+
+## Bi-Weekly Review Protocol
+
+For the bi-weekly review cadence and agenda, and the multi-touch second view with its tool-contract traps, read `references/review-protocol-and-multitouch.md`.
+
+---
+
+## Rules
+
+- **Revenue comes from the CRM, spend comes from the ad platform — never blend them into one number.** Each counts by its own rules; a "true cost" that adds ad spend to a CRM-derived figure is a number nobody can audit.
+- **Original Source and Deal Source lock at creation — no exception for a rep or an automation, ever.** The day either can overwrite them, every dashboard built on this stack degrades, and it degrades silently, so no one notices until the numbers stop making sense months later. The one narrow exception that's allowed is an audited data-ops merge of duplicate contact records — that's cleanup, not an override.
+- **Never reallocate off Dashboard 3.** It's built to catch a tracking break appearing overnight, not to render a performance verdict — a bad day's CTR there can sit next to a perfectly healthy cost per SQL that only shows up downstream. Reallocation decisions live in the Bi-Weekly Review, on the 90- or 180-day windows, never in the dashboard someone happens to already have open.
+- **A weak scorecard number is a flag to investigate, not a verdict on the channel — rule out one fatigued or off-message creative before touching budget.** Two Critical reads in a row, above the volume floor both times, is what actually triggers the reallocation; waiting for a third read past that point isn't diligence, it's the stopping rule not being followed.
+- **No reallocation decision on the 30-day window.** It exists to catch a tracking break, not to judge a channel. Judge on 90-day pipeline and 180-day ROAS — the sales cycle doesn't care what fits neatly in a monthly report.
+- **Below the volume floor, wait — don't optimize.** A channel judged on a handful of conversions is being judged on noise, whatever the resulting number looks like.
+- **Every metric on the scorecard needs an action attached to its Critical band, decided before the quarter starts.** A dashboard that only reports numbers without saying what happens when one crosses the line is decoration, not a reporting system.
+- **A benchmark without a named source is a placeholder, not a target.** CAC payback here comes from a dated industry report; the ROAS, pipeline-multiple and cost-per-SQL targets don't — replace them with your own trailing 2–3 quarters as soon as you have them, and never let a client hold the team to an unsourced range as if it were a promise.
+- **Multi-touch attribution is a second view, not a replacement for Deal Source.** Keep the single-touch field as the number everyone in the room trusts; use multi-touch to catch influence it would otherwise miss, not to relitigate which channel gets credit.

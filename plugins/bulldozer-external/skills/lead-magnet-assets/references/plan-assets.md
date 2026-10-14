@@ -4,6 +4,15 @@
 > document décoré (images qui n'apprennent rien). On produit un visuel quand il fait comprendre plus vite
 > qu'un paragraphe — sinon on garde le paragraphe.
 
+## Table des matières
+
+- Schéma complet
+- Règles de décision
+- La commande de couverture est obligatoire par défaut (R8)
+- Densité recommandée
+- Contrôle avant production
+- Contrôle après production
+
 ## Schéma complet
 
 ```json
@@ -31,8 +40,10 @@
 }
 ```
 
-Le champ `prompt` n'est pas facultatif : les URLs Studio expirent et les sandbox se réinitialisent. Sans
-le prompt conservé, l'asset est irrécupérable et le document devient non reproductible.
+Le champ `prompt` n'est pas facultatif : le lien de téléchargement Studio n'est pas garanti de rester
+valide et les sandbox se réinitialisent. Sans le prompt conservé ici, la seule voie de secours est de
+le retrouver côté OS (`bdzGetStudioJobParams` — voir `references/pannes-et-parades.md`, section Reset
+du sandbox), sans garantie de rétention : ne pas compter dessus pour s'exempter d'écrire le prompt ici.
 
 ## Règles de décision
 
@@ -99,13 +110,14 @@ traitée comme un oubli par la review.
 ```
 [ ] chaque commande est en statut produit ou échec — aucune en "à produire"
 [ ] chaque fichier existe réellement dans assets/ et s'ouvre
-[ ] aucun fichier n'est une URL S3 (les liens expirent, les fichiers non)
+[ ] aucun fichier n'est un lien de téléchargement Studio (sa validité n'est pas garantie, un fichier local si)
 [ ] les illustrations partagent visiblement la même direction artistique
 [ ] aucune image ne contient de texte, de chiffres ou de logo générés par l'IA
 [ ] les graphiques affichent leur source — dans le <figcaption>, PAS dans le SVG
 [ ] chaque SVG est dessiné « encre bord à bord » : x=0 à x=W (check_alignements.py)
 [ ] aucun libellé de SVG ne dépasse sa viewBox (il serait rogné à la conversion)
-[ ] aucune couleur de texte SVG posée par attribut fill= sous une classe qui définit un fill
+[ ] la couleur de texte de chaque SVG suit le bon sens pour son mode d'intégration — attribut
+    fill= si inliné (schéma), style=fill: si chargé en <img> (graphique) — voir svg-alignement.md
 [ ] le contraste du texte posé sur une image est mesuré, pas supposé
 [ ] les échecs sont documentés avec une proposition
 [ ] les prompts sont conservés dans plan-assets.json

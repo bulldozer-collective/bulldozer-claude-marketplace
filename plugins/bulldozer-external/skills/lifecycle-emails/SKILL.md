@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   lifecycle-emails
-description: |
+description: |-
   Build and optimize automated email flows — welcome series, drip, lifecycle, and nurture sequences. Triggers on 'email sequence,' 'drip campaign,' 'nurture sequence,' 'welcome sequence,' 're-engagement emails,' or 'trigger-based emails.' For cold outreach, see cold-email. For in-app onboarding, see onboarding.
-when-to-use: |
+when-to-use: |-
   Build and optimize automated email flows — welcome series, drip, lifecycle, and nurture sequences. Triggers on 'email sequence,' 'drip campaign,' 'nurture sequence,' 'welcome sequence,' 're-engagement emails,' or 'trigger-based emails.' For cold outreach, see cold-email. For in-app onboarding, see onboarding.
-argument-hint: |
+argument-hint: |-
   Welcome sequence for B2B SaaS trial users — 7-email flow over 14 days
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -48,6 +48,8 @@ Lead with usefulness. Build trust through content. Earn the right to sell before
 
 Fewer, better emails beat more generic ones every time. Segment your list and personalize where it matters (not just first name — segment by behavior, plan, or role).
 
+**Start with 2–3 segments, not one branch per persona.** Build the first split from what you already know at signup (the intent or role question, if one exists) or from a behavioral split the funnel already shows — not from every persona in the sales deck. Add a branch when the data shows a specific segment stalling at a specific step, not before: each extra branch is a sequence you now have to write, test, and maintain.
+
 ### Clear Path Forward
 
 Every email moves the reader somewhere. Make the next step obvious and frictionless.
@@ -70,6 +72,10 @@ Every email moves the reader somewhere. Make the next step obvious and frictionl
 | 5 | 7 | Value deepening (feature spotlight) |
 | 6 | 10 | Objection handling / FAQ |
 | 7 | 14 | Trial expiry warning + convert CTA |
+
+**Before writing Email 2**: "quick win" only means something if you know this product's actual activation event — the one action that predicts who sticks around, not a generic "first thing to click." If the caller hasn't named it, that's the real gap to close first, not something to paper over with a plausible-sounding placeholder — see `onboarding` for how to find it. A sequence built around the wrong "quick win" ships on time and activates no one.
+
+**If Email 7 keeps underperforming**, don't treat it as a copy problem by default. A trial-expiry reminder that gets opened and clicked but still doesn't convert is usually pointing at something upstream — the price or the paywall it leads to, not the reminder itself. Check `pricing` and `paywalls` before writing a fourth version of this email.
 
 ### Lead Nurture Sequence
 
@@ -99,6 +105,12 @@ Every email moves the reader somewhere. Make the next step obvious and frictionl
 | 3 | 8 | Special offer or exclusive content |
 | 4 | 12 | Breakup email (unsubscribe or stay?) |
 
+**Split the list before you write one sequence for everyone.** Someone who signed up and never reached the activation event has a different problem than someone who used the product for months and then stopped: the first needs pointing back toward the moment they missed, the second needs to know what changed or broke for them. A single "we miss you" arc sent to both is treating two different problems as one — if you can't tell which segment you're writing for, that's the question to ask before drafting, not something generic copy can smooth over.
+
+**Run the arc once, not on a loop.** If a contact goes through the full sequence above and never opens or clicks, don't re-enter them on the next inactivity trigger. Repeatedly emailing someone who has shown zero engagement only costs you on deliverability (see below) with no realistic upside — suppress them instead. If that non-responding segment is large enough to matter, it's a `churn-prevention` conversation (exit survey, save offer matched to a stated reason) — a lifecycle sequence can't diagnose why someone left, only try to bring them back.
+
+**If the product is a mobile app with an App Store auto-renewable subscription**, this email/SMS sequence isn't the only win-back lever and shouldn't be presented as if it were: Apple's App Store Connect has a native win-back offers mechanism (up to 5 offers active at once per subscription/storefront, eligibility gated by minimum paid duration and time since last subscribed) that runs at the platform level, independent of anything this skill produces. The two are cumulative, not substitutes — build the email sequence for channels Apple doesn't own (and for Android/web), and check with whoever owns App Store Connect whether a native win-back offer is already configured before assuming email is the only reactivation lever in play.
+
 ---
 
 ## Email Writing Rules
@@ -118,7 +130,7 @@ Every email moves the reader somewhere. Make the next step obvious and frictionl
 - Personalization that feels creepy ("I saw you visited our pricing page again")
 - Generic: "Newsletter Issue #47," "Your Weekly Update"
 
-**Length**: 40–60 characters ideal. Test longer for specific audiences — some niches respond better to full sentences.
+**Length**: 30–50 characters, with the words that matter in the first ~30 — that's where the mobile preview truncates, and most opens now happen on mobile. Test longer for specific audiences — some niches respond better to full sentences.
 
 ### Preview Text
 
@@ -145,87 +157,30 @@ Every email moves the reader somewhere. Make the next step obvious and frictionl
 
 ## Email Templates
 
-### Welcome Email 1 — Immediate
-
-Subject: You're in — here's where to start
-
-Preview text: One thing to do in the next 10 minutes
-
----
-
-Hey [Name],
-
-Welcome to [Product]. You made a good call.
-
-Your trial is active. Here's the one thing I'd recommend doing in the first 10 minutes:
-
-[Specific first action — the thing that leads to the "aha moment"]
-
-This is the step most people skip — and it's the reason teams that do it get results in week 1 instead of week 4.
-
-[CTA button: "Do This Now →"]
-
-If you run into anything, just reply to this email.
-
-[Name]
-[Title], [Company]
-
----
-
-### Welcome Email 3 — Story/Why
-
-Subject: Why I built this
-
-Preview text: (The real story, not the polished version)
-
----
-
-Hey [Name],
-
-I want to tell you why [Product] exists.
-
-[2–3 sentence honest story: what problem you faced, why existing solutions failed, what made you decide to build this]
-
-That's still what drives everything we do.
-
-If you're dealing with a similar problem, I think you'll find [specific feature or workflow] especially useful.
-
-[CTA: Learn more about [feature] →]
-
-[Name]
-
----
-
-### Re-engagement Email 4 — Breakup
-
-Subject: Should I close your account?
-
-Preview text: Genuinely asking
-
----
-
-Hey [Name],
-
-You haven't been active in [X weeks], and I don't want to keep emailing you if [Product] isn't useful right now.
-
-Two options:
-
-1. If you want to keep your account and come back to it later, no action needed — you're staying subscribed.
-
-2. If you'd rather unsubscribe and clear your inbox, click here → [Unsubscribe]
-
-No hard feelings either way.
-
-[Name]
-
-P.S. If there's something specific that stopped you from using [Product], I'd genuinely love to know. Just hit reply.
+Three ready-to-adapt templates — welcome (immediate), welcome (story/why), and the re-engagement breakup email. Read `references/templates.md` for the full subject line, preview text, and body of each.
 
 ---
 
 ## Timing Rules
 
-- **Welcome email**: Send immediately — within 5 minutes of signup. Delay = drop in open rate.
+- **Welcome email**: Trigger it automatically, right at signup — not on a batch job that runs later. Most people expect the welcome email the moment they sign up, and a large share of senders still don't deliver on that, so getting it genuinely immediate is a real edge, not a formality. If your stack can't fire instantly, sub-hour delivery is the ceiling to aim for — never next business day.
 - **B2B sequences**: Avoid weekends. Tuesday–Thursday typically outperforms.
 - **B2C sequences**: Test weekends — some audiences are more receptive outside work hours.
 - **Re-engagement**: Start 30–45 days after last activity. Don't wait 90 days.
 - **Gap between emails**: Minimum 2–3 days in automated sequences; maximum 2 weeks (longer and they forget who you are).
+
+## When the Problem Isn't the Email
+
+**Read a test the same way you'd read any other test.** Don't call a subject-line or timing winner before a full weekly cycle has run on real volume, and don't stop the moment day-3 numbers look good — early reads regress. If a properly sized test isn't running, say so instead of reporting a hunch as a result (see `ab-testing` for sizing and duration).
+
+**The signal that should make you stop editing copy.** If sender authentication is clean, the complaint rate is low, and clicks *and* the downstream metric (activation, trial-to-paid) stay flat across two honestly-tested rewrites — the email isn't the bottleneck anymore. It's getting through; what it points to (the activation step, the price, the paywall) is what isn't converting. Fix that, don't ship a third subject-line variant.
+
+**Don't read "opens" as proof of engagement.** Apple Mail's Mail Privacy Protection pre-fetches the tracking pixel on the server side before anyone looks at the message, so it registers an "open" for most Apple Mail recipients whether or not the email was ever seen — and Apple Mail accounts for a large share of inbox opens today. A healthy open rate on its own doesn't confirm anyone read the email; it can just mean Apple's servers did. Track opens as a trend over time, not as the signal that decides whether an email got through — clicks and the downstream metric are what MPP doesn't distort, and they're what should drive the stop/keep-editing call above.
+
+**What doesn't go in as a fixed target.** An open-rate or cadence number lifted from a benchmark article is someone else's list, not this one — it's a starting hypothesis to test here, never a target to hit. Same discipline applies to urgency in a trial-expiry or win-back email: a countdown or "only a few spots left" that isn't literally true isn't just weak copy — it's the fake-urgency pattern regulators have been actively fining through 2025–2026 (the FTC's $2.5B Amazon settlement over deceptive enrollment/cancellation design, and California's CCPA rules effective January 2026 naming false urgency directly as a prohibited dark pattern). If the deadline or scarcity isn't real, don't write it as if it were.
+
+## Deliverability Is a Prerequisite, Not an Afterthought
+
+None of the sequences above matter if the emails land in spam or bounce outright. Since 2024, Gmail and Yahoo enforce sender authentication (SPF, DKIM, and a DMARC record in alignment) and a spam-complaint ceiling on anyone sending in volume, plus a working one-click unsubscribe on marketing mail (transactional mail is exempt). That was the start, not the end state: multiple deliverability vendors converge on Google moving further since, from filtering non-compliant bulk mail to spam toward outright SMTP rejection (a 550 bounce, mail never delivered at all) — no official Google page has been readable to confirm the exact date, but the direction and the rough timing (around late 2025, later than the 2024 authentication mandate) are consistent across independent checks. Don't treat "authenticated in 2024" as the finish line — before you hand off a sequence, confirm with whoever owns the sending infrastructure that the domain is authenticated and the complaint rate is under control today, not just that it once passed the initial mandate — an open-rate number is not diagnostic if the mail never reached the inbox to be opened.
+
+**Grounding in Bulldozer OS**: the OS has no native connector that sends or triggers these sequences. The one OS tool family that does send email — Lemlist (`bdzCreateLemlistCampaign` / `bdzCreateLemlistLead` / `bdzStartLemlistCampaign`) — is built for cold outbound, prospects added one at a time with per-prospect personalization variables; it's the wrong tool here and shouldn't be reached for, because it has no way to trigger a sequence off a product or account event for people who are already users. Execution of the sequences this skill produces stays entirely with the client's ESP or product stack (Customer.io, the product's own transactional layer, HubSpot Marketing, etc.). What the OS can measure is what happens after someone clicks through: a GA4 report template (`bdzListGoogleAnalyticsReportTemplates` / `bdzGetGoogleAnalyticsReport`) tracks the activation or trial-to-paid events a sequence is meant to drive, once its links carry UTMs back to the product. If the client's HubSpot connector has Marketing Hub access and the emails are tied to a HubSpot campaign, `read_campaign_data` (operation `GET_ASSET_METRICS`, assetType `MARKETING_EMAIL`) can return send-level performance for them — run `GET_CAMPAIGN_ASSET_TYPES` first, since which asset types a portal exposes varies by account — but that access depends on the scope granted to the specific connector and isn't there by default, so verify it on the real project before promising it as a reporting source.

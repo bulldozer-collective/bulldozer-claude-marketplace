@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   dtc-shopify-playbook
-description: |
+description: |-
   Build the operating system for a DTC Shopify brand — unit economics baseline, retention stack (email + SMS flows), paid acquisition sequencing, LTV maximization levers, and the 3-operator model for scaling from 7 to 8 figures. Triggers on 'Shopify playbook,' 'DTC strategy,' 'email and SMS for ecommerce,' 'Klaviyo setup,' 'how to scale a DTC brand,' 'our email revenue is low,' 'Shopify retention,' or 'how to improve LTV.' For broader retention strategy, see customer-health-expansion.
-when-to-use: |
+when-to-use: |-
   Build the operating system for a DTC Shopify brand — unit economics baseline, retention stack (email + SMS flows), paid acquisition sequencing, LTV maximization levers, and the 3-operator model for scaling from 7 to 8 figures. Triggers on 'Shopify playbook,' 'DTC strategy,' 'email and SMS for ecommerce,' 'Klaviyo setup,' 'how to scale a DTC brand,' 'our email revenue is low,' 'Shopify retention,' or 'how to improve LTV.' For broader retention strategy, see customer-health-expansion.
-argument-hint: |
+argument-hint: |-
   DTC skincare brand, €2.1M GMV on Shopify. Klaviyo installed but barely used — only welcome email live. Repeat purchase rate 11%. CAC €38, AOV €62. Email is 14% of revenue. Goal: get to 28% email revenue share and improve repeat rate to 20%.
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -57,7 +57,7 @@ Target: LTV ≥ 3x CAC at 12 months
 | CAC (blended) | | Variable by stage | Fix LTV before scaling spend |
 | CAC payback | | <6 months | Don't scale paid until this is fixed |
 | LTV (12-month) | | 3–5x first order value | Build retention flows before scaling acquisition |
-| Repeat purchase rate | | 15–30% for healthy DTC | Email flow stack drives this |
+| Repeat purchase rate | | 15–30% for healthy DTC (apparel tends toward the low end, replenishable categories like supplements toward the high end) | Email flow stack drives this |
 | AOV | | Category-dependent | Bundling, upsell, subscription |
 | Email as % of revenue | | 28–38% target | See Flow Stack below |
 
@@ -68,89 +68,15 @@ Target: LTV ≥ 3x CAC at 12 months
 
 Scaling ads before these signals wastes €20–30K on a business that hasn't proven retention can sustain the economics.
 
+**This gate assumes a repeatable category.** For a genuinely one-time-purchase product (mattress, engagement ring, one specific piece of furniture), a repeat-purchase floor is the wrong instrument — most customers were never going to buy twice regardless of retention execution. Don't force gate #2 onto that kind of brand; substitute a proxy that actually reflects whether the first customer is satisfied enough to fund the next one: review velocity/rating, referral rate, or the trend in organic-search branded volume as word of mouth compounds. Applying the repeat-rate gate to a non-repeat category either blocks a healthy brand forever or, worse, gets waived so often it stops meaning anything.
+
 ---
 
 ## Step 2: Email + SMS Flow Stack
 
-**Target: email + SMS should produce 28–38% of total store revenue.** Below 25% means the flow stack is underbuilt — usually a thin set of flows, not a campaign frequency problem. The gap is almost always in flows, not in campaigns.
+**Target: email + SMS should produce roughly 28–38% of total store revenue** — a range converging across several sources that cite Klaviyo's own benchmark reporting (klaviyo.com itself could not be reached directly to confirm this here). Treat it as a mature-sender ceiling, not a floor: the cohort behind published benchmarks skews toward large, established lists, and secondary commentary on the same reporting puts brands under roughly €/$10M GMV closer to 15–20% from email alone — below the 25–38% band this section otherwise uses. A brand still building its list (the €2.1M GMV example in this skill's own argument-hint included) should read its own month-over-month trend rather than treat the higher end of this range as an immediate target. Below 25% (or below 15–20% for a newer, smaller list) means the flow stack is underbuilt — usually a thin set of flows, not a campaign frequency problem. The gap is almost always in flows, not in campaigns.
 
-**10-flow priority build order:**
-
-### Priority 1 — Build First (week 1–2)
-
-**Flow 1: Welcome Series**
-- Trigger: New subscriber via pop-up, checkout opt-in, or lead magnet
-- Sequence: 4–6 emails over 7–10 days
-  - Email 1 (immediate): Deliver the incentive (discount code, lead magnet) + brand story
-  - Email 2 (+48h): Best sellers + social proof (reviews, UGC)
-  - Email 3 (+3 days): Product education — how to use / what makes it different
-  - Email 4 (+5 days): Urgency on the incentive (if time-limited) or a second product introduction
-  - Email 5/6 (+7 days): Community / brand values / what buying this says about them
-- Target RPR (revenue per recipient): €4.50–€8.50
-- SMS: Add a single SMS at +24h after email 1 if no purchase
-
-**Flow 2: Abandoned Cart**
-- Trigger: Cart created, checkout not completed, 1+ hour elapsed
-- Sequence: 2–3 emails over 48 hours + 1 SMS
-  - Email 1 (+1h): Soft reminder — "left something behind" — NO discount
-  - Email 2 (+12h): Social proof / reviews for the specific product
-  - Email 3 (+24h): Final reminder — serve the discount NOW (not earlier)
-  - SMS (+24h if email not opened): Urgency trigger, discount revealed
-- Target RPR: €8–€15
-- Rule: Never show the discount before email 3 or SMS. Showing it early trains customers to abandon cart to get discounts.
-
-**Flow 3: Browse Abandon**
-- Trigger: Visited a product page (or category page), no add-to-cart, 1+ hour elapsed
-- Sequence: 2 emails over 48 hours
-  - Email 1 (+1h): Product reminder with content (blog post, how-to, review) related to that product
-  - Email 2 (+24h): Social proof / bestseller framing
-- Target RPR: €2–€4
-
-### Priority 2 — Build Second (week 3–4)
-
-**Flow 4: Post-Purchase (New Customer)**
-- Trigger: First purchase completed
-- Sequence: 3 emails over 10 days
-  - Email 1 (+1h): Confirmation + "what to expect" (shipping, packaging)
-  - Email 2 (+3 days): How to get the most from the product (education, reduces returns)
-  - Email 3 (+10 days): Ask for a review + introduce a complementary product
-- Goal: Reduce buyer's remorse, generate UGC, and introduce the next product
-
-**Flow 5: Repeat Purchase Prompt**
-- Trigger: X days after first purchase (calibrate to product replenishment cycle — for skincare: 30–45 days)
-- Sequence: 2–3 emails
-  - Email 1: "How's [product] working for you?" + gentle repurchase prompt
-  - Email 2 (+5 days): Repurchase prompt with social proof
-  - Email 3 (+5 days): Incentive for second purchase (if not converted)
-- Goal: Drive repeat purchase before the customer forgets
-
-**Flow 6: Win-Back**
-- Trigger: Customer has not purchased in 90–120 days (set based on average repeat purchase interval × 1.5)
-- Sequence: 3 emails over 14 days
-  - Email 1: "We miss you" + what's new
-  - Email 2: Your best sellers — reminder of what they loved
-  - Email 3: Last chance incentive — "here's 15% back"
-  - Optional: Sunset email after flow ends with no purchase (clean the list)
-
-### Priority 3 — Build Third (week 5–8)
-
-**Flow 7: VIP / High-LTV Segment**
-- Trigger: 2+ orders AND spending above threshold (e.g., total spend >€200)
-- Sequence: Ongoing 1:1 treatment — early access to launches, exclusive offers, personal thank-you
-- Goal: Retain and expand best customers; reduce churn on highest-LTV segment
-
-**Flow 8: Cross-Sell**
-- Trigger: Purchased Product A but never purchased Product B (where B is naturally complementary)
-- Sequence: 2 emails over 7 days introducing Product B with a reason-to-believe tied to Product A purchase
-
-**Flow 9: Subscription / Subscription Lapse** (if subscription product exists)
-- Trigger: Subscription paused or cancelled
-- Sequence: 3 emails over 7 days with benefit reminder and a lower-friction alternative (skip, pause, reduce frequency)
-
-**Flow 10: Post-Purchase (Repeat Customer)**
-- Trigger: Second or third purchase
-- Sequence: 2 emails — thank you + request for referral/UGC
-- Goal: Turn repeat buyers into advocates
+For the full 10-flow priority build order (Priority 1, 2 and 3: trigger, sequence, target revenue per recipient and goal of each flow, including the Welcome, Abandoned Cart and Win-Back sequences), read `references/flow-stack.md` before specifying or auditing any flow.
 
 ---
 
@@ -173,6 +99,7 @@ Scaling ads before these signals wastes €20–30K on a business that hasn't pr
 
 **SMS setup checklist:**
 - [ ] Compliance: TCPA (US) / GDPR (EU) — explicit SMS opt-in separate from email opt-in
+- [ ] Revocation handling is a moving regulatory target right now — don't hard-code either stance into a platform setup. The FCC's 2024 rule required honoring an opt-out by any reasonable method, not only a fixed "STOP" reply, but the broader compliance deadline for that rule has been pushed back repeatedly (most recently to January 31, 2027). A separate FCC order reported as adopted around October 1, 2026 moves the other way — it would let a sender designate ONE exclusive revocation channel instead — but isn't yet in force (pending Federal Register publication as of the sources checked). Confirm the live requirement with whoever configures opt-out logic on the SMS platform rather than assuming either version is the current rule.
 - [ ] Dedicated SMS keyword for opt-in (e.g., "text SKIN to 12345")
 - [ ] Quiet hours configured (no sends 9pm–8am local time)
 - [ ] Opt-out rate monitored weekly — pause if >1% per send
@@ -182,7 +109,9 @@ Scaling ads before these signals wastes €20–30K on a business that hasn't pr
 
 ## Step 4: Campaign Rhythm
 
-**8–12 email campaigns per month** is the sustainable cadence for DTC brands between €2M and €20M GMV. Below 6/month: list goes cold. Above 14/month: unsubscribe rate climbs without proportional revenue lift.
+**8–12 email campaigns per month is a practitioner starting point, not a published benchmark** — no email-platform benchmark report backs a specific campaigns-per-month figure; the platforms that do publish data (Klaviyo included) emphasize that relevance and timing move revenue more than raw send frequency. Treat 8–12 as a range to start from and adjust against your own unsubscribe rate and click-through trend, for DTC brands between €2M and €20M GMV. Below 6/month: list goes cold. Above 14/month: unsubscribe rate tends to climb without a proportional revenue lift.
+
+**Don't read open rate as an engagement signal on its own.** Apple Mail Privacy Protection pre-fetches the tracking pixel server-side for any subscriber on Apple Mail — roughly half of most DTC lists in 2026 — so a large share of "opens" fire whether or not anyone actually read the email. A spike in open rate after a subject-line change can be entirely artifact. Opens still work as a slow, multi-month trend line (a list going completely cold will still show it), but the decision signal for cadence, subject lines, or list health is click-through rate and the downstream conversion, never a single campaign's open number.
 
 **Campaign mix per month:**
 - 2–3 product/promo (feature a product or run a sale)
@@ -200,15 +129,38 @@ If campaigns are producing >50% of your Klaviyo revenue, your flow stack is unde
 
 ## Step 5: LTV Expansion Levers
 
-**Repeat purchase rate and AOV are the two LTV multipliers.** A 5% increase in retention can produce 25–95% more profit. Each lever has a natural implementation sequence:
+**Repeat purchase rate and AOV are the two LTV multipliers.** The oft-cited claim that a 5% increase in retention produces 25–95% more profit traces back to a 1990 services-industry study (banking, insurance, auto repair) — it is not a DTC or e-commerce number, and no readable primary source was found to confirm the range still applies outside that original context. Treat the direction (retention compounds profit disproportionately) as sound and calculate your own sensitivity from Step 1's LTV formula rather than citing a borrowed percentage. Each lever has a natural implementation sequence:
 
-**Lever 1: Subscription / Subscribe & Save**
-- Best for: Beauty, supplements, coffee, food — anything replenishable
-- Converts 5–15% of customers into recurring revenue
-- Tool: ReCharge or Bold Subscriptions
-- Churn: 5–15% monthly on subscriptions — model this before building, since high subscription churn can hurt more than it helps
-- Lock in a subscriber at 15% discount, and even with 10% monthly churn, you're typically ahead by month 3
+For the four LTV levers in detail (Subscription / Subscribe & Save, Bundling and Upsell, Loyalty / Rewards, Price Architecture) and the sequencing between them, read `references/ltv-expansion-levers.md` before recommending any lever.
 
-**Lever 2: Bundling and Upsell**
-- Cart upsell: Display a complementary product at checkout (Shopify native or Zipify OCU)
-- Po
+---
+
+## Step 6: Acquisition Sequencing
+
+**Step 1 set the gate — don't restate it, apply it.** Once the brand clears the unlock criteria (organic base, repeat rate, CAC under the payback ceiling), sequence channels instead of launching all three at once.
+
+For the channel order (Meta, Google Shopping / Search, third channel), the signal-before-structure checks, the bidding volume rules, the creative and kill-rule guidance and how to use the ad accounts already connected in Bulldozer OS, read `references/acquisition-sequencing.md` before planning paid acquisition.
+
+---
+
+## Step 7: The 3-Operator Model
+
+For the operator table (Retention / Lifecycle, Acquisition / Media, Creative), the hiring order and the one-person-one-number rule, read `references/operator-model-and-calendar.md`.
+
+---
+
+## Step 8: 90-Day Buildout Calendar
+
+For the week-by-week 90-day buildout table (what to build and which gate to check at each stage), read `references/operator-model-and-calendar.md`.
+
+---
+
+## Rules
+
+- **Sequence, don't parallelize.** Retention infrastructure (Steps 2–5) comes before acquisition spend (Step 6) — not because acquisition doesn't matter, but because it's the only order in which the CAC math means anything.
+- **Never show a discount before the point the flow specifies.** Abandoned Cart trains customers to abandon on purpose the moment the discount appears earlier than the sequence calls for.
+- **Model subscription churn before building the program**, not after the first cohort surprises you — 6.5–8.5% monthly is a reasonable overall starting point, but replenishable categories (coffee, consumables) run lower and meal kits/beauty boxes run as high as 15%; check Step 5 before assuming any single number is normal for your category.
+- **Read every test — price, subject line, or campaign — at 95% significance, 80% power, over a minimum of two full weeks.** Stopping early because the number looks good is a bias, not a shortcut, even when significance is technically reached.
+- **Don't touch a paid campaign's bid strategy under ~30–50 conversions/month.** Below that, the data is noise; consolidate instead of "optimizing."
+- **One accountable operator per lever.** Splitting retention and acquisition ownership across the same person is how the playbook's opening warning actually happens in practice.
+- **Every benchmark in this playbook is a starting range, not a target.** Category, price point, and channel change what "healthy" looks like — calculate your own from Step 1 before treating any number here as a goal.

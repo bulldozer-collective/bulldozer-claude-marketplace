@@ -1,0 +1,22 @@
+{
+  "customerId": "533c1f8f-bcc2-4e95-a3ee-4e630b86dbbf",
+  "projectId": "b09bf643-e087-4e6c-8415-f9ee96e5cc94",
+  "ads": {
+    "adAccount": {
+      "META": {
+        "id": "9a4dbb22-a2c9-47bb-94d6-be65068476bb",
+        "name": "Hosman - Bulldozer"
+      },
+      "LINKEDIN": {
+        "id": "63e84664-98b1-4876-8f08-944e392cfe53",
+        "name": "I2A"
+      }
+    }
+  },
+  "sea": {
+    "adAccount": {
+      "adwordLoginId": "1923201425",
+      "adwordCustomerId": "6752036174"
+    }
+  }
+}

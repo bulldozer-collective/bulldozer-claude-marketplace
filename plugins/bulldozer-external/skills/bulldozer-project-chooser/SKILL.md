@@ -1,20 +1,20 @@
 ---
-name: |
+name: |-
   bulldozer-project-chooser
-description: |
+description: |-
   Resolve and persist a Bulldozer customerId/projectId pair for Bulldozer MCP tools that require project context.
-when-to-use: |
+when-to-use: |-
   Use this skill whenever a Bulldozer MCP tool call requires a `projectId` (and associated `customerId`) parameter and one has not already been determined. Typical triggers: the user invokes a Bulldozer MCP tool without specifying a project, or a previous tool call failed because `projectId`/`customerId` was missing. Not needed if the user has explicitly provided a project ID in the current turn.
 allowed-tools:
   - Read
   - Write
   - mcp__plugin_bulldozer_bulldozer__bdzListUserProjectMemberships
-effort: |
+effort: |-
   low
 paths:
   - "**/bulldozer.json"
 metadata:
-  forge: disabled
+  "forge": "disabled"
 ---
 
 # Bulldozer Project / Customer Chooser

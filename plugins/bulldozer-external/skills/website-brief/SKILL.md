@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   website-brief
-description: |
+description: |-
   Produce a complete website project brief — business context, conversion goals, sitemap, audience and messaging requirements, design references, technical constraints, content ownership, timeline, and approval process. Triggers on 'website brief,' 'website redesign brief,' 'brief for our agency,' 'brief for website build,' 'write our web brief,' 'we need to brief a developer,' or 'how do we kick off a website project.' For brand positioning, see brand-platform. For conversion rate analysis, see audit-website-cro.
-when-to-use: |
+when-to-use: |-
   Produce a complete website project brief — business context, conversion goals, sitemap, audience and messaging requirements, design references, technical constraints, content ownership, timeline, and approval process. Triggers on 'website brief,' 'website redesign brief,' 'brief for our agency,' 'brief for website build,' 'write our web brief,' 'we need to brief a developer,' or 'how do we kick off a website project.' For brand positioning, see brand-platform. For conversion rate analysis, see audit-website-cro.
-argument-hint: |
+argument-hint: |-
   Series A SaaS, redesigning the website to support a new positioning. Existing Webflow site, 6 pages, needs to be redesigned with a new homepage, product page, pricing page, and 2 case study pages. Agency kick-off in 2 weeks, budget €25K.
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -72,6 +72,19 @@ The website must achieve [primary business outcome] within [timeframe], supporti
 
 **Include exactly one primary metric.** The primary metric is the one that determines whether the project was a success when reviewed 90 days post-launch. Secondary metrics are diagnostic — useful for understanding what's driving the primary metric, not for evaluating project success.
 
+**Pull the baseline — don't guess it.** "Current baseline" is a real number, not a placeholder to fill in from memory. If the client's Webflow site and HubSpot are already connected to Bulldozer OS, read them — in this order, each step has its own failure mode:
+
+- `bdzListCmsSites` first, always. It's the only way to get the `siteId` every CMS call below requires — a blank `siteId` is the most common real failure logged against this skill's tool calls, and it reads as a generic 400, not as "no connection."
+- `bdzGetCmsTrafficReport` and `bdzGetCmsTopPagesReport` give real session and pageview volume per page. Both require the Webflow Analyze add-on — a 409 here usually means the add-on isn't purchased, not that the credential is broken — and the two must be called one after the other, never in parallel.
+- `bdzListCmsForms` + `bdzListCmsFormSubmissions` count actual form submissions, matched on page + form element, never on the form's displayed name (several forms on the same site routinely share a name like "Email Form"). Before citing a count as a capture metric, check `bdzPreviewCmsFormFieldMapping` on that form: `submissionsInspected: 0` means it has never been submitted — the baseline is 0, not unknown — and a null email mapping means it can't capture an email at all. A plausible form name is not proof the capture works.
+- HubSpot's `get_campaign_attribution_reports` ties that traffic to revenue already attributed. Its first call in a session returns a status asking to be read via `tool_guidance` first instead of data — that's the tool's own gate, not a failure.
+
+One more terminology note for the Measurement method column: outside Google Ads, GA4 renamed "conversions" to "key events" in March 2024 — write "key events," not "conversions," when the method is GA4.
+
+**When the client wants two "primary" metrics, that's a decision they're avoiding, not a compromise to accept.** Ask which one wins the day a design or dev choice helps one at the cost of the other — a bigger pricing CTA that lifts trial starts but adds friction to the enterprise "talk to sales" path, for instance. Whichever answer comes back is the real primary metric; write only that one in the table, and move the other to secondary.
+
+**Don't call the result before the site has enough volume to say anything.** How long that takes depends entirely on the baseline volume just pulled above — a site converting from a few hundred monthly sessions needs far longer to produce a non-noisy read than one converting from tens of thousands, and there is no fixed number of weeks that transfers between the two. Agree on the read-by date with the client at brief time, using their own baseline, not after the 90-day number disappoints someone.
+
 ---
 
 ## Section 3: Target Audience
@@ -118,6 +131,8 @@ Secondary visitor: [Budget owner / technical evaluator / end user]. They care pr
 
 **Explicitly state what is OUT of scope.** Every page or feature not listed in this table is out of scope. If the client requests it later, it is a change order.
 
+**If a pricing page is in scope, the pricing model is a product decision the client brings — the agency doesn't invent it to fill a template.** Tiers, what's included or excluded at each one, self-serve versus sales-assisted access: these determine the page's structure before a wireframe can be drawn. An undefined pricing model is a Section 9 dependency with the same severity as a missing positioning statement in Section 5 — a wireframe built around placeholder tiers gets rebuilt in full the day real pricing arrives, not adjusted at the margins.
+
 ---
 
 ## Section 5: Messaging and Brand
@@ -137,26 +152,7 @@ Secondary visitor: [Budget owner / technical evaluator / end user]. They care pr
 
 ## Section 6: Design Direction
 
-**References are more useful than adjectives.** "Modern and professional" describes 80% of B2B SaaS websites. A list of 3 reference sites with notes on what specifically works is actionable.
-
-**Format:**
-```
-References (provide 3–5 URLs with notes):
-1. [URL] — what we like about it: [specific element — e.g., "the way they show the product without a product tour video"]
-2. [URL] — what we like: [specific element]
-3. [URL] — what we like: [specific element]
-
-What we want to avoid:
-- [Specific visual pattern or approach to avoid]
-- [Example of what we consider off-brand]
-
-Constraints:
-- Must work with existing color palette: [colors]
-- Typography: [keep existing / replace with]
-- Logo: [current logo applies / logo refresh in progress — deliverable by X date]
-```
-
-**Design system status:** Does a design system or component library exist? If yes, the new pages must extend it. If no, does the agency scope include creating one? This needs to be explicit — a component library is a significant scope item.
+For how to write the design direction (references over adjectives, what to specify, and how to give actionable feedback), read `references/design-and-technical.md` when writing Section 6.
 
 ---
 
@@ -184,14 +180,29 @@ Constraints:
 
 ## Section 8: Technical Requirements
 
-**List every system the website must connect to, comply with, or perform within.**
+For the checklist of systems the website must connect to, comply with, or perform within, and how to flag undecided fields as dependencies, read `references/design-and-technical.md` when writing Section 8.
 
-**Required fields:**
-- CMS platform: [Webflow / WordPress / Contentful / custom] — can non-technical staff update content?
-- Hosting: [client-managed / agency-managed] — who holds the domain and DNS?
-- Analytics: [GA4 event tracking setup — which events must fire?]
-- CRM integration: [HubSpot form embed / API / Zapier — which forms connect to which lists?]
-- Marketing tags: [LinkedIn Insight Tag, Google Ads pixel, hotjar, Intercom — which tools must be installed?]
-- Performance requirements: [page load target — sub-3 second LCP on mobile is the standard]
-- Accessibility: [WCAG 2.1 AA compliance required — yes/no]
-- Security: [HTTPS, data processin
+---
+
+## Section 9: Timeline and Budget
+
+For the milestone breakdown, budget structure and contingency rule, read `references/timeline-budget-approval.md` when writing Section 9.
+
+---
+
+## Section 10: Approval Process
+
+For who approves what at which stage, and the rule on the final approver, read `references/timeline-budget-approval.md` when writing Section 10.
+
+---
+
+## Rules
+
+- **Goals and audience before design references.** A brief that opens with visual inspiration produces a beautiful site solving the wrong problem — Section 2 and Section 3 exist to prevent that.
+- **One primary metric, not a scorecard.** A brief with five equally-weighted goals gives the agency no way to make tradeoffs when a decision affects one goal at the expense of another.
+- **Every page in Section 4 needs a status.** "We'll figure out the About page later" is how a 6-page project becomes a 9-page project with no additional budget.
+- **Content readiness gates the go-live date, not the reverse.** Set the Section 9 timeline off of when content actually arrives (Section 7), not off of a launch date picked first and worked backward from optimistically.
+- **No project starts without a named final approver.** A brief that lists "the marketing team" as the approver in Section 10 has not actually defined who approves anything.
+- **Flag missing positioning as a blocker, not a nice-to-have.** If Section 5 has no positioning statement, the project is not ready to brief — it's ready for a positioning exercise first.
+- **An unfunded reference, an unnamed piece of feedback, or a missing brand asset is a scope conversation, not something to solve mid-design.** Send it back in Section 6 before it costs a design round — the same way Section 5 already blocks on missing positioning.
+- **A pricing page with no pricing model, or two goals both called "primary," is not ready to brief either.** Both are decisions the client is avoiding, not details the agency can infer — name them as dependencies in Section 4 and Section 2 before wireframes start.

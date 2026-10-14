@@ -1,6 +1,7 @@
 ---
-name: lead-magnet-design
-description: |
+name: |-
+  lead-magnet-design
+description: |-
   Met en forme un livre blanc / lead magnet aux VRAIES couleurs du client, en document MODERNE — pas un
   rapport Word, pas un PDF de consultant des années 2010. Extrait les 7 tokens de charte depuis le CSS de
   production du client, utilise son logo réel, compose à partir des blocs typés du contenu (cartes KPI,
@@ -10,13 +11,13 @@ description: |
   "mets ce document aux couleurs de [client]", "designe ce livre blanc / ce rapport en PDF",
   "ce PDF fait rapport Word, refais la mise en page", "applique la charte de [client] à ce document",
   ou pour appliquer une liste de corrections de mise en page sur un document déjà produit.
-when-to-use: |
+when-to-use: |-
   Use this skill to lay out a long-form paginated deliverable (white paper, guide, report) in a client's
   real brand tokens and convert it to PDF, or to apply structured design commands to an existing one.
-  Not for landing pages (`lp-assemblage`), not for slides (`bulldozer:slides-deck`), not for a plain PDF
-  export of an already-designed document (`bulldozer:pdf-report`).
+  Not for landing pages (no dedicated skill for this exists in the OS yet — see ANALYSE.md), not for
+  slides (`bulldozer:slides-deck`), not for a plain PDF export of an already-designed document
+  (`bulldozer:pdf-report`).
 user-invocable: true
-effort: high
 allowed-tools:
   - Read
   - Write
@@ -24,9 +25,11 @@ allowed-tools:
   - Bash
   - Skill
   - WebFetch
-  - mcp__bulldozer__bdzListProjectFiles
-  - mcp__bulldozer__bdzGetProjectFile
-  - mcp__bulldozer__bdzCreateMetric
+  - mcp__plugin_bulldozer_bulldozer__bdzListProjectFiles
+  - mcp__plugin_bulldozer_bulldozer__bdzGetProjectFile
+  - mcp__plugin_bulldozer_bulldozer__bdzCreateMetric
+effort: |-
+  high
 ---
 
 # Lead magnet — la forme
@@ -51,9 +54,7 @@ Elle ne réécrit jamais le fond. Elle **compose** à partir des blocs typés li
 
 **Les 7 tokens** — fond · accent · texte · typo display · typo texte · radius · **casse** — sont
 **extraits du CSS de production du site client**, jamais choisis au jugé. Protocole complet, avec
-l'ordre de fiabilité des sources et le format du brandbook : `references/charte-extraction.md`. Il
-s'appuie sur les briques existantes `emetteur-brand-kit` (charte + preuves) et `logo-resolver` (logo en
-fichier réel).
+l'ordre de fiabilité des sources et le format du brandbook : `references/charte-extraction.md`.
 
 > ⛔ **Le site de production prime sur toute charte interne** — brandbook, `CLAUDE.md`, skill « charte
 > maison », PDF de charte. Ces documents sont écrits une fois et ne suivent pas les refontes. Extraire
@@ -61,12 +62,26 @@ fichier réel).
 > périmée a déjà coûté une production entière (le cas est documenté dans `charte-extraction.md`).
 
 **Le logo est TOUJOURS le fichier réel du client.** Priorité : fichiers projet OS
-(`bdzListProjectFiles` / workspace) → extraction depuis le site de production → échelle `logo-resolver`.
-Jamais une recréation approximative, jamais un logo généré par IA, jamais un simple texte si un fichier
-est obtenable. Le niveau atteint (officiel / rehost / banque / svg_recree) est consigné.
+(`bdzListProjectFiles` / workspace) → extraction depuis le site de production → banque de logos en
+dernier recours (voir `references/charte-extraction.md`). Jamais une recréation approximative, jamais
+un logo généré par IA, jamais un simple texte si un fichier est obtenable. Le niveau atteint
+(officiel / rehost / banque / svg_recree) est consigné.
 
 > Une couleur « de mémoire » et un logo recréé sont la première chose que le client repère. Ce sont aussi
 > les deux défauts les plus faciles à éviter : ils ne coûtent qu'une extraction faite sérieusement.
+
+> **L'accent extrait n'est pas garanti lisible en texte.** `--accent` est fidèle à la marque, pas conçu
+> par elle pour porter du texte à corps courant — un lime saturé ou un pastel qui passent très bien en
+> bouton peuvent tomber sous le seuil de lecture une fois posés en libellé. Mesurer le contraste réel
+> contre le fond **sur lequel le texte est effectivement posé** (une ouverture en `--texte` inversé n'a
+> pas le même fond qu'une page courante — se rappeler la même règle vaut pour toute paire réelle du
+> document, pas seulement la plus sombre). Seuils WCAG 1.4.3 : **4,5:1 en corps courant**, **3:1 à partir
+> de 18 pt / 14 pt gras** (un chiffre KPI ou un numéro de chapitre passe déjà souvent ; un libellé en
+> 9-10 pt presque jamais). Sous le seuil : dériver `--accent-texte` — même teinte, luminosité ajustée
+> jusqu'au seuil calculé, jamais une couleur de remplacement. Même logique que `--accent-ink`, appliquée
+> dans l'autre sens (accent EN texte, pas accent en fond) — protocole complet dans
+> `references/charte-extraction.md`. Pour un usage non-texte (filet, bordure, icône), le seuil reste 3:1
+> (WCAG 1.4.11) et l'accent brut suffit presque toujours.
 
 ## Le standard « lead magnet moderne » — 13 points opposables
 
@@ -144,7 +159,9 @@ deux colonnes, trois variantes d'ouverture de chapitre — est dans `references/
 1. **HTML unique auto-porté** — CSS inline dans le document, images en chemins locaux relatifs, règles
    `@page` pour l'impression (format, marges, header/footer, pagination).
 2. **Conversion PDF via WeasyPrint** — pattern `bulldozer:pdf-report` : installation, conversion,
-   fallback impression navigateur si WeasyPrint est indisponible.
+   fallback impression navigateur si WeasyPrint est indisponible. Si le client demande un PDF
+   accessible (lecteur d'écran), conversion en `--pdf-variant "pdf/ua-1"` — protocole et limites dans
+   `references/pdf-production.md`.
 3. **Contrôle statique AVANT la première conversion** — `check_alignements.py` sur les sources :
    alignements, encre bord à bord, libellés rognés, polices déclarées par graisse, couleurs hors tokens,
    propriétés ignorées par WeasyPrint. Quelques millisecondes, et ça évite une conversion pour rien.
@@ -175,6 +192,16 @@ Traitement : appliquer → régénérer le PDF → **vérifier la page concerné
 qui reste. Une commande qu'on ne peut pas appliquer sans casser autre chose se signale au lieu d'être
 appliquée à moitié.
 
+**Grouper avant de reconvertir, jamais après.** Convertir puis inspecter page par page a un coût réel
+(voir Production technique) : appliquer 5 corrections une par une sur la même page en reconvertissant à
+chaque fois multiplie ce coût par 5 pour rien. Regrouper les corrections qui touchent **la même page**
+ou **la même cause** (3 corrections « hiérarchie H2/H3 » sur trois chapitres différents relèvent d'un
+seul ajustement de style, pas de trois), les appliquer ensemble, reconvertir une fois, vérifier une
+fois — puis confirmer **chaque correction individuellement** dans le compte-rendu : grouper l'exécution
+ne dispense pas de rendre compte ligne par ligne. Deux corrections qui se contredisent (l'une resserre
+une marge, l'autre l'élargit) ne se tranchent pas en silence en appliquant la dernière reçue : signaler
+le conflit et attendre l'arbitrage.
+
 ## Interdits
 
 - ❌ Charte au jugé (couleur « de mémoire », police de substitution non vérifiée).
@@ -185,10 +212,13 @@ appliquée à moitié.
 - ❌ Résorber un trou blanc en gonflant le texte, en agrandissant l'interlignage ou en étirant les marges.
 - ❌ Inventer un bloc que le contenu n'a pas fourni (surtout un testimonial).
 - ❌ Utiliser les couleurs par défaut d'une librairie de graphiques.
+- ❌ Poser l'accent extrait en couleur de texte à corps courant sans avoir mesuré son contraste réel
+  (WCAG 1.4.3) — le corriger en dérivant `--accent-texte`, jamais en changeant de couleur.
+- ❌ Emoji comme repère de section dans le document produit.
 
 ## Journalisation (R5)
 
-À l'invocation : `bdzCreateMetric` (`type = AI_METRIC_TYPE_SKILL_USED`,
+À l'invocation : `bdzCreateMetric` (`type = METRIC_TYPE_SKILL_USED`,
 `reference = lead-magnet-design`). Non bloquant si l'appel échoue.
 
 ## Références
@@ -202,6 +232,10 @@ appliquée à moitié.
 - `references/blocs-composes.md` — la palette de formes complémentaires (duo KPI, bande do/don't,
   page de données, annexe en 2 colonnes, 3 variantes d'ouverture) **avec le coût en pages de chacune**
 - `references/pdf-production.md` — HTML autoporté, `@page`, WeasyPrint, fallback, contrôle page par page
-- `../lead-magnet-review/scripts/check_alignements.py` — contrôle statique des alignements,
+- `references/pannes-et-parades.md` — pannes déjà payées (Studio, egress, rendu SVG, conversion PDF,
+  hébergement) et leur parade — à consulter avant de rejouer une panne connue
+- `scripts/check_alignements.py` — contrôle statique des alignements,
   à lancer AVANT la première conversion
+- `scripts/check_rythme.py` — contrôle du rythme et du remplissage sur le PDF converti (voir
+  `references/pdf-production.md` §5)
 - `assets/template-lead-magnet.html` — base tokenisée (composants des 9 types de blocs)

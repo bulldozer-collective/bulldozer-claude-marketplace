@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   win-loss-analysis
-description: |
+description: |-
   Run a win/loss analysis program — structured buyer interviews, pattern extraction, competitive intelligence, and action-owner mapping. Triggers on 'win loss analysis,' 'why are we losing deals,' 'analyze lost deals,' 'win loss program,' 'why are we winning,' 'deal debrief,' or 'competitive intelligence from buyers.' For battlecard creation from findings, see battlecards. For ICP refinement, see icp-builder.
-when-to-use: |
+when-to-use: |-
   Run a win/loss analysis program — structured buyer interviews, pattern extraction, competitive intelligence, and action-owner mapping. Triggers on 'win loss analysis,' 'why are we losing deals,' 'analyze lost deals,' 'win loss program,' 'why are we winning,' 'deal debrief,' or 'competitive intelligence from buyers.' For battlecard creation from findings, see battlecards. For ICP refinement, see icp-builder.
-argument-hint: |
+argument-hint: |-
   B2B SaaS, 15 closed deals last quarter — 8 wins, 7 losses. Want to understand why we're losing to Competitor X and whether our discovery process is the gap.
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -24,7 +24,11 @@ You are a Bulldozer strategist running a win/loss analysis program. Your job is 
 
 ## Input
 
-`$ARGUMENTS` — deal sample (recent closed-won and closed-lost deals), competitors encountered, current hypotheses about why you win/lose. If not provided, read available CRM exports or deal notes. Ask once if no deal data whatsoever is available.
+`$ARGUMENTS` — deal sample (recent closed-won and closed-lost deals), competitors encountered, current hypotheses about why you win/lose. If not provided and the CRM is HubSpot on a connected project, pull the sample directly instead of asking for a manual export: search deals where `hs_is_closed_won` or `hs_is_closed_lost` is true, filtered to the interview window on `closedate`. The contacts to recruit for each deal (name, job title) read the same way — search contacts associated with that deal — which is exactly the list "Who to interview" below needs. Segment the sample by deal size on `amount_in_home_currency`, never raw `amount` (a multi-currency portal mixes currencies silently otherwise), and again by `dealtype` where the portal uses it. Check `get_properties(deals, [dealtype])` on the connected portal before assuming what it holds: HubSpot's out-of-the-box field is a 2-value enum, New Business vs. Existing Business, but many portals extend it with custom values (Renewal, Upsell) instead of adding a separate property — segment on those directly if they exist, rather than lumping renewal and upsell losses into one "Existing Business" bucket. Whichever granularity the portal actually has, a loss on an existing-business deal is a retention problem with its own dynamics, not a competitive miss, and pooling it with new-logo losses hides both patterns. If no CRM access is available, ask once for deal notes or a manual list.
+
+**Don't shortcut the sample with the CRM's native loss-reason field.** HubSpot's `closed_lost_reason` is free text, not a curated set of options — reps type their own wording, so it won't group cleanly enough to pre-filter or pre-tag a sample by reason. Some portals cover this gap with a custom enum property instead (Bulldozer's own portal uses one, `motif_du_deal_perdu`, with a closed set of causes); check whether the connected portal has an equivalent before assuming the reason is unusable, but never build the interview sample or a finding on the native free-text field alone — that's exactly the gap the interview program below exists to close.
+
+**The same caution applies to "which competitor" — don't trust a free-text field for that either.** When the ask names a specific competitor ("why are we losing to Competitor X"), the instinct is to pre-filter the sample by pulling every deal that named them. A portal's own competitor field is often free text too — Bulldozer's own portal has one, `perdu_chez_concurrence___si_oui__lequel__`, with no curated options — so a rep can spell the same name three different ways, and it won't filter reliably any more than `closed_lost_reason` groups by cause. A curated multi-select "Competitor(s)" property, built for exactly this filter, is what some portals add on top of the categorical loss-reason property above — check for one before promising a stakeholder a clean "every deal lost to Competitor X" pull; without it, treat the ask as a hypothesis to confirm through the interviews and the Claap cross-check below, not a query you can run on the CRM directly.
 
 ## Output
 
@@ -56,9 +60,12 @@ A rep's explanation of a loss is shaped by ego, limited information, and the nar
 
 ### Sample
 
-**Minimum viable sample:** 10 interviews per quarter (60/40 win/loss split is ideal — 6 wins, 4 losses, or 5/5)  
+**Minimum viable sample:** 10 interviews per quarter (60/40 win/loss split is ideal — 6 wins, 4 losses, or 5/5). Most teams running a first program land closer to 8–12 — that's enough for directional color, not enough to trust a quarter-over-quarter trend; treat 10 as the floor for calling a pattern real, not the target to stop at.  
+**Saturation check:** patterns typically start surfacing around interview 9–10. If three interviews in a row surface no new theme, you've reached saturation for that period — running more interviews on the same deal type past that point mostly re-confirms what you already found.  
 **Pattern signal threshold:** 3+ buyers citing the same theme = systematic finding. 1–2 = anecdote, not action trigger.  
-**Interview timing:** Within 30 days of deal close. Memory decays fast. At 60 days, buyers are merging details from multiple vendors. At 90 days, they've rationalized the decision and are less likely to be candid about near-misses.
+**Interview timing:** Ideally within 2–4 weeks of deal close, 30 days at the outside. Memory decays fast. At 60 days, buyers are merging details from multiple vendors. At 90 days, they've rationalized the decision and are less likely to be candid about near-misses.
+
+For scaling past quarterly sampling, pre-screening the list with a CRM signal, and checking the champion beyond job title, read `references/program-design-detail.md`.
 
 **Who to interview:**
 - For losses: the decision-maker or champion who engaged most with your team
@@ -72,12 +79,7 @@ A rep's explanation of a loss is shaped by ego, limited information, and the nar
 
 ### Recruiting
 
-Target 20–40% interview conversion on outreach. Cold email to a closed-lost buyer gets 2–5%. Warm introduction from the rep who worked the deal gets 20–40%.
-
-**Recruiting script (from rep to buyer):**
-> "Hi [Name] — I wanted to reach out personally. I know we didn't win your business, and I genuinely want to understand what we could have done better. Our Head of Product Marketing does independent buyer conversations — no sales, no follow-up — just 30 minutes to understand your perspective. Would you be open to that? It helps us improve, and many people find it useful to have a structured debrief on a major purchase decision."
-
-**Why this works:** Framing it as independent (not the rep calling), non-sales, and mutual benefit increases response rates. The rep flagging it as personal adds warmth.
+For recruiting expectations, the rep-to-buyer recruiting script and how to use it, read `references/program-design-detail.md`.
 
 ---
 
@@ -95,37 +97,7 @@ Target 20–40% interview conversion on outreach. Cold email to a closed-lost bu
 
 ### Core Interview Questions
 
-**Buying process:**
-- "Walk me through what triggered this evaluation — what changed that made you look for a solution?"
-- "Who was involved in the decision? Who had the most influence on the final call?"
-- "How does your company typically make decisions like this — what's the process?"
-
-**Evaluation and comparison:**
-- "What vendors did you seriously evaluate? What made you put them on the shortlist?"
-- "What criteria mattered most when comparing options? Were there non-negotiables?"
-- "How did different vendors perform against those criteria?"
-- "Were there any red flags that eliminated a vendor early? What were they?"
-
-**The decision (for losses):**
-- "What tipped the decision toward [Competitor]? Was there a specific moment when the choice became clear?"
-- "What almost made you choose us instead? What was closest to turning the decision?"
-- "If [Competitor] hadn't been in the evaluation, what would you have done?"
-
-**The decision (for wins):**
-- "What specifically about us tipped the decision in our favor? Was there a defining moment?"
-- "What almost made you choose someone else? How close was it?"
-- "What concerns did you have about us that almost cost us the deal?"
-
-**Advice:**
-- "If you could go back, what's the one thing we could have done differently in the sales process?"
-- "What did we do that you found genuinely useful — that you'd want us to keep doing?"
-- "If a peer in your role asked you about us, what would you tell them?"
-
-**Follow-up probing (use on every substantive answer):**
-- "Tell me more about that."
-- "When you say [X], what specifically do you mean?"
-- "How important was that compared to the other factors?"
-- "What would have needed to be true for that not to be a concern?"
+For the core interview questions by section (buying process, evaluation and comparison, the decision for losses and for wins, advice) and the follow-up probes, read `references/interview-questions.md`.
 
 ---
 
@@ -144,11 +116,7 @@ Raw interview notes are not intelligence. Patterns are intelligence.
 | What prospect criticized | Same dimensions |
 | Decision criteria rank | What was #1–3 in their evaluation |
 
-**At 10+ interviews, build the pattern matrix:**
-- Which loss reason appears 3+ times? → Systematic finding
-- Which competitor appears 3+ times in losses? → Build or update battlecard
-- Where deals stall consistently? → Sales process problem, not competitive problem
-- What's praised consistently? → Don't change this — protect it
+For the price-tag probe and the per-segment pattern matrix (what the 3+ mentions rules mean), read `references/pattern-matrix.md`.
 
 **Three finding buckets (cluster every pattern here):**
 
@@ -169,27 +137,7 @@ Raw interview notes are not intelligence. Patterns are intelligence.
 
 From the interview data, build a competitive brief per competitor encountered in 3+ deals:
 
-```
-## Competitive Brief: [Competitor Name]
-
-### Why they win (from buyer interviews)
-[What buyers say the competitor does better — in buyer language, not your internal framing]
-
-### Why you win against them (from buyer interviews)
-[What buyers say you do better — in buyer language]
-
-### Their sales process strengths (from buyer interviews)
-[How their sales team operates — what buyers found valuable about working with them]
-
-### Their weaknesses (from buyer interviews)
-[What buyers found frustrating, unclear, or weak — this feeds directly into battlecards]
-
-### Decision criteria where they dominate
-[What evaluation dimensions they consistently win on]
-
-### Landmines (questions that surface their weaknesses)
-[Discovery questions that expose their gaps without naming them]
-```
+For the per-competitor brief template and how to cross-check it against Claap, read `references/competitive-brief.md`.
 
 ---
 
@@ -197,13 +145,20 @@ From the interview data, build a competitive brief per competitor encountered in
 
 Publish a standing monthly scorecard tied to the program:
 
-| Metric | This Month | Last Month | Trend |
-|--------|-----------|-----------|-------|
-| Deals analyzed | | | |
-| Win rate (interviewed sample) | | | |
-| Top win driver #1 | | | |
-| Top win driver #2 | | | |
-| Top loss driver #1 | | | |
-| Top loss driver #2 | | | |
-| Primary competitor in losses | | | |
-| Interventions f
+For the scorecard table and the three rules for reading it (including closing the loop each month), read `references/monthly-scorecard.md`.
+
+---
+
+## Rules
+
+- **Buyers only, never reps, for the "why."** A rep's account of a loss defends their pipeline. If you can't get the buyer on the call, you don't have a finding — you have a guess.
+- **3+ mentions before you call it systematic.** One or two buyers citing the same issue is an anecdote. Routing an anecdote to an owner burns the credibility you need for the next real finding.
+- **Interview inside 2–4 weeks of close, 30 days at the outside.** Past that window the buyer is reconstructing the decision, not reporting it — the closer you get to 90 days, the more they've rationalized their choice.
+- **Every finding gets an owner and a next-review date, or it doesn't go on the scorecard.** A finding without an owner is a complaint, not intelligence.
+- **Don't fix what buyers praise.** The "what's praised" column exists to stop a well-meaning team from redesigning something that's already winning deals.
+- **An intervention marked "shipped" twice for the same recurring finding isn't a fix.** Escalate past the owner instead of logging the request a third time.
+- **Probe "price" once before you tag it.** A buyer who'd still have picked the competitor at any price wasn't lost on price — route what's left after the probe to Message or Process based on what it actually was.
+- **One pattern matrix per segment, never pooled.** A 3+ mentions threshold means nothing if the three mentions come from deals that don't compare — enterprise and SMB, new business and existing business (or the portal's own custom `dealtype` values, if it has any), or two different pipelines, get their own matrix.
+- **Check `dealtype` on the real portal before assuming it's a closed 2-value field.** Some portals extend it with custom values (Renewal, Upsell) instead of a separate property — segment on those if present, don't default to treating every non-new-business deal the same way.
+- **Check for a curated loss-reason field before trusting any CRM reason.** A native free-text field like HubSpot's `closed_lost_reason` isn't a source of pre-sorted findings — that's what the interview program produces. Use it only as a cross-check once a curated field or the interview tags exist.
+- **A free-text "which competitor" field doesn't make "pull every deal lost to Competitor X" a reliable query.** Same discipline as the loss-reason field above: without a curated multi-select property built for that filter, treat a named-competitor ask as something the interviews and the Claap cross-check confirm, not something the CRM answers directly.

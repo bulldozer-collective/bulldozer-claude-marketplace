@@ -1,0 +1,9 @@
+# Multi-armed bandit vs. fixed-horizon A/B test
+
+Everything in "Core Principles" assumes the classic format: two fixed variants, a pre-committed sample size, one winner declared at the end. That's the right tool for a high-stakes, strategic change — a pricing model, a new onboarding flow, a homepage redesign — where a wrong call is expensive and the team needs a result it can fully trust.
+
+It's the wrong tool when the decision is short-lived, has several candidate variants, and shifting traffic toward whatever is winning *during* the test matters more than a certain read of the effect size afterward — a subject-line test with a two-day send window, a rotating set of ad creatives, notification copy. For those, a multi-armed bandit (which reallocates traffic toward the better-performing variant as data comes in, instead of holding the split fixed until the end) reaches a usable answer faster and loses less traffic to the underperforming variant along the way.
+
+The trade-off is real, not free speed: a bandit optimizes for return during the test, not for a confident, generalizable estimate of the effect size, and it breaks down as soon as the decision depends on more than one metric — a variant that's winning on the primary metric while quietly moving a guardrail can keep pulling more traffic before anyone thinks to check.
+
+Never run a pricing, paywall, or other guardrail-sensitive test as a bandit; default to the fixed-horizon format unless the decision specifically calls for a bandit's trade-offs. The same reasoning rules a bandit out for an activation or onboarding hypothesis: Principle #1 requires the expected outcome to be the real activation event, not a proxy, and a bandit's live reallocation can lock in a variant that's winning on an early proxy signal well before there's been time to see whether it actually moved that event.

@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   international-expansion
-description: |
+description: |-
   Plan go-to-market entry into a new geographic market: localization checklist, regulatory considerations, channel adaptation, pricing adjustments, and hiring priorities. Triggers on 'expand to,' 'international expansion,' 'new market,' 'localization,' or 'enter the French market.' For ABM in a new market, see account-based-marketing. For pricing strategy, see pricing.
-when-to-use: |
+when-to-use: |-
   Plan go-to-market entry into a new geographic market: localization checklist, regulatory considerations, channel adaptation, pricing adjustments, and hiring priorities. Triggers on 'expand to,' 'international expansion,' 'new market,' 'localization,' or 'enter the French market.' For ABM in a new market, see account-based-marketing. For pricing strategy, see pricing.
-argument-hint: |
+argument-hint: |-
   B2B SaaS expanding from US to France — currently 50 French trials, no French-language support
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -49,113 +49,44 @@ Before investing in market entry, verify:
 
 **Bulldozer rule**: Never enter a market you don't have at least 5 organic customers or 50 organic trials from. The market is showing you something — respond to it.
 
+**One large inbound deal is not the same signal as five organic customers.** A single big prospect from a target country asking for local invoicing, a translated contract, or an in-region entity is real revenue, but it's one data point, not distributed demand — the same test the strategy applies to positioning ("is the alternative the right one, is the signal real") applies here: don't read one enterprise logo's requirements as market validation and skip straight to Phase 3 commitments for that customer alone. Serve that one deal through Phase 2's without-entity approach if the terms allow it, and still wait for the 5-customer/50-trial bar before treating the market itself as validated.
+
+Two of the six signals have a real data source in Bulldozer OS (SEO domain overview, Google Analytics, declared project markets); for the exact calls and the four signals that stay judgment calls, read `references/go-no-go-signals-in-os.md`.
+
+---
+
+## Which Market First — Distance, Not Just Size
+
+Ranking candidate markets by TAM alone is the most common sequencing mistake. A market that scores well on every Go/No-Go signal above can still be the wrong *first* market if it's the most distant one on the list — distance is what determines how fast Phase 1–2 actually move, not how big the number in the pitch deck is.
+
+Compare candidates against the home market using the **CAGE Distance Framework** (Pankaj Ghemawat, "Distance Still Matters: The Hard Reality of Global Expansion," *Harvard Business Review*, September 2001) — four axes, not one TAM figure:
+
+- **Cultural** — language, business etiquette, how buying decisions get made
+- **Administrative** — legal system, trade agreements, data-localization rules
+- **Geographic** — time zone overlap, travel time for the markets that still require in-person selling
+- **Economic** — purchasing power, category maturity
+
+**The arbitrage**: a smaller market that's close on all four axes (familiar language, workable regulatory regime, usable time-zone overlap) clears Phase 1–2 in one cycle. A bigger market that's far on all four takes longer to even learn from — translating, hiring, and adapting to unfamiliar regulation before there's any signal the market wants the product at all. If the team can only run one entry at a time (the Bulldozer rule above), run the low-distance market first even when its TAM is smaller — it validates faster, and what it teaches (localization process, first-hire profile, channel mix) transfers partially to the harder market next.
+
+**What distance doesn't excuse**: skipping the Go/No-Go signals for a low-distance market just because it's cheap to reach. Proximity makes a market cheaper to test, not automatically worth entering — a nearby market with zero organic demand is still zero organic demand.
+
 ---
 
 ## The 4-Phase Entry Approach
 
-### Phase 1: Validate (Month 1–2)
-
-Don't build anything yet. Validate demand and product-market fit with what you have.
-
-**Actions**:
-- Interview 10+ customers/trials from the target market (in their language if possible)
-- Identify: Why did they find you? What's their workflow? Who else are they evaluating?
-- Test: Will they pay? What's their willingness to pay? What feature gaps exist?
-
-**Go signal for Phase 2**: 3+ paying customers acquired without localization effort.
-
-### Phase 2: Expand Without Entity (Month 3–6)
-
-Serve the market from your existing legal entity. Don't set up a local company yet.
-
-**Actions**:
-- Translate homepage, pricing page, and support docs (minimum viable localization)
-- Localize payment methods (SEPA for EU, local invoicing requirements)
-- Add a local time zone to support coverage
-- Identify a local partner or reseller for market intelligence
-
-**Go signal for Phase 3**: >€/£/¥ X in ARR from the market with acceptable unit economics.
-
-### Phase 3: Commit (Month 6–12)
-
-First dedicated hire and possible legal entity.
-
-**Actions**:
-- Hire country manager or first AE in market
-- Evaluate legal entity requirement (often driven by customer requirements, tax, or employment law)
-- Localize product (UI, date formats, currency, address formats)
-- Establish local pricing and contract terms
-
-### Phase 4: Scale (Month 12+)
-
-Build a full local team and complete localization.
+For the four entry phases (Validate, Expand Without Entity, Commit, Scale) with their timing, actions and go signals, read `references/entry-phases-and-localization.md`.
 
 ---
 
 ## Localization Checklist
 
-### Product Localization
-
-| Item | Priority | Notes |
-|------|:--------:|-------|
-| UI language translation | High | UI strings, error messages, notifications |
-| Date/time format | High | DD/MM/YYYY vs MM/DD/YYYY; 24h vs 12h |
-| Currency and number format | High | Comma vs period as decimal separator |
-| Address format | Medium | Country-specific postal format |
-| Phone number format | Medium | Country code handling |
-| Right-to-left support | High (if applicable) | Arabic, Hebrew markets |
-| Local payment methods | High | SEPA, iDEAL, PayPal, Boleto, etc. |
-| Timezone handling | Medium | Default timezone and display |
-
-### Content Localization
-
-| Item | Priority |
-|------|:--------:|
-| Homepage (headline, subhead, CTA) | Critical |
-| Pricing page | Critical |
-| Terms of Service and Privacy Policy | Critical |
-| Customer-facing emails (billing, transactional) | High |
-| Help documentation (top 20 articles) | High |
-| Blog/content (top 10 pages driving organic) | Medium |
-| Social content | Low |
-
-**Translation quality tiers**:
-1. Machine + human review: for low-stakes content
-2. Professional translation: for legal, commercial, and support docs
-3. Native-speaker copywriter: for homepage and marketing copy (machine translation marketing copy always reads as machine translation)
+For the product and content localization checklists, read `references/entry-phases-and-localization.md`.
 
 ---
 
 ## Regulatory Considerations by Market
 
-### European Union / EEA
-
-- **GDPR**: Applies from day 1 if you handle EU personal data (you almost certainly do). Requires: privacy policy, data processing agreements with vendors, lawful basis for processing, user consent or legitimate interest, right-to-erasure capability.
-- **VAT**: EU VAT rules apply to digital services sold to EU consumers. B2B sales typically handled via reverse charge, but varies by country.
-- **Employment law**: Significantly more employee-protective than US. Termination requires cause and notice periods. Non-compete enforceability varies.
-
-### United Kingdom
-
-- **UK GDPR**: Post-Brexit, UK has its own GDPR equivalent. Similar requirements.
-- **FCA regulation**: If your product touches financial services, check FCA requirements early.
-
-### Germany (specific)
-
-- **Works council**: If hiring >5 employees, a works council can be formed — this affects hiring, termination, and changes to working conditions.
-- **Imprinting requirement**: All German websites require an Impressum (legal notice with company info). Missing this is a compliance risk.
-- **Data hosting**: Some German enterprises require data hosted in Germany (Hetzner, Deutsche Telekom).
-
-### France (specific)
-
-- **Labour code**: 35-hour workweek, strong protections. Employment contracts must be in French.
-- **CNIL**: French data protection authority. Similar GDPR requirements plus some French-specific rules.
-- **Formal business culture**: Contracts and relationships require more formality than Anglo-Saxon markets. Expect longer sales cycles.
-
-### Japan (specific)
-
-- **Language**: English rarely sufficient; Japanese localization is mandatory for serious market entry.
-- **Local entity**: Often required by large customers.
-- **Hanko**: Physical seal used on contracts historically; digital contracts now accepted but confirm with each customer.
+For the regulatory points by market (EU/EEA, United Kingdom, Germany, France, Japan), read `references/regulatory-by-market.md` for every market you are assessing before recommending entry.
 
 ---
 
@@ -184,7 +115,7 @@ Convert US prices to local purchasing power, not just currency. A $100/mo tool p
 3. Round to a psychologically clean price in local currency
 4. Test: show the local price to local prospects and gauge reaction
 
-**Data source**: World Bank PPP data or BigMac Index as a quick proxy.
+**Data source**: World Bank PPP data, or the Big Mac Index as a fast, intuitive proxy. Treat the Big Mac Index as a rough starting point only — it's a single-good basket that ignores local costs, competitive pricing, and willingness-to-pay, not a calibration method to defend a final price with.
 
 ### Local Pricing Considerations
 
@@ -238,4 +169,30 @@ The country manager or first AE is the most important decision you'll make in th
 
 | Metric | Month 3 target | Month 6 target | Month 12 target |
 |--------|:--------------:|:--------------:|:---------------:|
-| Paying customers | 
+| Paying customers | 3+ (per 90-day plan) | 10+ (first-hire threshold) | Steady net-new adds every quarter |
+| ARR from market | First revenue booked | Meets the ARR gate set in Phase 2 | Tracked as a distinct, growing line in company ARR |
+| LTV:CAC in market | Not yet measurable | Directional read from the first cohort | >3:1 before scaling further investment in the market |
+| Local coverage | Home-entity support only | Reseller/partner confirmed, or first AE hired | Country manager or team, per Phase 3/4 |
+| Compliance status | Documentation drafted | Complete (per 90-day plan) | Renewed and audited on a regular cycle |
+| Referenceable customers | None yet | First customer willing to be a reference | 3+ referenceable customers, usable in sales |
+
+Treat this as a scorecard, not a single number: a market can look strong on customer count while still failing the LTV:CAC gate, or have a referenceable customer while compliance documentation lags. Either half being weak is a real signal to slow down, not a rounding error to average away.
+
+### When to Stop, Not Just When to Advance
+
+The Go/No-Go Framework and the phase gates above say when to advance. They don't say when to quit — and no audited, named source gives a universal ARR gate or time limit for a market entry that isn't working (checked 2026-09-08: only unattributed agency and vendor blogs circulate specific numbers here; none traceable to a named practitioner, firm, or study, so none is cited).
+
+Use the team's own capacity instead of a borrowed number: if a market hasn't cleared its Phase 2 ARR gate after two full sales cycles at that stage, that's not a market that needs more patience — it's a market that failed the test, the same discipline the Go/No-Go signals already apply to entry. Redirect the budget and the in-market time to the home market or to a different candidate, rather than open-ending the timeline because the sunk cost feels too large to walk away from.
+
+---
+
+## Common Mistakes
+
+- **Entering more than one market at a time.** Splits the team and the budget across markets that are each too thin to validate properly. Run the Go/No-Go Framework and the 4-phase approach on one market before opening a second.
+- **Treating translation as localization.** A translated homepage with US payment methods, US date formats, and a US-only support timezone is not localized — see the Product and Content Localization checklists above.
+- **Building before validating.** Setting up a legal entity, hiring a country manager, or fully localizing the product before the market has shown organic signal (Phase 1) reverses the order the Go/No-Go Framework is built around.
+- **Hiring the first in-market rep too early.** A country manager or AE with no pipeline to work has to build it from scratch instead of closing it — wait for the 10+ paying customers threshold in First Hire in a New Market.
+- **Copy-pasting the home-market playbook.** Channels, pricing, and messaging that work at home don't transfer as-is — see Channel Adaptation and Pricing Adaptation. A market entry plan that skips those sections is a home-market plan with a new currency symbol.
+- **Selling compliance as a differentiator.** "GDPR compliant" or "hosted in-region" is table stakes to operate in a regulated market, not a reason a prospect picks the product over a competitor who is also compliant — see Regulatory Considerations. A market entry pitch that leans on compliance as its main selling point is usually covering for the fact that Phase 1 validation (does the market actually want the product) never really happened.
+- **Ranking candidate markets by TAM alone.** The biggest market on paper is often the most culturally and administratively distant one — see Which Market First. Sequencing by size instead of distance is how a first entry takes twice as long to validate as it needed to.
+- **Escalating a market that hasn't cleared its gate.** Missing the Phase 2 ARR gate is a real signal, not a reason to extend the timeline and hope it turns — see When to Stop, Not Just When to Advance.

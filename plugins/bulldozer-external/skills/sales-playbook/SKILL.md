@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   sales-playbook
-description: |
+description: |-
   Build a B2B sales playbook — ICP and persona definitions, stage-by-stage process with entry/exit criteria, discovery framework, objection handling, demo structure, handoff to CS, and rep onboarding path. Triggers on 'sales playbook,' 'build our sales playbook,' 'document the sales process,' 'rep onboarding,' 'how should reps sell,' or 'our sales process is inconsistent.' For competitive positioning specifically, see battlecards. For ICP definition, see icp-builder.
-when-to-use: |
+when-to-use: |-
   Build a B2B sales playbook — ICP and persona definitions, stage-by-stage process with entry/exit criteria, discovery framework, objection handling, demo structure, handoff to CS, and rep onboarding path. Triggers on 'sales playbook,' 'build our sales playbook,' 'document the sales process,' 'rep onboarding,' 'how should reps sell,' or 'our sales process is inconsistent.' For competitive positioning specifically, see battlecards. For ICP definition, see icp-builder.
-argument-hint: |
+argument-hint: |-
   B2B SaaS, 5-rep sales team, no current playbook — ACV €20k, sales cycle ~60 days, two personas (VP Sales + Head of RevOps), using HubSpot
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -52,7 +52,9 @@ Everything else is supporting context. Build the field tools first, then add con
 
 ## Step 1: Define the ICP and Buyer Personas
 
-Pull from existing ICP documentation if available. If not, build from the last 20 closed-won deals.
+Pull from existing ICP documentation if available. If not, build from the last 20 closed-won deals — pull them from the CRM (HubSpot or equivalent) rather than asking someone to reconstruct the list from memory, and bound the query to a single pipeline: a CRM that's been in use for a while commonly runs several deal pipelines in parallel (main sales, upsell, outbound, partner...), each with its own stage set, so pulling closed-won deals across all of them blends motions that don't share a buying process.
+
+Filter further by deal type before pulling those 20: HubSpot's native deal type field (`dealtype`) ships with two values, New Business and Existing Business — check `get_properties(deals, [dealtype])` on the actual portal before assuming it's still just those two, since a portal that's been live for a while commonly extends it with custom values (Renewal, Upsell) rather than adding a separate property, and segment on those directly if they exist rather than treating everything non-New-Business as one block. Even at the default two values, it's enough to exclude renewals and expansions without a custom property. A renewal counted as closed-won was sold into a relationship that already existed, often through a different buyer than the one who signed the original deal — leaving it in blends net-new acquisition signal with retention signal, and the persona cards below end up describing neither buyer well.
 
 **ICP filter (4 questions a rep can ask in the first 10 minutes):**
 1. Does this account match the target firmographic? (Industry + employee band + revenue)
@@ -88,7 +90,8 @@ For each persona include:
 **Entry criteria:** Meeting booked, prospect has articulated a problem or change event  
 **Exit criteria:** Rep has mapped: pain + quantified impact + decision process + economic buyer identified + timeline confirmed  
 **Rep activities:** Run structured discovery call (see framework below), update MEDDPICC fields in CRM, confirm next step before ending call  
-**Common failure:** Leaving discovery without confirming who the economic buyer is
+**Common failure:** Leaving discovery without confirming who the economic buyer is  
+**Cheap first check:** `num_associated_contacts` on the HubSpot deal record is auto-populated by HubSpot itself — a deal that's been sitting in Discovery for weeks with a count of 1 is a single-threading signal worth acting on before reading a single call note (see the Champion row in Step 3 for what to do with it)
 
 ### Stage 3: Demo / Solution
 **Entry criteria:** Pain confirmed, economic buyer identified (or meeting to reach them scheduled)  
@@ -118,30 +121,7 @@ For each persona include:
 
 ## Step 3: Discovery Framework (MEDDPICC)
 
-MEDDPICC is a qualification and deal-mapping framework, not a checklist. The goal is not to fill in every field — it's to know which fields are blank and why.
-
-| Element | Questions | What you're mapping |
-|---------|-----------|---------------------|
-| **Metrics** | "What does success look like in numbers? What KPIs are you measured on?" | The quantified business outcome — this becomes the ROI story |
-| **Economic Buyer** | "Who ultimately signs off on this? Who else needs to approve?" | Budget authority — not your champion |
-| **Decision Criteria** | "What's most important in your evaluation? What would make you say no?" | Must-haves, nice-to-haves, deal-breakers |
-| **Decision Process** | "Walk me through how you've made similar purchases. What's your timeline?" | Steps, stakeholders, legal/procurement involvement, timeline |
-| **Identify Pain** | "What happens if you don't solve this? How much is this costing you?" | Urgency and cost of inaction |
-| **Champion** | "Who internally is most invested in solving this?" | The person driving the deal from inside the account |
-| **Competition** | "What else are you evaluating? What do you like about those options?" | Who you're competing against and on what criteria |
-
-**Discovery call structure (45 minutes):**
-
-| Time | Section | Goal |
-|------|---------|------|
-| 0–5 min | Rapport + agenda setting | Confirm why they agreed to meet, set expectations |
-| 5–15 min | Current state + pain | Understand their world before your solution existed |
-| 15–25 min | Impact + metrics | Quantify the cost of the problem |
-| 25–35 min | Decision process + competition | Map the buying process and competitive landscape |
-| 35–40 min | Solution bridge | Connect their specific pain to your capabilities (briefly — don't demo here) |
-| 40–45 min | Next steps | Secure a specific next action with a date before leaving the call |
-
-**The rule:** Never leave a discovery call without confirming the next step verbally and logging it in CRM within one hour.
+The full MEDDPICC table (each element, its discovery questions and what it maps) and how to use the framework are in `references/discovery-meddpicc.md`. Read it when writing the discovery section of the playbook.
 
 ---
 
@@ -155,7 +135,7 @@ A demo is not a product tour. It's a story where the prospect is the hero and yo
 Recap what you heard in discovery. "When we spoke, you mentioned X was your biggest challenge. Specifically, you said [their words]. Is that still the right framing?" Let them confirm or correct. Then transition: "What I want to show you today is exactly how we'd solve for that."
 
 **Act 2: The demo (20–25 minutes)**
-Show only the features that connect to the pain identified in discovery. Three workflows maximum — one per top pain point. Each workflow: show the problem state → show the solution → show the outcome in their language. Never show a feature you didn't hear referenced in discovery.
+Show only the features that connect to the pain identified in discovery. Three workflows maximum — one per top pain point. Each workflow: show the problem state → show the solution → show the outcome in their language. Never show a feature you didn't hear referenced in discovery. If call recordings are connected (Claap or equivalent), recordings are auto-tagged `PainPoints` — pull the transcript for this account before building the demo to map each workflow to the prospect's actual wording, not a paraphrase from memory of the discovery call.
 
 **Act 3: After (10–15 minutes)**
 "Based on what you saw today, is this the right solution to [pain they named]?" Get a reaction before closing. Handle objections that surface. Confirm next steps: "What would need to happen on your end for us to move forward?"
@@ -169,17 +149,62 @@ Show only the features that connect to the pain identified in discovery. Three w
 
 ## Step 5: Objection Handling
 
-Use the ACRC framework: **Acknowledge → Clarify → Respond → Confirm**
+The four-step objection read (Acknowledge, Clarify, Respond, Confirm) and the full catalogue of objections with how to answer each are in `references/objection-handling.md`. Read it when writing the objection-handling section of the playbook.
 
-1. **Acknowledge** — Show you heard them. "I understand why you'd feel that way."
-2. **Clarify** — Probe the real concern. "Help me understand — what specifically concerns you about...?"
-3. **Respond** — Address the actual concern with evidence (not defensiveness)
-4. **Confirm** — Check it landed. "Does that address your concern, or is there something else underneath it?"
+---
 
-**Top objections and scripts:**
+## Step 6: Closing and Negotiation
 
-**"It's too expensive."**  
-Clarify: "Is this about the total number, the per-seat cost, or how it fits your current budget cycle?"  
-Respond: "Our average customer sees [specific ROI outcome] within [timeframe]. At your current [cost of the problem], the payback period is [X months]. Would it help if I put together the business case in writing?"
+The negotiation preparation list, concession rules and closing techniques are in `references/closing-and-negotiation.md`. Read it when writing the closing and negotiation section of the playbook.
 
-**"We're not r
+---
+
+## Step 7: CS Handoff Protocol
+
+The handoff record to complete at contract signature and the handoff process are in `references/handoff-and-onboarding.md` (section "Step 7: CS Handoff Protocol"). Read it when writing the handoff section.
+
+---
+
+## Step 8: Rep Onboarding Path
+
+The 90-day ramp for new reps (days 1-30 and onward) is in `references/handoff-and-onboarding.md` (section "Step 8: Rep Onboarding Path"). Read it when writing the onboarding section.
+
+---
+
+## Key Metrics
+
+Don't import benchmarks from outside the company — sales cycle length, win rate, and ramp time vary too much by segment, ACV, and buying committee size for an external number to mean anything here. Track these against the company's own last 4–6 quarters, and flag movement, not the absolute number. Pull the underlying deal data straight from the CRM rather than a rep's self-report, and bound every one of these to a single pipeline — a portal with multiple pipelines running side by side (main, upsell, partner...) has a different stage set and a different definition of closed-won for each one, so mixing them produces a conversion rate that describes no real motion. Split by deal type too (the same native `dealtype` field used in Step 1 — New Business vs. Existing Business by default, or the portal's own custom values if it has extended them): a renewal-heavy quarter shortens the blended cycle length and inflates the blended win rate without new-logo selling having actually improved.
+
+| Metric | What it tells you | How to calculate it |
+|---|---|---|
+| Stage conversion rate | Where deals actually die | Deals exiting stage N ÷ deals entering stage N, per stage |
+| Sales cycle length | Whether the process is speeding up or dragging | Days from Stage 1 entry to Closed-Won, by segment |
+| Win rate at Proposal | Whether discovery is qualifying correctly | Closed-Won ÷ (Closed-Won + Closed-Lost) from Proposal stage onward |
+| Rep ramp time | Whether onboarding is working | Days from start date to first solo Closed-Won deal |
+| Discovery-to-demo slip | Whether reps are advancing under-qualified deals | Deals that reach Demo without an identified economic buyer |
+| Handoff completeness | Whether CS is inheriting real risk | % of Closed-Won deals with a complete handoff record before CS kickoff |
+
+If stage conversion is falling only at one stage, that stage's entry/exit criteria are wrong or reps aren't enforcing them — fix the criteria before adding more training.
+
+---
+
+## Common Mistakes
+
+- **Qualifying with hope instead of evidence.** A rep who wants the deal to be real will hear a maybe as a yes. Every MEDDPICC field should be backed by something the prospect said or did, not something the rep inferred.
+- **Running the same demo for every persona.** A demo that doesn't map to the specific pain from discovery is a product tour, and prospects can tell.
+- **Treating objections as scripts to recite.** The Acknowledge → Clarify → Respond → Confirm read (Step 5) fails the moment a rep skips Clarify and jumps straight to a rehearsed Respond — that's when responses sound canned instead of relevant.
+- **Negotiating alone under deadline pressure.** End-of-quarter discounting without approval or without a concession traded back trains the account to wait for the next deadline.
+- **A handoff that's really just a Closed-Won status change.** If CS has to ask the customer why they bought, the handoff failed.
+
+---
+
+## Rules
+
+1. Never advance a deal past Discovery without an identified economic buyer — a champion is not a buyer.
+2. Never leave a discovery or demo call without a specific next step and a date, confirmed out loud before hanging up.
+3. Never give a price concession without trading for something back — a term, a timeline, or a reference.
+4. Never let silence after a proposal go unaddressed for more than one follow-up cycle — re-engage with a real question or close the deal out.
+5. Never close a deal without a complete handoff record — the deal isn't done until CS can deliver what was sold, not when the signature lands.
+6. Never let a deal pass two consecutive calls without a verified contact with the economic buyer without flagging it as single-threaded — a low `num_associated_contacts` count on a deal that's been open for a while is the cheap early warning, not proof either way.
+7. Never revise a price a third time without new information from the buyer — ask directly what's actually holding the deal back instead of drafting another version.
+8. Never close a deal Lost without picking a reason from a fixed list — a free-text reason typed by the rep can't be aggregated into a pattern worth fixing.

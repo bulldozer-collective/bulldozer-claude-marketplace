@@ -1,7 +1,9 @@
 ---
-name: bulldozer-sea
-description: Query Google Ads campaigns, ad groups, keywords, and their metrics (impressions, clicks, cost, conversions, quality score), and generate new keyword ideas with search volumes and CPC ranges (Keyword Planner), via the Bulldozer SEA MCP tools.
-when-to-use: |
+name: |-
+  bulldozer-sea
+description: |-
+  Query Google Ads campaigns, ad groups, keywords, and their metrics (impressions, clicks, cost, conversions, quality score), and generate new keyword ideas with search volumes and CPC ranges (Keyword Planner), via the Bulldozer SEA MCP tools.
+when-to-use: |-
   Use this skill whenever the user requests data about one of their Google Adwords accounts. Google ads, Google Adwords, and SEA are synonyms. The user may just use the word "keywords" to refer to their Google Adwords keywords. Some examples of requests: "what are my best keywords for last month", "list all the google ads campaigns running at the moment", "show me ad group performance", "which campaigns spent the most this week".
   Also use it for keyword *ideation* (Keyword Planner) requests: "find new keyword ideas for X", "what's the search volume for these keywords", "how much would this keyword cost / what's the CPC", "suggest keywords for this landing page", "keyword planner". Note the distinction: the reporting tools (bdzListSeaL1s/L2s/L3s, bdzGetSeaL*Metrics) describe keywords/campaigns **already running and imported**; the keyword-ideas tool (bdzGenerateSeaKeywordIdeas) discovers **candidate** keywords not yet in a campaign.
 user-invocable: false
@@ -19,11 +21,12 @@ allowed-tools:
   - Read
   - Write
   - Edit
-effort: medium
+effort: |-
+  medium
 paths:
   - "**/bulldozer.json"
 metadata:
-  forge: disabled
+  "forge": "disabled"
 ---
 
 # Bulldozer SEA services

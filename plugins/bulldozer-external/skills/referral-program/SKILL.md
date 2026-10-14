@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   referral-program
-description: |
-  Design and optimize customer referral programs, affiliate programs, and word-of-mouth growth loops. Triggers on 'referral program,' 'affiliate program,' 'viral loop,' 'refer a friend,' 'customers referring customers,' or 'referral incentive design.' For product launch virality, see launch.
-when-to-use: |
-  Design and optimize customer referral programs, affiliate programs, and word-of-mouth growth loops. Triggers on 'referral program,' 'affiliate program,' 'viral loop,' 'refer a friend,' 'customers referring customers,' or 'referral incentive design.' For product launch virality, see launch.
-argument-hint: |
+description: |-
+  Design and optimize customer referral programs, affiliate programs, and word-of-mouth growth loops. Triggers on 'referral program,' 'affiliate program,' 'viral loop,' 'refer a friend,' 'customers referring customers,' or 'referral incentive design.' For product launch virality, see launch. For a full affiliate/partner program build (recruitment tiers, deal registration, dispute rules), see affiliate-program.
+when-to-use: |-
+  Design and optimize customer referral programs, affiliate programs, and word-of-mouth growth loops. Triggers on 'referral program,' 'affiliate program,' 'viral loop,' 'refer a friend,' 'customers referring customers,' or 'referral incentive design.' For product launch virality, see launch. For a full affiliate/partner program build (recruitment tiers, deal registration, dispute rules), see affiliate-program.
+argument-hint: |-
   B2B SaaS, $99/mo ACV, want double-sided referral for existing customers
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -42,13 +42,15 @@ A `referral-program-spec.md` file with: program type selection, incentive struct
 
 Referrer = existing customer. Higher trust, lower volume. One-time or limited rewards.
 
-**The benchmark**: Referred customers have 16–25% higher LTV and 18–37% lower churn than non-referred. They also refer others at 2–3x the rate of regular customers.
+**On the benchmark**: the often-quoted 16–25% LTV lift, 18–37% lower churn, and 2–3x re-referral rate for referred customers don't hold up as a single, verified package — they conflate several sources, at least one of which doesn't actually say what's attributed to it, and a later replication complicates even the LTV figure. Treat the range as directional at best, never as a number to promise a client. Run your own referred-vs-non-referred cohort (activation, retention, revenue) before quoting any of it internally. Full citation trail in `references/benchmarks-and-alternative.md`.
+
+**The alternative you're really comparing to.** It's rarely a competitor's referral program — it's the unincentivized word-of-mouth already happening for free. Before building the mechanism, get a baseline: ask new customers how they heard about you, or check the free-text `source` field on the lead lists this skill sets up below (already used for other attribution). Without that baseline, a program that looks like it's "working" may just be paying for referrals that would have happened anyway — money spent buying credit for word-of-mouth you already had, not lifting the volume. Detail in `references/benchmarks-and-alternative.md`.
 
 ### Affiliate Programs
 
 **Best for**: Reaching audiences you don't have, products with higher ACV that justify ongoing commissions, content creators and bloggers in your space.
 
-Affiliates may not be customers. Ongoing commission relationship. Higher volume potential, variable trust level.
+Affiliates may not be customers. Ongoing commission relationship. Higher volume potential, variable trust level. For the recruitment, tiering, deal-registration and dispute mechanics of a standalone program, use `affiliate-program` — the section below stays scoped to what changes when affiliates are layered onto an existing referral motion.
 
 ---
 
@@ -59,6 +61,8 @@ Trigger Moment → Share Action → Referred User Converts → Reward Delivered 
 ```
 
 Design every step of this loop before launching.
+
+**Before you build it, check what it's compounding.** A referral program is a growth loop like any other, and a loop only compounds what's already there — it doesn't fix it. Pouring new signups into a product that's losing existing customers just increases the volume that leaks out the other side, and it shows up as "the program doesn't work" a few months later when it was never the program's job to fix. Look at logo retention (or net revenue retention, for an expansion-heavy motion) across the last two or three cohorts before committing budget and engineering time to this. If it's trending down, that's the higher-leverage fix — a referral program built on customers who are quietly unhappy also produces fewer referrers and worse-fit referred signups, because people don't vouch for something they're about to leave.
 
 ---
 
@@ -111,42 +115,11 @@ Gamifies referral. Increases engagement. Best for products with strong community
 
 Example: "Refer 1 → $50. Refer 5 → $300 + your logo on our site"
 
-### Incentive Sizing by Product Type
+**Refuse this for enterprise motions.** A public leaderboard or a "your logo on our site" tier reads as gimmicky in front of a buyer who's about to run your contract through procurement, and it undermines the trusted-advisor framing sales spent months building. Tiering fits products with a real community or a high-frequency, low-ACV self-serve motion — not a handful of enterprise accounts referring other enterprise accounts.
 
-| Product type | Referrer reward | Referred reward |
-|-------------|----------------|----------------|
-| Self-serve SaaS (<$50/mo) | 1 month free or $10-$50 credit | 1 month free or $10-$30 credit |
-| Mid-market SaaS ($100-$500/mo) | $100-$500 credit or cash | 20-30% off first 3 months |
-| High-ACV SaaS (>$1k/mo) | % of first year revenue ($500-$2k) | Custom negotiated |
-| E-commerce | 10-20% commission | 10-15% off first order |
+### Cash vs. credit, and sizing by product type
 
----
-
-## Referral Email Template
-
-Subject: You can now earn [reward] for sharing [Product]
-
-```
-Hey [Name],
-
-We just launched our referral program.
-
-Share [Product] with someone in your network who'd find it useful — 
-they get [their reward], you get [your reward] after they sign up.
-
-Your referral link: [unique link]
-
-It's simple:
-1. Share your link
-2. They sign up
-3. You both get [reward]
-
-[Share My Link]
-
-Thanks for being part of the [Product] community.
-
-[Your name]
-```
+The reward *type* is a compliance decision, not just a marketing preference — cash above the US 1099-NEC threshold means collecting a W-9, and a personal cash reward to a B2B referrer who isn't the buyer can read as a kickback in a regulated industry. Whatever the amount, the ceiling is what the same customer costs through your next-best paid channel. For the full cash-vs-credit tradeoffs and the incentive sizing table by product type, read `references/incentive-economics.md`.
 
 ---
 
@@ -155,15 +128,15 @@ Thanks for being part of the [Product] community.
 ### Before Launch
 - [ ] Define program goals and success metrics
 - [ ] Choose incentive structure and amounts
-- [ ] Select referral tracking tool (Rewardful, Tolt, PartnerStack, or custom)
+- [ ] Select referral tracking tool (Rewardful, Tolt, PartnerStack, or custom) — or, before buying anything, a dedicated lead list in Bulldozer OS for a first pass (see "Measuring this in Bulldozer OS" below)
 - [ ] Build referral landing page for referred users
 - [ ] Set up tracking and attribution
-- [ ] Define fraud prevention rules (cap per referrer, verification requirements)
+- [ ] Define fraud prevention rules (cap per referrer, verification requirements) — for what this actually means (self-referral, reward farming, gating the reward on a verified conversion), read `references/launch-assets.md`
 - [ ] Write terms and conditions
 - [ ] Test complete referral flow end-to-end
 
 ### Launch
-- [ ] Announce to existing customers via email
+- [ ] Announce to existing customers via email — for the referral email template, read `references/launch-assets.md`
 - [ ] Add in-app referral prompt at trigger moment
 - [ ] Add referral CTA to post-milestone screens
 - [ ] Brief support team on program details
@@ -173,6 +146,8 @@ Thanks for being part of the [Product] community.
 - [ ] Identify top referrers and reach out personally
 - [ ] Gather friction feedback from program participants
 - [ ] Send reminder to non-referrers at day 14
+
+**What 30 days can and can't tell you, in short**: enough to read the funnel for a self-serve product, not enough to judge incentive size once a real sales cycle is involved — that needs at least one full cycle length. Full reasoning and the HubSpot pointer in `references/launch-assets.md`.
 
 ---
 
@@ -188,21 +163,10 @@ Thanks for being part of the [Product] community.
 | Referral CAC vs. other channels | Program ROI |
 | LTV of referred customers | Quality of referred users |
 
+**Measuring this in Bulldozer OS, in short.** Bulldozer OS has no dedicated referral object, but a lead list per cohort (`bdzCreateLeadList` / `bdzAddLeadToList`, free-text `source` field) covers the first four rows before any paid tracking tool is wired in, HubSpot's `DEAL` object covers the revenue rows where connected, and a GA4 report template (metric name `conversions`, not `keyEvents`) covers click → signup. **One real trap**: the `source` field only writes once per lead — a referred person already known to the OS keeps their old source silently, which understates "% new customers from referrals" with no error thrown. For the full mechanism, the `source` caveat, and the HubSpot/GA4 field names, read `references/measuring-in-bulldozer-os.md`.
+
 ---
 
 ## Affiliate Program Design
 
-For content creators, bloggers, and distribution partners:
-
-**Commission structure**:
-- SaaS: 20–30% recurring monthly commission (for 6–12 months) OR 50–100% of first month one-time
-- E-commerce: 5–15% of sale value
-- High-ACV: Flat fee per qualified introduction ($500–$2k) plus percentage of closed revenue
-
-**Recruitment**:
-1. Start with people already writing about you (Google: "best [category]" and find who lists competitors)
-2. Check who links to competitors (Ahrefs backlink analysis)
-3. Reach out to newsletter and podcast hosts in your space
-4. List your program on affiliate directories (Commission Junction, ShareASale for e-commerce)
-
-**Tool options**: Rewardful (Stripe-native), Tolt (SaaS-focused), PartnerStack (enterprise features), Introw (B2B partner programs with deal registration and QBRs).
+For content creators, bloggers, and distribution partners — commission structure, recruitment sequence, and tool landscape (Rewardful, Tolt, PartnerStack, Introw) in `references/affiliate-program-design.md`. No audited study sets a market-standard commission rate: every figure in that annex comes from affiliate-software vendors describing their own customers' programs, not an independent survey — treat it as a starting range to negotiate from, not a benchmark to defend. For the recruitment tiers, deal-registration and dispute mechanics of a standalone affiliate program, use `affiliate-program` instead of building that out here.

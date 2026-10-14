@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   cohort-mmm
-description: |
+description: |-
   Build cohort analysis and unit economics models — logo retention cohorts, revenue cohorts, CAC payback by channel and segment, LTV calculation, and media mix modeling interpretation. Triggers on 'cohort analysis,' 'retention cohorts,' 'LTV by cohort,' 'CAC payback,' 'unit economics,' 'media mix model,' 'which cohorts perform best,' or 'our blended metrics are hiding problems.' For attribution model setup, see attribution-funnel. For weekly tracking, see weekly-growth-review.
-when-to-use: |
+when-to-use: |-
   Build cohort analysis and unit economics models — logo retention cohorts, revenue cohorts, CAC payback by channel and segment, LTV calculation, and media mix modeling interpretation. Triggers on 'cohort analysis,' 'retention cohorts,' 'LTV by cohort,' 'CAC payback,' 'unit economics,' 'media mix model,' 'which cohorts perform best,' or 'our blended metrics are hiding problems.' For attribution model setup, see attribution-funnel. For weekly tracking, see weekly-growth-review.
-argument-hint: |
+argument-hint: |-
   B2B SaaS, 18 months of customer data, 3 acquisition channels (outbound, content, paid) — want to know which cohorts and channels have the best unit economics and where payback is trending
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -55,25 +55,9 @@ The only way to see this: cohorts. Group customers by when they started, track e
 - First payment date (cohort anchor — not signup date, payment date)
 - Active/churned status per month
 
-**Table structure:**
+For how to decide what counts as "active" and how to treat downgrades, read `references/cohort-table-reading.md`.
 
-| Cohort | M0 | M1 | M2 | M3 | M6 | M12 |
-|--------|----|----|----|----|----|----|
-| Jan 2024 | 100% | X% | X% | X% | X% | X% |
-| Feb 2024 | 100% | X% | X% | X% | X% | — |
-| Mar 2024 | 100% | X% | X% | X% | — | — |
-
-Each cell: percentage of cohort still active (paying) in that month.
-
-**Reading the table:**
-
-| Pattern | What it means | Action |
-|---------|--------------|--------|
-| Large M0→M1 drop (>15%) | Onboarding failure — customers not reaching activation | Fix onboarding: time-to-value, first-week experience |
-| Steady decline throughout | Normal churn — product may not be "sticky" enough | Investigate engagement; consider usage-based triggers |
-| Flat after M3 | Customers who survive onboarding become loyal | Optimize early-stage experience to push more through onboarding |
-| Newer cohorts declining faster | Acquisition quality dropping OR product regressed | Segment by channel — is the problem ICP drift or product? |
-| Newer cohorts improving | Onboarding or product improvements working | Quantify the improvement; protect the changes that drove it |
+For the cohort table structure and the pattern-reading table (pattern, meaning, action), read `references/cohort-table-reading.md`.
 
 **The two-stage churn model:**
 Most SaaS companies see two distinct churn behaviors:
@@ -115,6 +99,8 @@ CAC payback = how many months until a cohort's cumulative gross profit exceeds t
 - Monthly MRR per customer
 - Gross margin (%)
 
+For what "spend" must include in the CAC calculation (the biggest lever, usually left implicit), read `references/cac-payback-detail.md`.
+
 **CAC payback calculation:**
 
 ```
@@ -128,26 +114,7 @@ CAC payback = how many months until a cohort's cumulative gross profit exceeds t
 4. Payback month = first month where cumulative gross profit > cohort CAC
 ```
 
-**Example table:**
-
-| Month | Customers | Cohort CAC | M0 MRR | Gross Margin | M0 GP | Cumulative GP | Payback? |
-|-------|-----------|-----------|--------|-------------|-------|--------------|---------|
-| Acquisition | 10 | $8,000/customer | $1,200 | 80% | $960 | $960 | No |
-| M1 | 9 active | — | $1,250 | 80% | $900 | $1,860 | No |
-| M2 | 9 active | — | $1,280 | 80% | $922 | $2,782 | No |
-| ... | ... | ... | ... | ... | ... | ... | ... |
-| M9 | 8 active | — | $1,400 | 80% | $896 | ~$8,100 | ✅ |
-
-Payback at month 9.
-
-**CAC payback benchmarks:**
-
-| ACV | Acceptable | Healthy | Watch Signal |
-|-----|-----------|---------|-------------|
-| <€5K | 6–10 months | <6 months | >12 months |
-| €5K–€25K | 10–15 months | <12 months | >18 months |
-| €25K–€100K | 14–20 months | <18 months | >24 months |
-| €100K+ | 18–30 months | <24 months | >36 months |
+For the worked payback example, the CAC payback benchmark table by ACV, its caveats, and the annual-prepay clock issue, read `references/cac-payback-detail.md`.
 
 **What matters more than the benchmark:** Whether payback is improving or worsening across cohort vintages. If payback is extending quarter over quarter, it's caused by one of three things:
 1. CAC rising (channels getting more expensive or less efficient)
@@ -175,6 +142,8 @@ The classic formula LTV = ARPU ÷ churn rate is wrong for most SaaS businesses. 
 - **3–5x**: Healthy — efficient acquisition at scale. Standard target for growth-stage SaaS.
 - **>5x**: Underinvested — you may be leaving growth on the table by being too conservative on acquisition spend. Test scaling.
 
+For where the LTV:CAC "3x" reference comes from and its limits, read `references/ltv-and-ceiling-notes.md`.
+
 **LTV by segment:** Calculate separately for each:
 - Acquisition channel (outbound vs. inbound vs. paid vs. partner)
 - Firmographic segment (employee band, industry, funding stage)
@@ -195,6 +164,8 @@ Example: ($1,000 MRR × 80% GM) × 15 months = $12,000 CAC ceiling
 Any channel spending above $12,000 to acquire a customer paying $1,000/month is buying growth at a loss.
 ```
 
+For why the CAC ceiling is conservative whenever there is real expansion, read `references/ltv-and-ceiling-notes.md`.
+
 Set CAC ceilings quarterly per channel. When a channel exceeds its ceiling, either:
 1. Reduce spend until efficiency recovers
 2. Improve conversion rates to reduce CAC
@@ -206,10 +177,36 @@ Set CAC ceilings quarterly per channel. When a channel exceeds its ceiling, eith
 
 The cohort data answers one primary question: **Are we getting better or worse at growing durable revenue?**
 
-**Positive trends (growing quality):**
-- Newer cohorts retain at higher rates through M6 → onboarding improvements are working
-- CAC payback shortening → acquisition efficiency improving or expansion accelerating
-- NRR increasing quarter over quarter → customer success and expansion motions strengthening
+For the positive and negative trend signals and the sample-size check before acting on a trend, read `references/trends-and-allocation.md`.
 
-**Negative trends (degrading quality):**
-- Newer cohorts churn faster → ICP drift (acquiring wrong customers), product regressi
+---
+
+## Step 7: From Trends to Allocation Decisions
+
+This is where the analysis stops being a report and becomes a resourcing call. For each channel and segment, answer three questions with the cohort data already built:
+
+1. **Is CAC payback under, at, or over the ceiling from Step 5?** Under → room to scale spend. At → hold and monitor. Over → cut spend or fix the funnel before adding more.
+2. **Is the channel's LTV:CAC trending up or down over the last 2–3 cohort vintages?** A channel above the LTV:CAC bar today but trending down is a different call than one trending up — the direction matters as much as the level.
+3. **Is retention for this channel's cohorts converging toward the blended average, or diverging from it?** A channel that consistently retains worse than the blended average is quietly dragging down company-wide NRR even if its CAC looks fine in isolation.
+
+For the allocation recommendation table and what this analysis cannot tell you on its own, read `references/trends-and-allocation.md`.
+
+---
+
+## Common Mistakes
+
+For the list of common mistakes (single-cohort trends, survivorship bias, blended CAC, tiny cohorts, gross margin, NRR, LTV extrapolation, S&M spend, subscription status), read `references/common-mistakes.md` before presenting results.
+
+---
+
+## Rules
+
+- Never present a cohort table without stating the sample size behind each row — a percentage with no denominator is not evidence.
+- Never blend CAC or LTV across channels when channel-level data exists — the whole point of this analysis is to stop hiding channel-level reality inside an average.
+- Never call a trend "improving" or "degrading" off a single cohort vintage — require at least two to three consecutive cohorts moving the same direction.
+- Always separate early-stage churn (M0–M3) from steady-state churn before drawing conclusions about product/market fit — they have different causes and different fixes.
+- Always show GRR next to NRR when NRR is used to argue growth is healthy.
+- When revenue data lives in the CRM, pull it from there rather than asking for a manual export. In principle, Bulldozer OS can query HubSpot DEAL records directly by SQL, grouped by `DATE_TRUNC(closedate, 'MONTH' | 'WEEK' | 'QUARTER' | 'YEAR' | ...)`, which would build the revenue cohort table (Step 2) and the CAC payback inputs (Step 3) in one query. **In practice, on this portal this exact call fails**: `query_crm_data` on DEAL is blocked by a missing OAuth scope (`reporting.full.read`, `reporting.full.admin`, `crm.hubsql.execute`, `marketing.campaigns.revenue.lite.read`, `marketing.campaigns.revenue.full.read`), reproduced repeatedly over six weeks (2026-09-03 through 2026-10-10), including with this skill's own GROUP BY DATE_TRUNC query every time it was retested. Try it first — if it works on the connected portal, use it as described above. If it fails, the error itself now names a fix: reconnect the HubSpot connection and explicitly check the missing scopes during reconnection (none are granted by default). If a scope shows a lock icon and can't be selected, a HubSpot admin on the client's portal has to approve it for the app first — reconnecting alone won't clear that case. Until the scopes are granted, the fallback is `search_crm_objects` (DEAL, filtered on `hs_is_closed_won`/`hs_is_closed_lost`, paginated via `total`/`offset`), aggregating by month on the client side instead of via SQL GROUP BY. Either way, a scope refusal must never be read as "no revenue this month" — a blocked call returns nothing, and nothing looks exactly like an empty cohort. Use the property ending in `_in_home_currency` (e.g. `amount_in_home_currency`), not the raw `amount` — on a multi-currency portal, summing raw `amount` mixes currencies and silently misstates the total.
+- For the logo retention table (Step 1), DEAL alone is not enough: closed-won tells you a deal happened, not whether the customer is still paying next month. Check first whether the client bills through HubSpot's own Subscription object (`hs_status`: active/past_due/unpaid/paused/canceled/expired/scheduled, plus `hs_mrr` and `hs_recurring_billing_frequency`) — when it's populated, it is the CRM-native source for per-customer active/churned status and billing cadence, and Step 1 can be built without leaving HubSpot. When the client bills elsewhere (Stripe, Chargebee, a homegrown billing table), the Subscription object will be empty or absent and the billing/subscription system stays the required source for Step 1 — confirm which situation applies before promising either path.
+- Never report a CAC payback number without stating whether the CAC behind it is media-spend-only or fully-loaded (sales and marketing headcount included) — the two answer different questions and are commonly reported several times apart.
+- Never blend cohorts billed on different frequencies (monthly vs. annual or multi-year) into one payback trajectory without saying so — state whether payback is measured on a cash (bill-date) or recognized-revenue (MRR) basis.

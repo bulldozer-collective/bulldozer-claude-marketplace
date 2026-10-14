@@ -88,6 +88,23 @@ mettre `border-radius: 0` sur ce bloc en print, sinon le rayon dessine un arc pa
 weasyprint lead-magnet.html lead-magnet.pdf
 ```
 
+**PDF accessible (PDF/UA)** — WeasyPrint sait produire un PDF balisé (structure lue par un lecteur
+d'écran) depuis sa version 63 (2024), améliorée depuis (financement NLnet, v66, 2025-07-24) :
+
+```bash
+weasyprint --pdf-variant "pdf/ua-1" lead-magnet.html lead-magnet.pdf
+```
+
+Deux prérequis HTML, déjà posés dans `assets/template-lead-magnet.html` (`<html lang="…">` et
+`<title>`) : un titre de document et l'attribut `lang` sur `<html>`. L'ordre du DOM devient aussi
+l'ordre de lecture du PDF — vérifier que le flux HTML suit l'ordre visuel voulu, pas seulement le
+rendu CSS (un bloc positionné visuellement en premier par `grid`/`flex` mais placé plus loin dans le
+DOM se lira dans le mauvais ordre). L'éditeur prévient lui-même que la conformité PDF/UA n'est pas
+garantie automatiquement : elle dépend du HTML/CSS fourni, pas seulement de l'option. Non confirmé :
+que l'attribut `alt` d'une `<img>` est bien reporté comme texte alternatif dans le PDF balisé — à
+tester avec un lecteur d'écran réel avant de promettre un document accessible à un client qui le
+demande explicitement.
+
 Si WeasyPrint est absent :
 
 ```bash
@@ -128,7 +145,7 @@ Un PDF non inspecté n'est pas validé. Deux niveaux :
 **Automatique** — le script de la skill review repère les défauts mesurables :
 
 ```bash
-python3 ../lead-magnet-review/scripts/check_rythme.py lead-magnet.pdf --min-fill 0.66 --max-prose-run 4
+python3 scripts/check_rythme.py lead-magnet.pdf --min-fill 0.66 --max-prose-run 4
 ```
 
 Il sort, par page : le taux de remplissage, les suites de prose trop longues, le contraste d'échelle
@@ -166,6 +183,8 @@ typographique, et un verdict global.
 [ ] tout CTA masqué à l'impression a son équivalent texte (URL, email) en clair
 [ ] pas de filet de séparation isolé en haut d'une page (§2 bis d)
 [ ] PDF généré APRÈS la dernière modification du HTML
+[ ] si le client demande un PDF accessible : conversion avec --pdf-variant "pdf/ua-1", <title> et
+    lang= vérifiés, ordre du DOM confronté à l'ordre de lecture voulu
 [ ] check_rythme.py passé, défauts traités ou consignés
 [ ] inspection visuelle page par page effectuée
 [ ] sommaire recontrôlé après la dernière conversion

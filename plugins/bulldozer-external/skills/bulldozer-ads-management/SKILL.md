@@ -1,9 +1,9 @@
 ---
-name: |
+name: |-
   bulldozer-ads-management
-description: |
+description: |-
   Guidance for managing LinkedIn and Meta ads through the Bulldozer MCP server, covering ad account resolution (persisted to bulldozer.json), platform-specific hierarchy nomenclature, and ad import workflows.
-when-to-use: |
+when-to-use: |-
   Use when the user asks to import, list, search, analyze, or otherwise manage LinkedIn or Meta ads via Bulldozer — including any operation that requires resolving an ad account, creating an ad import, or referencing campaigns/ad sets/ads.
 allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__bdzListRegisteredAdAccounts
@@ -16,18 +16,18 @@ allowed-tools:
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   medium
 paths:
   - "bulldozer.json"
   - "**/bulldozer.json"
 metadata:
-  forge: disabled
+  "forge": "disabled"
 ---
 
 # Bulldozer Ads Management
 
-This skill explains how to interact with the Bulldozer MCP server for all operations related to ads on LinkedIn and Meta. It also persists ad account configuration to `bulldozer.json`.
+This skill explains how to interact with the Bulldozer MCP server for all operations related to ads on LinkedIn and Meta **ONLY**. Refer to `bulldozer:bulldozer-sea` skill for Google Ads operations. It also persists ad account configuration to `bulldozer.json`.
 
 ## Tools reference
 

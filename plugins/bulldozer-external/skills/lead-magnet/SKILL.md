@@ -1,6 +1,7 @@
 ---
-name: lead-magnet
-description: |
+name: |-
+  lead-magnet
+description: |-
   Produit un LEAD MAGNET (livre blanc) client-ready de bout en bout pour un client Bulldozer OS — le fond
   ET la forme — livré en PDF + HTML source, aux couleurs réelles du client, sans aucune donnée inventée.
   Orchestre la chaîne complète : contexte projet via l'API OS → cadrage validé par l'humain → rédaction
@@ -12,14 +13,17 @@ description: |
   "lead magnet" ni "livre blanc" mais décrit un document long, téléchargeable, qui capte des contacts.
   Déclencher AUSSI quand il demande seulement "un livre blanc" sans préciser la chaîne : c'est cette skill
   qui orchestre, pas une rédaction improvisée.
-when-to-use: |
+  Fonctionne MÊME SI le client n'est pas dans le Bulldozer OS : la skill demande alors de quel client il
+  s'agit, fait valider l'URL de son site officiel, et reconstruit le contexte depuis ce site (mode
+  hors-base) — la production continue à l'identique.
+when-to-use: |-
   Use this skill whenever the user wants a downloadable long-form marketing asset (white paper, guide,
   ebook, lead magnet) produced for a Bulldozer OS customer — content and design, ending in a PDF.
-  Do NOT use for: ABM 1-to-1 co-branded white papers built from a target account's news (that is
-  `abm-newsjacking`), landing pages (`lp-rapprochement`), slide decks (`bulldozer:slides-deck`), or a raw
-  PDF export of an existing document (`bulldozer:pdf-report`).
+  Do NOT use for: ABM 1-to-1 co-branded white papers built from a target account's news (no dedicated
+  skill exists yet — closest today is `account-based-marketing`, which does not cover the co-branded/
+  newsjacking series mechanic), landing pages (no dedicated skill in scope today), slide decks
+  (`slides-deck`), or a raw PDF export of an existing document (`pdf-report`).
 user-invocable: true
-effort: high
 allowed-tools:
   - Read
   - Write
@@ -28,20 +32,21 @@ allowed-tools:
   - Skill
   - WebSearch
   - WebFetch
-  - mcp__bulldozer__bdzListUserProjectMemberships
-  - mcp__bulldozer__bdzGetProject
-  - mcp__bulldozer__bdzGetProjectAiContext
-  - mcp__bulldozer__bdzGetProjectToneOfVoice
-  - mcp__bulldozer__bdzGetProjectValueProposition
-  - mcp__bulldozer__bdzGetProjectMarketPositioning
-  - mcp__bulldozer__bdzGetProjectMarketPerception
-  - mcp__bulldozer__bdzListProjectIcpProfiles
-  - mcp__bulldozer__bdzGetProjectObjectives
-  - mcp__bulldozer__bdzGetCompetitors
-  - mcp__bulldozer__bdzListProjectFiles
-  - mcp__bulldozer__bdzListReviews
-  - mcp__bulldozer__bdzSearchReviews
-  - mcp__bulldozer__bdzCreateMetric
+  - mcp__plugin_bulldozer_bulldozer__bdzListUserProjectMemberships
+  - mcp__plugin_bulldozer_bulldozer__bdzGetProject
+  - mcp__plugin_bulldozer_bulldozer__bdzGetProjectToneOfVoice
+  - mcp__plugin_bulldozer_bulldozer__bdzGetProjectValueProposition
+  - mcp__plugin_bulldozer_bulldozer__bdzGetProjectMarketPositioning
+  - mcp__plugin_bulldozer_bulldozer__bdzGetProjectMarketPerception
+  - mcp__plugin_bulldozer_bulldozer__bdzListProjectIcpProfiles
+  - mcp__plugin_bulldozer_bulldozer__bdzGetProjectObjectives
+  - mcp__plugin_bulldozer_bulldozer__bdzGetCompetitors
+  - mcp__plugin_bulldozer_bulldozer__bdzListProjectFiles
+  - mcp__plugin_bulldozer_bulldozer__bdzListReviews
+  - mcp__plugin_bulldozer_bulldozer__bdzSearchReviews
+  - mcp__plugin_bulldozer_bulldozer__bdzCreateMetric
+effort: |-
+  high
 ---
 
 # Lead Magnet — orchestrateur
@@ -60,35 +65,37 @@ Le voisinage est peuplé — se tromper de skill coûte une production entière 
 
 | Si la demande est… | Ce n'est pas ici, c'est… |
 | ------------------ | ------------------------ |
-| Un livre blanc **cobrandé** émetteur × compte cible, tiré de l'**actu** d'un compte nommé, en série (6 docs) | `abm-newsjacking` |
-| Une **landing page** de rapprochement 1-to-1 | `lp-rapprochement` |
-| Une **présentation** client (slides) | `bulldozer:slides-deck` |
-| Un **export PDF** d'un document déjà écrit | `bulldozer:pdf-report` |
-| Des **créas publicitaires** | `abm-linkedin-creas`, `bulldozer:ad-creative` |
+| Un livre blanc **cobrandé** émetteur × compte cible, tiré de l'**actu** d'un compte nommé, en série (6 docs) | pas de skill dédié aujourd'hui — le plus proche est `account-based-marketing`, qui ne couvre pas la mécanique newsjacking/série |
+| Une **landing page** de rapprochement 1-to-1 | pas de skill dédié dans le périmètre actuel |
+| Une **présentation** client (slides) | `slides-deck` |
+| Un **export PDF** d'un document déjà écrit | `pdf-report` |
+| Des **créas publicitaires** | `ad-creative` |
 
 Ici : **UN** lead magnet, thématique **donnée par l'opérateur**, contexte tiré du **Bulldozer OS**,
 destiné à capter des leads pour ce client. **Monomarque par défaut** — et co-brandé avec un partenaire
-si l'opérateur le demande et que l'accord est acté (voir `lead-magnet-design/references/co-branding.md`).
-À ne pas confondre avec `abm-newsjacking`, qui produit des livres blancs cobrandés **en série**, tirés de
-l'actualité d'un compte cible nommé.
+si l'opérateur le demande et que l'accord est acté (voir `references/co-branding.md`).
 
 ## Vocabulaire
 
-- **Client** : l'entreprise pour qui on produit, identifiée par un projet Bulldozer OS.
-- **Opérateur** : la personne qui invoque la skill (freelance ou membre Bulldozer). C'est elle qui donne
-  la thématique et qui valide.
-- **Cadrage** : le brief validé à l'étape ❷ — thématique, angle, ICP cible, objectif business, langue,
-  longueur. C'est le contrat d'entrée de toute la chaîne.
-- **Manifeste de contenu** : le JSON produit par `lead-magnet-content` qui décrit sections, blocs typés,
-  données et sources. C'est l'interface entre le fond, les assets et le design.
+Les termes clés (client, opérateur, cadrage, manifeste de contenu) sont définis dans `references/fautes-et-vocabulaire.md`.
 
 ## Les 9 règles opposables (valables pour toute la suite)
 
 Ces règles ne sont pas des intentions : chaque étape se vérifie contre elles, et un manquement bloque.
 
-**R1 — L'API Bulldozer OS est obligatoire, jamais contournable.** Aucune génération ne démarre sans
-`(customerId, projectId)` résolu via `bulldozer:bulldozer-project-chooser`. Pas de projet résolu = pas de
-lead magnet. On ne « devine » pas le client depuis le nom d'un dossier ou une conversation précédente.
+**R1 — Le contexte client vient du Bulldozer OS en priorité, d'un cadrage humain à défaut.**
+On cherche **toujours** le projet dans l'OS d'abord (`bulldozer-project-chooser`, puis
+recherche par nom). Deux issues, deux modes :
+
+- **Mode OS** (nominal) — le projet existe : `(customerId, projectId)` résolus, contexte tiré de l'API.
+  Quand le projet existe, ce mode n'est pas optionnel : on ne se rabat pas sur le site par confort.
+- **Mode hors-base** (repli légitime) — le client n'est pas dans l'OS : on demande **de quel client il
+  s'agit**, on fait **valider l'URL de son site officiel par l'opérateur**, et on reconstruit le contexte
+  depuis ce site. La chaîne continue ensuite à l'identique, avec les mêmes skills.
+
+Ce qu'on ne fait jamais, dans les deux modes : deviner le client depuis un nom de dossier ou une
+conversation précédente, et retenir un site sans confirmation humaine. Un lead magnet produit à la
+charte d'une homonyme est irrattrapable — l'URL se fait valider, elle ne se déduit pas.
 
 **R2 — La thématique vient de l'HUMAIN, jamais de la skill.** L'opérateur donne le sujet, l'angle et la
 cible. La skill exécute un cadrage donné, elle ne l'invente pas. Elle **peut** proposer des titres, des
@@ -105,7 +112,7 @@ signalée « à compléter » — jamais un chiffre plausible. Les sources sont 
 plus bas. Toute réimplémentation d'une brique existante est un défaut de production.
 
 **R5 — Logging.** Chaque skill de la suite loggue son invocation via `bdzCreateMetric`
-(`type = AI_METRIC_TYPE_SKILL_USED`, `reference = <nom de la skill>`). Non bloquant si l'appel échoue.
+(`type = METRIC_TYPE_SKILL_USED`, `reference = <nom de la skill>`). Non bloquant si l'appel échoue.
 
 **R6 — Deux points de passage humains, exactement : cadrage et livraison.** Entre les deux, la chaîne
 tourne en autonome (boucle review bornée). Pas de micro-validations intermédiaires qui cassent le flow,
@@ -131,20 +138,17 @@ objet qu'on télécharge et qu'on montre : un document 100 % texte-et-graphiques
 - Un document livré sans aucune image doit porter cette absence **en clair au rapport de complétude**,
   avec la commande prête à relancer.
 
-> Faute déjà commise : une production a livré 23 pages sur le coût de la santé des chiens et des chats
-> sans un seul animal, en invoquant « aucun visuel sans fonction ». Les 5 graphiques étaient justes, le
-> document était froid. R8 existe pour que l'arbitrage revienne à l'humain.
+> Faute déjà commise sur R8 (23 pages sans un seul animal) : récit complet dans `references/fautes-et-vocabulaire.md`.
 
 **R9 — La DA vient du site de production, pas d'une charte interne.** Brandbook, `CLAUDE.md`, skill
 « charte maison » : ces documents sont écrits une fois et ne suivent pas les refontes. On extrait les
 7 tokens du **site en ligne d'abord**, on compare ensuite avec la source interne, et **le site gagne**
 en cas de divergence — qui se consigne et se remonte à l'opérateur. Cette règle vaut aussi, et surtout,
-quand on croit connaître la marque : y compris pour **Bulldozer** sur un document co-brandé.
+quand on croit connaître la marque : y compris pour **Bulldozer** sur un document co-brandé. Cette
+extraction a lieu **à ❶**, avant la moindre commande de visuel — un visuel produit sans la charte
+réelle du client ne se corrige pas en le repeignant après coup, il se refait.
 
-> Faute déjà commise : une charte interne annonçant « fond noir, 0 border-radius » a produit un document
-> entier à l'opposé du site réel (fond clair, angles arrondis, sentence case). Verdict : « il n'y a que
-> la police qui est bonne. » Protocole complet dans
-> `lead-magnet-design/references/charte-extraction.md`.
+> Faute déjà commise sur R9 (charte interne contredisant le site réel) : récit complet dans `references/fautes-et-vocabulaire.md`. Protocole complet dans `references/charte-extraction.md`.
 
 ## Le flow
 
@@ -152,6 +156,7 @@ quand on croit connaître la marque : y compris pour **Bulldozer** sur un docume
 Opérateur : « fais un lead magnet pour [client] sur [thématique] »
   ↓
 ❶ project-chooser → contexte API complet
+   └─ client absent de l'OS → mode hors-base : quel client ? → site validé par l'humain → contexte
 ❷ CADRAGE — VALIDATION HUMAINE n°1 (thématique/angle donnés par l'opérateur)
 ❸ lead-magnet-content   → draft en blocs typés + manifeste de contenu
 ❹ lead-magnet-assets    → plan d'assets + visuels réellement produits
@@ -165,22 +170,15 @@ de démarrer la chaîne**.
 
 ### ❶ Contexte client (R1)
 
-1. Invoquer `bulldozer:bulldozer-project-chooser` → `(customerId, projectId)` persistés dans
-   `bulldozer.json`. **Sans ce couple, s'arrêter ici** et le dire.
-2. Tirer le contexte via l'API, dans cet ordre :
-   `bdzGetProjectAiContext` · `bdzGetProjectToneOfVoice` · `bdzGetProjectValueProposition` ·
-   `bdzGetProjectMarketPositioning` · `bdzGetProjectMarketPerception` · `bdzListProjectIcpProfiles` ·
-   `bdzGetProjectObjectives` · `bdzGetCompetitors` · `bdzListProjectFiles` (logo, assets de marque).
-3. **Chaque brique manquante est notée et remontée au cadrage** — jamais comblée par invention (R3).
-   Ce que chaque appel apporte concrètement, et quoi faire quand il revient vide :
-   `references/contexte-api.md`.
+Le détail des gestes (chercher le projet dans l'OS, mode OS avec l'ordre des appels API et le `targetProjectId`, mode hors-base en trois gestes, **extraction de la charte** (7 tokens + logo → `brandbook-[client].md`, voir R9), briques manquantes remontées au cadrage) est dans `references/etape-1-contexte-client.md` — **le lire avant de tirer le contexte**. Ce que chaque appel apporte et quoi faire quand il revient vide : `references/contexte-api.md`.
 
 ### ❷ Cadrage — validation humaine n°1 (R2, R6)
 
 **Une seule salve de questions**, pas dix allers-retours. Ce qui se confirme : thématique et angle
 (donnés par l'opérateur), ICP cible parmi les profils API, objectif business du magnet (le CTA final),
-langue, longueur (défaut **12–20 pages**, ajustable), contraintes éventuelles, et les trous du contexte
-API relevés en ❶.
+langue, longueur (défaut **8–16 pages**, ajustable — un document court qui répond à un problème précis
+bat un document long sur un sujet flou, voir `references/cadrage.md`), contraintes éventuelles, et les
+trous du contexte API relevés en ❶.
 
 Proposer 3 titres candidats **seulement si l'opérateur le demande ou n'a pas de titre** — sinon prendre
 le sien, tel quel. La salve type et le format du brief de cadrage : `references/cadrage.md`.
@@ -193,8 +191,8 @@ le sien, tel quel. La salve type et le format du brief de cadrage : `references/
 | Étape | Skill déléguée | Entrée | Sortie attendue |
 | ----- | -------------- | ------ | --------------- |
 | ❸ Contenu | `lead-magnet-content` | brief de cadrage + contexte API | markdown en blocs typés + `manifeste-contenu.json` |
-| ❹ Assets | `lead-magnet-assets` | draft + manifeste | plan d'assets complété des fichiers/SVG produits |
-| ❺ Design | `lead-magnet-design` | draft + assets + charte client | `lead-magnet.html` + `lead-magnet.pdf` |
+| ❹ Assets | `lead-magnet-assets` | draft + manifeste + `brandbook-[client].md` (déjà extrait à ❶) | plan d'assets complété des fichiers/SVG produits, à la palette réelle du client |
+| ❺ Design | `lead-magnet-design` | draft + assets + `brandbook-[client].md` (appliqué, pas réextrait) | `lead-magnet.html` + `lead-magnet.pdf` |
 
 Chaque étape rend la main avec ses livrables **réellement présents sur le disque**. Un livrable annoncé
 mais absent est un échec d'étape, pas un détail : vérifier les fichiers avant d'enchaîner.
@@ -224,48 +222,21 @@ tard sans tout refaire). Avec :
 
 ### Publication en URL (si demandée au cadrage, question 11)
 
-Le PDF et le HTML sont les livrables ; **l'URL est ce qui rend le lead magnet diffusable**. Publier via
-`bulldozer:bulldozer-hosting` en **site statique public** :
-
-1. Ajouter au HTML un bouton **« Télécharger le PDF »** pointant vers le PDF en chemin relatif — ce
-   bouton n'existe que dans la version publiée, pas dans le HTML source livré à part.
-2. **Zipper `index.html` + le PDF ensemble** : les deux sont alors servis sous la même URL, et la page
-   propose son propre téléchargement. C'est ce qui évite d'avoir deux liens sans rapport.
-3. Déposer le zip via `bulldozer:bulldozer-fridge`, puis `bdzCreateHosting` avec
-   `type = HOSTING_TYPE_STATIC_SITE` et un `subdomain` → `https://{customerSlug}.bulldozer-os.fr/{subdomain}/`.
-4. **Vérifier les deux URL en HTTP** (page et PDF) avant de les annoncer : un `curl -o /dev/null -w "%{http_code} %{content_type}"` suffit.
-5. Consigner `hostingId`, `subdomain` et URLs dans `bulldozer.json` — republier plus tard se fait avec
-   `bdzReplaceHostingContent` sur le même id, **sans changer l'URL**.
-
-> ⚠️ **Une page ainsi publiée est PUBLIQUE** : pas de mot de passe, pas d'expiration. Le dire
-> explicitement à l'opérateur au moment de livrer l'URL, en rappelant ce qu'elle expose (emails des
-> interlocuteurs, chiffres clients). La skill `bulldozer-hosting` ne documente que l'hébergement privé
-> à URL signée d'une heure : le mode site statique public existe pourtant dans l'API et c'est celui-ci
-> qu'il faut pour un lead magnet.
+Pour la procédure complète de publication (bouton de téléchargement, zip, `bulldozer-fridge`, `bdzCreateHosting`, vérification HTTP, consignation), les limites (**publier n'est pas capter** : un site statique ne capte aucun lead, voir `bdzAttachLeadListToCmsForm`) et l'avertissement que la page est PUBLIQUE, lire `references/publication-url.md` **avant toute publication**, et dire à l'opérateur que l'URL est publique et qu'elle ne capte rien par elle-même.
 
 Puis logger la complétion (R5).
 
 ## Briques réutilisées (R4 — ne rien réécrire)
 
-| Besoin | Brique | Note |
-| ------ | ------ | ---- |
-| Résolution projet | `bulldozer:bulldozer-project-chooser` | obligatoire, étape ❶ |
-| Charte réelle du client (7 tokens) + logo fichier | `emetteur-brand-kit` + `logo-resolver` | protocole détaillé dans `lead-magnet-design/references/charte-extraction.md` |
-| Illustrations | `bulldozer:bulldozer-studio` | `bdzCreateStudioJob`, textless, `useTov`. **Couverture visuelle par défaut (R8)** |
-| Graphiques | `dataviz` | palette dérivée des tokens client |
-| PDF | `bulldozer:pdf-report` (pattern WeasyPrint) | conversion + fallback |
-| Niveau rédactionnel | `anthropic-skills:anti-slop-writing` | grille universelle |
-| Publication en URL publique | `bulldozer:bulldozer-hosting` + `bulldozer:bulldozer-fridge` | étape ❼, si demandée au cadrage — zip `index.html` + PDF, `HOSTING_TYPE_STATIC_SITE` |
-| Document co-brandé (2 marques) | `lead-magnet-design/references/co-branding.md` | accord partenaire confirmé par l'opérateur |
-| Avis clients réels (testimonials) | `bdzListReviews` / `bdzSearchReviews` | R3 : jamais de verbatim inventé |
+Pour la table complète des briques réutilisables (résolution projet, charte réelle, illustrations, graphiques, PDF, niveau rédactionnel, publication, co-branding, avis clients), lire `references/briques-reutilisees.md`.
 
-> ⚠️ `anthropic-skills:bulldozer-editorial` porte la voix éditoriale **de Bulldozer**. Pour un lead magnet
-> client, c'est le ton de voix **du client** (`bdzGetProjectToneOfVoice`) qui prime — n'emprunter à
-> `bulldozer-editorial` que ses exigences de structure et d'anti-remplissage, jamais sa voix.
+> ⚠️ **Le ton de voix qui prime est celui du client** (`bdzGetProjectToneOfVoice`, R7), jamais une
+> habitude éditoriale interne à Bulldozer — y compris sur un document de fond long.
 
 ## Interdits du master
 
-- ❌ Sauter le project-chooser, ou « retrouver » le projet autrement (R1).
+- ❌ Sauter la recherche dans l'OS, ou passer en mode hors-base alors que le projet existe (R1).
+- ❌ Retenir un site client sans validation explicite de l'opérateur, ou en déduire un d'un nom (R1).
 - ❌ Démarrer sans thématique humaine, ou en déduire une du contexte API (R2).
 - ❌ Dépasser 2 boucles de review **de sa propre initiative**. Une remarque de l'opérateur après
   livraison rouvre légitimement une passe (il est le point de passage humain) : écrire alors un
@@ -277,7 +248,11 @@ Puis logger la complétion (R5).
 - ❌ Multiplier les validations intermédiaires : deux points humains, pas trois (R6).
 - ❌ Annoncer un fichier sans avoir vérifié qu'il existe et qu'il s'ouvre.
 - ❌ Prendre une charte interne pour la DA du client sans l'avoir confrontée au site (R9).
+- ❌ Passer en ❹ (assets) sans `brandbook-[client].md` déjà écrit — commander un visuel avant la charte
+  produit une direction artistique à refaire, pas à corriger (R9).
 - ❌ Publier une URL sans dire à l'opérateur qu'elle est publique, et ce qu'elle expose.
+- ❌ Laisser croire qu'une URL de diffusion capte des leads : le hosting statique ne le fait jamais seul
+  (voir ❼) — le dire avant de publier, pas après coup.
 - ❌ Enterrer une hypothèse non vérifiée (email déduit, chiffre supposé) dans une note de bas de
   page : elle se dit en tête du message de livraison.
 
@@ -291,7 +266,7 @@ conversion PDF**.
 
 ## Journalisation (R5)
 
-À l'invocation : `bdzCreateMetric` (`type = AI_METRIC_TYPE_SKILL_USED`, `reference = lead-magnet`).
+À l'invocation : `bdzCreateMetric` (`type = METRIC_TYPE_SKILL_USED`, `reference = lead-magnet`).
 À la livraison : un second appel avec `reference = lead-magnet:delivered`. Non bloquant si l'appel échoue.
 
 ## Références
@@ -300,3 +275,7 @@ conversion PDF**.
 - `references/cadrage.md` — la salve de cadrage, les défauts, le format du brief de cadrage
 - `references/contexte-api.md` — ce que chaque appel API apporte, et quoi faire quand il revient vide
 - `references/pannes-et-parades.md` — pannes connues (Studio, hosting, egress, WeasyPrint, polices)
+- `references/charte-extraction.md` — le protocole des 7 tokens + logo, R9 (le site de production
+  gagne toujours sur une charte interne)
+- `references/co-branding.md` — le partage de territoire entre deux marques sur un même document,
+  quand un partenaire est co-signataire.

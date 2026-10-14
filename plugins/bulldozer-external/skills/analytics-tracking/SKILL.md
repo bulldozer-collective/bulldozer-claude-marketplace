@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   analytics-tracking
-description: |
+description: |-
   Set up, fix, or audit analytics tracking — conversion tracking, event tracking, UTM parameters, and tracking plans. Triggers on 'set up tracking,' 'conversion tracking,' 'event tracking,' 'UTM parameters,' 'tracking plan,' or 'analytics isn't working.' For A/B test measurement, see ab-testing.
-when-to-use: |
+when-to-use: |-
   Set up, fix, or audit analytics tracking — conversion tracking, event tracking, UTM parameters, and tracking plans. Triggers on 'set up tracking,' 'conversion tracking,' 'event tracking,' 'UTM parameters,' 'tracking plan,' or 'analytics isn't working.' For A/B test measurement, see ab-testing.
-argument-hint: |
+argument-hint: |-
   Set up GA4 + GTM for a SaaS marketing site — need conversion tracking for demo requests
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -68,6 +68,8 @@ checkout_payment_completed
 
 Clean data beats more data. Validate every event before moving on.
 
+A tracking plan that tries to capture everything "just in case" is the surest way to get one nobody trusts. Push back on requests to add events with no decision attached to them — every extra event is something a future person has to validate, maintain, and reconcile against what GA4 already tracks automatically (see Enhanced Measurement below) forever.
+
 ---
 
 ## Tracking Plan Framework
@@ -84,6 +86,8 @@ Clean data beats more data. Validate every event before moving on.
 | `signup_completed` | method, plan | Success confirmation |
 | `pricing_page_viewed` | — | /pricing page load |
 | `form_submitted` | form_type | Any form |
+
+GA4 Enhanced Measurement already fires `page_view` and `form_submit` automatically once enabled — check DebugView before building a custom trigger for `pricing_page_viewed` or `form_submitted`, or the site ends up sending both and double-counting.
 
 **Product/App**:
 
@@ -102,9 +106,9 @@ Clean data beats more data. Validate every event before moving on.
 
 1. Create GA4 property + data stream for your domain
 2. Install via Google Tag Manager (preferred) or gtag.js
-3. Enable Enhanced Measurement (captures clicks, scrolls, file downloads automatically)
+3. Enable Enhanced Measurement — it auto-tracks page views, scroll depth (90%), outbound clicks, site search, video engagement, file downloads and form submissions, no code required for any of them
 4. Configure custom events for your conversion goals
-5. Mark key events as Conversions in GA4 Admin
+5. Mark key events as Conversions in GA4 Admin — if the project's GA4 property is connected in Bulldozer, `bdzListGoogleAnalyticsConversionEvents` returns the live list of conversion events configured on the property, so this step can be checked without opening GA4 Admin
 
 ### Custom Event via GTM
 
@@ -133,6 +137,14 @@ dataLayer.push({
 
 **Folder organization in GTM**: Group by tracking system (GA4, Meta, LinkedIn) not by page.
 
+### Client-Side Is the Default — Server-Side (sGTM) Is a Trade-Off, Not an Upgrade
+
+Standard web GTM (client-side) is the right starting point for most B2B SaaS marketing sites. Server-side GTM is a system to build, host and maintain — a real monthly cost, not a free data-quality upgrade — worth it when volume or regulatory exposure justifies it (heavy ad spend, e-commerce, GDPR-sensitive sectors), not by default for a mid-size site. Don't take a vendor's "20-40% data loss to ad-blockers" claim at face value — measure the gap on your own traffic first. Full cost breakdown (Cloud Run instance count and pricing) and the independent test that debunks the vendor numbers: `references/server-side-gtm.md`.
+
+### Attribution Model — Know What This Plan Does and Doesn't Decide
+
+This plan gets events firing correctly and named consistently. It does not decide which channel gets credit for a conversion — that's the attribution model, set in GA4 Admin > Attribution Settings, not in GTM. GA4 offers three property-level models (Data-Driven Attribution by default, Paid and Organic Last Click, and a Google-Ads-only last-click model that silently falls back to Paid and Organic whenever a path has no Google Ads touchpoint), and DDA needs enough volume to be trusted — but no official, current conversion-volume threshold exists for either GA4 or Google Ads today, so don't cite a specific number: check the account directly instead (Google Ads' own "Switch to DDA" page, or watch for last-click-looking results on a GA4 property set to DDA). When a channel's numbers swing with no GTM/GA4 config change behind it — including after GA4's April 2026 attribution restructure, which reset some properties back to data-driven — check Attribution Settings before treating it as a broken tag (see Common Issues below). Don't let this tracking plan double as an attribution report — that's a separate, model-aware conversation (see the dedicated attribution skill). Full detail, dates and the Google Ads native-selector change: `references/attribution-model.md`.
+
 ---
 
 ## UTM Parameter Strategy
@@ -155,6 +167,10 @@ dataLayer.push({
 
 **Quick builder**: Use a Google Sheets UTM builder with drop-down validation to enforce consistency across the team.
 
+### Never Tag Internal Links
+
+The most common way a clean tracking plan gets quietly undermined isn't a missing tag — it's UTMs added to links between pages of the same site (nav links, in-content CTAs, footer links). GA4 attributes a new session to whatever source/medium a URL's UTM carries, so an internally-tagged link can reset the visitor's original source mid-visit — and once that tagged URL gets copied, bookmarked or shared, the pollution keeps recurring. Reserve UTMs strictly for links that leave the property (email, social, paid, partner sites); track internal link clicks as a GTM custom event instead (`cta_clicked`, already in the events table above — its `location` property says where the click came from, no UTM needed). For a product that spans multiple domains or subdomains, use GA4's cross-domain measurement and referral exclusion list to stitch sessions together — never UTMs — so the two mechanisms don't get mixed.
+
 ---
 
 ## Debugging and Validation
@@ -175,6 +191,7 @@ dataLayer.push({
 - [ ] Works on mobile (especially important for popup and CTA events)
 - [ ] Conversions recorded correctly in GA4 and in ad platforms
 - [ ] No PII leaking into event properties (emails, names, addresses)
+- [ ] Report shows the % of fires where each key property is actually populated — an event that always fires but is blank half the time is a silent tracking gap, not a validated event
 
 ### Common Issues
 
@@ -184,43 +201,21 @@ dataLayer.push({
 | Wrong property values | Data layer key mismatch | Console.log `dataLayer` and check the key names |
 | Duplicate events | Multiple tracking scripts | Audit for duplicate GTM containers or gtag.js installs |
 | Conversions not attributed | UTMs missing or broken | Test a full UTM URL end-to-end |
+| Channel numbers shifted, nothing changed in GTM/GA4 config | Attribution model or lookback window changed in GA4 Admin, or a platform-side model reset/recalibration (e.g. the April 2026 GA4 attribution restructure) | Check Admin > Attribution Settings before treating it as a broken tag |
 
 ---
 
 ## Privacy and Compliance
 
-- **EU/UK/CA**: Cookie consent required before firing tracking tags. Use Consent Mode v2 with Google.
+- **EU/UK**: Cookie consent required before firing tracking tags. Implement Consent Mode v2 — the four signals are `ad_storage`, `analytics_storage`, `ad_user_data`, `ad_personalization`; without the latter two set correctly, Google Ads and GA4 lose personalized-ads, remarketing and conversion-tracking capability for EEA/UK traffic. Mandatory since March 2024 (DMA / EU User Consent Policy); Google began actively enforcing it on July 21, 2025 — non-compliant accounts lose personalized-ads, remarketing and conversion-tracking access, not just a warning — treat it as a launch blocker, not a nice-to-have, for any site with EU/UK visitors. Since June 15, 2026, `ad_storage` alone governs whether advertising data reaches a linked Google Ads account — Google Signals no longer acts as a fallback and is now reporting-only inside GA4. Test the consent banner's `ad_storage` signal specifically on any site connected to Google Ads: get that wrong post-migration and conversions, remarketing audiences and Smart Bidding signals can go quiet with nothing left to catch the gap.
 - **No PII in events**: Never put email addresses, names, or phone numbers in event properties.
-- **Data retention**: Set GA4 retention to match your policy (max 14 months by default).
+- **Data retention**: GA4 defaults to 2 months for the event-level data used in Explorations (funnels, path analysis, custom segments) — not 14. Raise it to 14 months, the ceiling on a free GA4 property, in Admin > Data Settings > Data Retention. Standard reports aggregate data that isn't subject to this ceiling and persists regardless.
 - **User deletion**: Have a process to delete user data on request (GA4 supports this natively).
 
 ---
 
 ## Output: Tracking Plan Document
 
-```markdown
-# [Site/Product] Tracking Plan
+Ready-to-copy template (Overview, Events table, Custom Dimensions, UTM Convention): `references/tracking-plan-template.md`.
 
-## Overview
-- Analytics stack: GA4 + GTM
-- Last updated: [Date]
-- Owner: [Name]
-
-## Events
-
-| Event Name | Description | Properties | Trigger | Conversion? |
-|------------|-------------|------------|---------|-------------|
-| demo_requested | User submits demo request | form_location, source | Demo form submit | Yes |
-| trial_signup_completed | User completes trial signup | method, plan | Success page | Yes |
-
-## Custom Dimensions
-| Name | Scope | Parameter |
-|------|-------|-----------|
-| user_type | User | user_type |
-| plan | Session | plan_name |
-
-## UTM Convention
-Source: [list of approved sources]
-Medium: [list of approved mediums]
-Campaign: [naming pattern]
-```
+Once the plan is live, add a population-rate column to the Events table: the % of fires where each key property is non-empty. An event that's 100% present but only 60% populated with `form_location` isn't validated, it's decoration.

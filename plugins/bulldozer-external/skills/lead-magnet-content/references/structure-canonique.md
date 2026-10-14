@@ -104,3 +104,9 @@ valeur ? Si non, c'est de la valeur. Si le chapitre s'effondre parce qu'il n'ét
 c'est de la plaquette — à réécrire.
 
 Seul le CTA final assume d'être 100 % client. C'est son rôle.
+
+**Le seuil se déplace selon l'objectif du cadrage**, pas le test. Un magnet de haut de funnel
+(faire comprendre un problème) reste strictement à 90/10. Un magnet explicitement cadré comme
+guide d'achat ou de comparaison (bas de funnel) peut nommer le produit du client plus souvent —
+c'est ce qu'attend le lecteur qui télécharge ce format-là. Le test ne change pas pour autant :
+chaque mention doit encore porter un argument, jamais une simple répétition du nom.

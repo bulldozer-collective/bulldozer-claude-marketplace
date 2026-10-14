@@ -1,8 +1,9 @@
 ---
-name: bulldozer-fridge
-description: |
+name: |-
+  bulldozer-fridge
+description: |-
   Temporarily drop a file into the Bulldozer "fridge" — a code-gated, public, auto-expiring S3 upload.
-when-to-use: |
+when-to-use: |-
   Use when the user wants to quickly share / drop / stash / upload a file for a short time (a scratch
   or throwaway upload that self-destructs), or hand a file to an external/unauthenticated party via a
   fridge code. NOT for permanent hosting of a page/site (use hosting) or for generated project assets
@@ -10,9 +11,10 @@ when-to-use: |
 user-invocable: false
 allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__bdzRequestFridgeCode
-effort: low
+effort: |-
+  low
 metadata:
-  forge: disabled
+  "forge": "disabled"
 ---
 
 # Bulldozer Fridge

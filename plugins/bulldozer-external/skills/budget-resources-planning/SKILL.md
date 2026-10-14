@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   budget-resources-planning
-description: |
+description: |-
   Build the annual operating budget and resource allocation plan for a B2B SaaS company — revenue model, headcount plan by quarter, department allocation benchmarks, 3-scenario planning, runway calculation, and signal-based unlock triggers. Triggers on 'budget planning,' 'annual operating plan,' 'AOP,' 'headcount plan,' 'budget allocation,' 'how much to spend on GTM,' 'how many people can I hire,' or 'runway calculation.' For org design, see org-design-hiring-roadmap. For team assessment, see team-assessment.
-when-to-use: |
+when-to-use: |-
   Build the annual operating budget and resource allocation plan for a B2B SaaS company — revenue model, headcount plan by quarter, department allocation benchmarks, 3-scenario planning, runway calculation, and signal-based unlock triggers. Triggers on 'budget planning,' 'annual operating plan,' 'AOP,' 'headcount plan,' 'budget allocation,' 'how much to spend on GTM,' 'how many people can I hire,' or 'runway calculation.' For org design, see org-design-hiring-roadmap. For team assessment, see team-assessment.
-argument-hint: |
+argument-hint: |-
   Series A, €2.8M ARR. Raised €4M. Need to build a 12-month operating plan — how to allocate the €4M across hiring, marketing, and infrastructure. Board wants to see a hiring plan with runway to 18 months.
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -32,69 +32,32 @@ A `budget-plan-{company}-{year}.md` file with: revenue model by quarter, departm
 
 **Produce on first invocation. Build the revenue model before the headcount plan — revenue capacity determines what headcount is justified.**
 
+**When this artifact is the wrong move.** A full annual operating plan — stage benchmarks, 3 scenarios, signal-based unlocks — assumes there is a revenue motion worth modeling. Two cases where building it anyway just hides the real decision inside a spreadsheet:
+
+- **No repeatable New ARR motion yet.** Pre-seed or pre-PMF, where each new logo is still won by a different combination of channel and pitch, doesn't have a rate to extrapolate. What's needed there is a cash runway table (Step 5 alone) and a hiring freeze on anything but the roles proving the motion — not a department-benchmark budget that pretends the motion is already found.
+- **The strategic objective isn't decided yet.** A budget allocates money against a bet (which segment, which motion, land-and-expand vs. net-new). If the board or founders haven't made that call, running this skill produces a plan that looks rigorous and answers the wrong question — the objective decision belongs in strategy work first, not inside a budget template.
+
 ---
 
 ## Step 1: Revenue Model
 
-**Revenue model structure for B2B SaaS:**
-
-```
-New ARR = Net new logos × Average ACV
-Expansion ARR = Existing ARR × NRR expansion rate (anything above 100%)
-Churned ARR = Existing ARR × Churn rate (negative)
-Net New ARR = New ARR + Expansion ARR − Churned ARR
-
-Quarterly revenue target = (Annual target − Starting ARR) ÷ 4 quarters
-+ account for seasonal skew (Q2 and Q4 typically stronger)
-```
-
-**ARR growth rate benchmarks by stage:**
-
-| Stage | ARR | Target growth (YoY) | Efficient growth (Rule of 40) |
-|-------|-----|--------------------|-----------------------------|
-| Seed | <€1M | 200%+ | >40 (growth rate + profit margin) |
-| Series A | €1–5M | 100–150% | >40 |
-| Series B | €5–20M | 80–120% | >40 |
-| Series C | €20–50M | 60–80% | >40 |
-| Growth | €50M+ | 40–60% | >40 |
-
-**NRR benchmarks:**
-- <100%: Company is shrinking from existing base (churn exceeds expansion)
-- 100–110%: Healthy for sales-led motions
-- 110–120%: Strong — existing customers more than replace churn
-- 120%+: Best-in-class (Snowflake, HubSpot level)
+The revenue model structure for B2B SaaS (new ARR, expansion ARR and the related formulas, with the worked detail) is in `references/revenue-model.md`. Read it before building the revenue model.
 
 ---
 
 ## Step 2: Department Budget Allocation
 
-**Benchmarks by stage for B2B SaaS (% of ARR or % of total operating budget):**
-
-**Series A (€1–5M ARR):**
-| Department | % of total opex | Notes |
-|------------|----------------|-------|
-| Engineering / Product | 35–45% | Heaviest spend — product is the moat |
-| Sales & Marketing | 35–45% | Build the GTM engine |
-| G&A (Finance, HR, Ops) | 10–15% | Keep lean — no office overhead |
-| Customer Success | 8–12% | 1 CSM per €1M–1.5M ARR managed |
-
-**Series B (€5–20M ARR):**
-| Department | % of total opex | Notes |
-|------------|----------------|-------|
-| Engineering / Product | 30–40% | Still dominant but GTM catching up |
-| Sales & Marketing | 40–50% | Primary scaling investment |
-| G&A | 12–18% | More infrastructure required |
-| Customer Success | 10–15% | NRR becomes critical at this stage |
-
-**Healthy structure check:** Engineering + Sales/Marketing should account for 65–80% of total opex at every stage. If G&A exceeds 20%, overhead is too high.
-
-**Fully-loaded cost multiplier:** Budget 1.25–1.40x base salary for every hire (employer taxes, benefits, equipment, tools, onboarding). A €60K base salary costs €75–85K fully loaded.
+The budget allocation benchmarks by stage (Series A and later, by department, with notes) are in `references/department-budget-benchmarks.md`. Read it before allocating budget across departments.
 
 ---
 
 ## Step 3: Headcount Plan
 
 **Build the headcount plan month by month, by role.** A headcount plan that shows "Q3: +4 people" is not a plan. A headcount plan that shows "July: RevOps hire, August: AE #3, September: SDR #2" is executable.
+
+**Check the existing roster before asking.** If working inside a Bulldozer project, `bdzListProjectTeams` then `bdzGetProjectTeam` / `bdzListProjectTeamMembers` show who's already on the teams this budget covers — current headcount, job titles, internal vs. external — instead of asking the user to redescribe a structure that may already be on record. Build the plan on top of what's there, not from a blank sheet.
+
+**All four team tools in this step take a `targetProjectId`, not just the usual project context.** `bdzListProjectTeams`, `bdzGetProjectTeam`, `bdzListProjectTeamMembers` and `bdzCreateProjectTeamMember` (below) each require a `targetProjectId` — the project's UUID — as a mandatory parameter alongside the standard `customerId`/`projectId` pair. It's easy to assume the usual two-ID pair is enough because most other project-scoped tools only need those; omitting the third one here fails the call.
 
 **Headcount plan format:**
 
@@ -110,33 +73,17 @@ Quarterly revenue target = (Annual target − Starting ARR) ÷ 4 quarters
 
 **Stagger hiring:** Don't hire everyone in months 1–3. Stagger 1–2 hires per month at seed/Series A. This preserves cash optionality and gives new hires adequate onboarding attention.
 
+**The real ceiling is often onboarding capacity, not budget.** A plan that puts three new quota-carrying reps under one manager in the same quarter isn't executable regardless of what the runway table says — the existing team's ramp degrades along with the new hires' because the manager can't run three onboarding tracks at once. Ask who is doing the ramping before approving the stagger, not just how much cash it costs. Bulldozer OS doesn't help here: the team roster (`bdzGetProjectTeam` / `bdzListProjectTeamMembers`) records job title, seniority and time allocation per member, but carries no reporting line or manager field — span of control isn't something the OS can check, it has to be asked of the client directly.
+
+**Tag every line as growth or backfill.** A plan that shows "+4 headcount" without saying how many of those four are replacing someone who left overstates the capacity actually being added and hides the real cost of attrition from the board. Two hires funding growth and two backing out of open roles is a different plan than four incremental heads — write down which is which.
+
+**Log approved hires as they're made.** Once a hire from this plan is signed, register them with `bdzCreateProjectTeamMember` (job title, experience level, time allocation) against the team from the roster check above. That's the same record `team-assessment` and `org-design-hiring-roadmap` read from — logging it here keeps the org picture current instead of drifting from what the budget actually paid for.
+
 ---
 
 ## Step 4: Scenario Planning
 
-**Build 3 executable scenarios, not 5 theoretical ones.** Each scenario must have specific metrics that trigger switching — not "if things go badly."
-
-**Base Case:**
-- Revenue: Current trajectory, NRR holds, no major new customer segments
-- Hiring: Headcount plan as designed (Step 3)
-- Burn: [€X/month] → runway [Y months]
-- Trigger to switch to Upside: ARR grows 20%+ ahead of plan for 2 consecutive quarters
-- Trigger to switch to Downside: NRR drops below 90% or pipeline coverage falls below 2x for 2 months
-
-**Upside Case:**
-- Revenue: 120% of base case — driven by expansion win rate or new market channel performance
-- Hiring: Accelerate 2–3 hires from Q3 into Q2; add 1–2 additional roles not in base plan
-- Burn: [€X+15%/month] → runway [Y-3 months] — acceptable tradeoff for faster growth
-- Unlock criteria: Specific NRR threshold AND specific pipeline coverage ratio both met for 60 days
-
-**Downside Case:**
-- Revenue: 70% of base case — driven by churn spike, pipeline slowdown, or macro
-- Hiring: Pause all hires except P1 roles (roles that directly produce revenue or prevent churn)
-- Burn: [€X-20%/month via hiring freeze + discretionary cut] → runway [Y+6 months]
-- Trigger: NRR below 90% OR monthly ARR growth flat/negative for 2 months
-- Immediate actions: freeze non-essential vendor spend, defer hardware refreshes, freeze T&E
-
-**Scenario switching protocol:** Designate one decision-maker (CEO or CFO) who reviews scenario metrics monthly. Scenario switch is a board-level decision — not operational. Pre-define the actions so there's no debate when the trigger fires.
+The three executable scenarios (base case and the two others, with their switching triggers) are in `references/scenarios-and-signal-unlocks.md` (section "Step 4: Scenario Planning"). Read it before writing the scenario plan.
 
 ---
 
@@ -162,22 +109,13 @@ Note: For B2B SaaS with annual contracts, you receive cash at signing — model 
 - <9 months: Implement downside scenario now; fundraising becomes urgent
 - <6 months: Existential — board escalation required
 
+**The 12-month trigger is a floor, not the only reason to start early.** These thresholds are burn-driven — they tell you when running out of cash forces the timeline. A second, independent trigger is market-driven: strong metrics, a hot narrative, or a signal that the funding window is closing (a downturn in the category, a comparable's down-round) are reasons to start a raise well above 12 months of runway to capture better terms while they're available, not reasons to wait until the burn clock says so. Don't let a healthy runway number be read as "no urgency" when the market signal says otherwise.
+
 ---
 
 ## Step 6: Signal-Based Spending Unlocks
 
-**2026 best practice for B2B SaaS boards:** Budget is not unlocked by calendar — it's unlocked by performance signals. This approach prevents the "we hired for the plan, but the plan was wrong" problem.
-
-**Unlock gate format:**
-
-| Spend category | Unlock trigger | Who approves | Action if trigger not met |
-|---------------|---------------|-------------|--------------------------|
-| AE #3 hire | Q1 ARR target hit AND pipeline coverage >3x | CEO | Defer to next quarter |
-| Marketing budget increase (+€20K/month) | MQL→SQL rate >20% for 60 days | CEO + CFO | Hold at current budget |
-| VP Sales hire | 2 AEs at >80% quota for 2 consecutive quarters | CEO + Board | Defer; hire SDR instead |
-| International expansion spend | Existing market at €5M+ ARR AND NRR >110% | Board | Remove from plan entirely |
-
-**Why signal-based unlocks matter:** A company that hires ahead of revenue signals burns capital building capacity that doesn't have work to do. A company that hires behind signals misses market opportunity. Signal-based unlocks thread the needle: capital deploys when the business has proven the need, not when the original plan said it would.
+The unlock gate format and the rules for releasing budget on performance signals are in `references/scenarios-and-signal-unlocks.md` (section "Step 6: Signal-Based Spending Unlocks"). Read it before writing the spending unlock gates.
 
 ---
 
@@ -200,4 +138,11 @@ Note: For B2B SaaS with annual contracts, you receive cash at signing — model 
 ## Rules
 
 - **Headcount is the budget.** If you can't name the specific roles you're planning to hire and when, you don't have a headcount plan — you have a wish list. Every budget line for people should have a role title and a planned start month.
-- **Model cash flow, not ARR.** Annual contracts paid upfront change the shape of your cash curve dramatically. A €500K
+- **Model cash flow, not ARR.** Annual contracts paid upfront change the shape of your cash curve dramatically. A €500K annual deal signed in March is €500K of cash in March and nothing for the eleven months after it. Build the burn table on cash received, not on bookings.
+- **Budget fully-loaded or don't budget at all.** Base salary is never the cost of a hire: apply the 1.25–1.40x multiplier, add the first-year recruiting cost, and apply the ramp curve to revenue-generating roles. A plan built on base salaries understates people cost by a quarter to a third, and the gap compounds with every hire.
+- **A trigger without a metric, a threshold and a duration is a mood.** "If growth slows" is not a scenario switch; "NRR below 90% for two consecutive months" is. Write the actions next to the trigger, before it fires — pre-defining them removes the debate from the month where debating costs the most.
+- **Write the downside plan while the numbers are good.** A hiring freeze designed in a bad quarter gets designed under pressure, by people who are already defending their own headcount. Decide in advance which roles are P1, which vendor lines are discretionary, and who signs the freeze.
+- **Start the raise at twelve months of runway, not at six.** A round takes 4–6 months to close. Beginning at nine months means signing with three months of cash left, which is negotiating from a position everyone in the room can see. Treat 12 months as the trigger to start the process, not the moment to start worrying.
+- **Re-forecast on actuals, don't defend the plan.** The revenue model was a set of assumptions, and by mid-year several of them are measurable. Rebuild H2 on what H1 actually produced — a budget that survives twelve months untouched was never being read.
+- **Budget is a constraint; onboarding capacity is often the real one.** A hire the runway table can afford is still unexecutable if there's no manager with room to ramp them. Check who does the ramping before staggering hires into the same quarter, not just what they cost.
+- **A missed unlock gate is a fork, not a single door.** "Hold" and "cut" are different decisions — hold when a metric is flat or newly missed, cut when the data shows a channel or bet has been getting worse for more than one period. Defaulting every miss to "hold" lets a genuinely failing line keep its budget by default.

@@ -1,11 +1,11 @@
 ---
-name: |
+name: |-
   crm-setup
-description: |
+description: |-
   Configure a B2B CRM from scratch — HubSpot or Salesforce setup, data import, workflow automation, lifecycle stage configuration, deal pipeline, reporting dashboards, and team onboarding. Triggers on 'CRM setup,' 'set up HubSpot,' 'configure our CRM,' 'CRM implementation,' 'migrate to HubSpot,' 'build our CRM from scratch,' or 'we just got HubSpot, what do we do.' For CRM architecture design, see crm-strategy. For data quality and hygiene, see audit-crm-tracking.
-when-to-use: |
+when-to-use: |-
   Configure a B2B CRM from scratch — HubSpot or Salesforce setup, data import, workflow automation, lifecycle stage configuration, deal pipeline, reporting dashboards, and team onboarding. Triggers on 'CRM setup,' 'set up HubSpot,' 'configure our CRM,' 'CRM implementation,' 'migrate to HubSpot,' 'build our CRM from scratch,' or 'we just got HubSpot, what do we do.' For CRM architecture design, see crm-strategy. For data quality and hygiene, see audit-crm-tracking.
-argument-hint: |
+argument-hint: |-
   Series A, 5-rep sales team — just purchased HubSpot Sales Hub Pro. No prior CRM. Need to configure lifecycle stages, pipeline, email sequences, and reporting from scratch in 2 weeks.
 disable-model-invocation: false
 user-invocable: true
@@ -47,6 +47,8 @@ CRM setup must be done in order. Each layer depends on the previous one being co
 6. TEAM ONBOARDING — Training, access, SOPs
 ```
 
+**This sequence assumes a team large enough to need it.** Below roughly 3 reps, sales and ops are usually the same one or two people wearing every hat — SDR, AE, and RevOps admin at once. Run the phases in parallel rather than strictly in order (foundation and data import the same week, automation right after), and skip anything built for a role split that doesn't exist yet: no SAL stage (see 1.1), no round-robin routing (see 3.3), no per-rep dashboard slice (see Phase 5). Building those for a team of two creates upkeep with no one to benefit from it — add them back the day the team actually splits those roles.
+
 ---
 
 ## Phase 1: Foundation (Days 1–3)
@@ -55,17 +57,7 @@ CRM setup must be done in order. Each layer depends on the previous one being co
 
 **Settings → Properties → Contact → Lifecycle Stage**
 
-Default HubSpot stages don't need to be renamed — but their definitions need to be documented and their triggers need to be built into workflows:
-
-- Subscriber: form fill, unknown company
-- Lead: company data enriched + ICP match at firmographic level
-- MQL: meets lead score threshold (build this in Phase 3)
-- SAL: SDR marked "Accepted" in contact record
-- SQL: discovery call held, deal created with minimum required fields
-- Opportunity: deal created (auto-synced from Deal lifecycle stage)
-- Customer: Closed-Won deal (auto-synced)
-
-**Build a lifecycle stage definition document** (1 page) before configuring anything. Paste it into a pinned Slack channel so every rep can reference it.
+For the LEAD-object check, the full lifecycle stage mapping (Subscriber through Customer), when to skip the SAL stage, and the stage definition document, read `references/lifecycle-and-pipeline.md` before configuring lifecycle stages.
 
 ### 1.2 Deal Pipeline (HubSpot)
 
@@ -83,8 +75,10 @@ Create ONE pipeline named "[Company] Sales Pipeline" with these stages:
 **Required fields at each stage** (Settings → CRM → Deal Stage Required Fields):
 - Proposal stage: ACV estimate, economic buyer name
 - Negotiation stage: close date, competitor field, champion name
-- Closed Lost: Closed Lost Reason (picklist — required before stage can save)
+- Closed Lost: a curated Deal Lost Reason property (required before stage can save) — see the note below on why this can't be the native field as-is
 - Closed Won: Handoff Completed checkbox
+
+For why required text fields are not proof, the native `hs_buying_role` field, the Closed Lost Reason and competitor free-text traps, and the migration note, read `references/lifecycle-and-pipeline.md` before setting stage required fields.
 
 ### 1.3 Custom Properties
 
@@ -95,37 +89,13 @@ Settings → Properties → [Object] → Create Property
 
 For each property: set field type, create dropdown options (picklists), set property group (Sales, Marketing, CS, RevOps), set "Used in reports" = Yes.
 
+**Check for a native equivalent before building a custom one.** Deal Type is the property most often rebuilt from scratch when it already ships: the native `dealtype` field on Deal has two values out of the box, New Business and Existing Business — confirmed live on a real HubSpot portal. It won't split renewal, expansion, and cross-sell from each other (all three land in Existing Business), so build a custom property only if that finer split is a report someone actually needs — not as a default first move.
+
 ---
 
 ## Phase 2: Data Import (Days 3–5)
 
-### 2.1 Pre-Import Cleaning
-
-Before importing any data:
-1. Deduplicate: remove duplicate rows by email domain + name
-2. Normalize: standardize company name format, job title format
-3. Tag source: add a column "Import Source" with value "[Import Name] - [Date]" for every row — this enables post-import analysis
-
-**Do not import everything at once.** Import in batches by segment (existing customers, closed-won, active pipeline, contact database) so you can identify which batch created which records.
-
-### 2.2 Import Order
-
-1. Companies first (import by domain — HubSpot deduplicates companies by domain)
-2. Contacts second (associate to companies during import using domain column)
-3. Deals third (associate to contacts and companies)
-4. Notes and activities last (import only recent 12 months — older activity creates noise)
-
-### 2.3 Source Attribution
-
-**For every imported contact, set the "Original Source" and "Original Source Detail" fields.**
-
-HubSpot sets original source automatically for new contacts created via forms or integrations. For imported contacts, manually set it to the relevant category: "Offline Sources," "Direct Traffic," or create a custom import source value.
-
-**This is the most commonly skipped step and the biggest reporting problem.** If 30% of your contacts have "unknown" as source, your attribution reports are unreliable.
-
-### 2.4 Deduplication After Import
-
-Run HubSpot's duplicate contact tool (Contacts → Actions → Manage Duplicates) immediately after import. Merge duplicates before building any automations — automations triggered on duplicates create data chaos.
+Pre-import cleaning, import order, source attribution and post-import deduplication (2.1–2.4) are in `references/data-import.md` — read it before any import. Never skip source attribution on import.
 
 ---
 
@@ -133,27 +103,7 @@ Run HubSpot's duplicate contact tool (Contacts → Actions → Manage Duplicates
 
 ### 3.1 Lead Scoring
 
-**Settings → Properties → Contact → HubSpot Score**
-
-Build the two-dimensional scoring model from your CRM strategy:
-
-**Firmographic score attributes:**
-- Industry = [ICP Industry 1]: +20
-- Employee count between [X] and [Y]: +15
-- Funding stage = [Target Stage]: +10
-- Technology: Uses [positive-signal tool]: +10
-
-**Behavioral score attributes:**
-- Demo request form submitted: +40
-- Pricing page viewed: +30
-- Pricing page viewed 2x in 7 days: +40 (additional)
-- Case study page viewed: +20
-- Multiple contacts from same company (2+) viewed site in 7 days: +25
-
-**MQL threshold workflow:**
-
-Workflow trigger: HubSpot Score ≥ 65 AND Lifecycle Stage is Lead  
-Action: Set Lifecycle Stage → MQL, Set MQL Date → today, Create task for SDR team, Send Slack notification
+For lead scoring (native Lead Scoring check, predictive scoring caveat, firmographic and behavioral attributes, MQL threshold workflow), read `references/automation-workflows.md` before building scoring.
 
 ### 3.2 Lifecycle Transition Workflows
 
@@ -173,29 +123,9 @@ Action: Set associated Contact Lifecycle Stage → SQL, Set SQL Date → today
 Trigger: Deal Stage = Closed Won  
 Action: Set Contact Lifecycle Stage → Customer, Set Company type → Customer, Create CS handoff task, Assign contact to CSM owner
 
-### 3.3 Alert Workflows
+### 3.3 Lead Routing
 
-**Unworked MQL alert:**
-Trigger: Lifecycle Stage = MQL AND Last Contacted is unknown AND Time since MQL Date > 12 hours  
-Action: Slack notification to SDR team manager with contact name and MQL score
-
-**Stale deal alert:**
-Trigger: Deal in active pipeline stage AND Last Activity Date > 14 days  
-Action: Task created for deal owner "No activity in 14 days — update or mark Closed Lost"
-
-**Deal closing soon:**
-Trigger: Deal Close Date within 7 days AND Deal Stage ≠ Closed Won/Lost  
-Action: Slack notification to AE + manager
-
-### 3.4 Data Hygiene Automations
-
-**Enrichment re-run trigger:**
-Trigger: Company property "Last Enriched" > 90 days ago  
-Action: Webhook to Clay enrichment workflow (if using Clay) or flag for manual review
-
-**Closed Lost contact recycle:**
-Trigger: Deal marked Closed Lost AND time since close > 180 days AND no active deal for this contact  
-Action: Set Contact Lifecycle Stage back to Lead (enables future nurture)
+For lead routing (3.3), alert workflows (3.4: unworked MQL, stale deal, closing soon, single-threaded) and data hygiene automations (3.5: enrichment re-run, contact refresh, Closed Lost recycle), read `references/automation-workflows.md`.
 
 ---
 
@@ -224,37 +154,48 @@ Every rep configures a Calendly/HubSpot meeting link before going live:
 
 ## Phase 5: Reporting Dashboards (Days 11–13)
 
-Build 4 dashboards at launch. Nothing more — additional dashboards should be added only when a leadership question requires it.
-
-**Dashboard 1: Pipeline (Sales)**
-- Pipeline by stage (total value and count of deals)
-- Deals created this month vs. last month
-- Pipeline coverage ratio (open pipeline ÷ next quarter ARR target)
-- Average deal age by stage
-
-**Dashboard 2: Funnel (RevOps/Marketing)**
-- Contacts by lifecycle stage
-- Lead → MQL conversion rate (this month vs. last month)
-- MQL → SQL conversion rate
-- Avg days Lead → MQL, MQL → SQL, SQL → Opportunity
-
-**Dashboard 3: Team Activity (Sales)**
-- Calls logged by rep
-- Emails sent by rep (sequences enrolled + manual)
-- Meetings booked by rep
-- Deals advanced by rep (moved to a later stage)
-
-**Dashboard 4: Revenue (Leadership)**
-- Closed Won ARR this month
-- Win rate (Closed Won ÷ Closed Won + Lost)
-- Avg sales cycle (days from opportunity created to close)
-- Closed Lost Reason distribution
+Build 4 dashboards at launch, nothing more (Pipeline, Funnel, Team Activity, Revenue). For the metrics of each dashboard, read `references/reporting-and-team-onboarding.md`.
 
 ---
 
 ## Phase 6: Team Onboarding (Days 13–15)
 
-### 6.1 Data Entry Standards
+For the data entry standards (6.1), access and permissions (6.2) and training and SOPs (6.3), read `references/reporting-and-team-onboarding.md`.
 
-Document and publish before the team starts using the CRM:
-- W
+---
+
+## Testing Protocol (Before Go-Live)
+
+Do not open the CRM to the full team until this passes. A launch-week bug caught here is caught by one person; the same bug caught after go-live is caught by every rep, one at a time, in front of a prospect.
+
+1. **End-to-end record walkthrough.** Create one test contact and run it manually through Subscriber → Lead → MQL → SAL → SQL → Opportunity → Customer, confirming every workflow in Phase 3 fires as designed and every required field actually blocks the stage change when it's missing.
+2. **Workflow conflict check.** Review the active workflows for two of them triggering the same action on the same record. Two workflows both trying to set a lifecycle stage off the same trigger is one of the most common launch-week bugs.
+3. **Notification test.** Trigger each Slack, task-creation, or routing workflow (3.1–3.4) with a test record and confirm the right person receives it — not a former owner, not a channel nobody watches.
+4. **Permission walkthrough.** Log in as a rep-level test user, not an admin account, and confirm they see and can edit only what 6.2 specifies. Testing with an admin account will not catch a permission gap.
+5. **Sequence send test.** Enroll an internal email address in each required sequence (4.1) and read every touch the way a prospect would. Broken personalization tokens are the single most common thing this step catches.
+6. **Dashboard sanity check.** Open all four dashboards (Phase 5) against the live imported data and confirm the numbers are plausible — a Pipeline dashboard reading zero usually means a deal property wasn't imported, not that pipeline is empty.
+
+A failure in steps 1–4 blocks go-live. A failure in 5 or 6 can go live with a fix ticket open, provided the fix lands within the first week.
+
+## Maintenance Cadence
+
+The CRM degrades from the day it launches unless someone owns keeping it clean. Assign each of these to a named person, not "the team":
+
+- **Weekly** — Run the duplicate contact tool (2.4). Review any Closed Lost deal missing a real Deal Lost Reason (1.2): the field blocks the stage, but a rep can still park it on "Other" indefinitely without a check.
+- **Monthly** — Re-run the enrichment trigger (3.5) on companies flagged stale. Measure the empty-Original-Source count on contacts created in the last 30 days (2.3) instead of sampling by eye — a rising share means the leak is upstream of the CRM, not inside it.
+- **Quarterly** — Review the custom property count against the 30-property ceiling (1.3) and retire properties no report actually uses. Re-check the lead scoring thresholds (3.1) against real MQL → SQL conversion — a threshold set at launch on no data goes stale fast. Compare the deal stage probabilities set in 1.2 against the win rate actually observed at each stage over the quarter — a launch-day guess left untouched after months of real deals is a forecast built on nothing, and renaming a stage later doesn't automatically update the probability stored on it, so confirm the two haven't drifted apart. Pull the Deal Lost Reason distribution (1.2) and check whether one catch-all option is quietly absorbing most of the quarter's losses.
+- **On every hire or departure** — Update team permissions (6.2) the same day. A departing rep who keeps edit access is a data integrity risk, not only a security one.
+
+**If no one can be named against a cadence, write down a slower one that will actually happen — don't publish a Weekly line that's really a Never.** A maintenance SOP that everyone quietly knows gets skipped doesn't just leave that one task undone; it teaches the team that the whole cadence document is optional, including the parts that matter. A named Monthly cadence someone actually runs beats a named Weekly one that exists only on paper.
+
+---
+
+## Rules
+
+- Do not build automation before the data underneath it is clean. A workflow triggered on a dirty deduplication pass propagates the mess instead of fixing it.
+- Do not launch to the full team without running the Testing Protocol above. A rep's first bad experience with the CRM — a broken sequence, a wrong Slack ping — sets how much they trust it afterward.
+- Do not add a dashboard, a property, or a workflow because it's possible. Add it because a specific report or a specific rep problem requires it; every addition after launch should trace to a named need.
+- Do not treat lifecycle stage, lead scoring, or deal stage probability thresholds as fixed. They are hypotheses set on day one with no data behind them yet — revisit them against real conversion numbers on the cadence above, not once and never again.
+- Do not skip source attribution on import (2.3) to save time. It is the most commonly skipped step and the most expensive to fix later: reconstructing "unknown" source after the fact takes guesswork a rep working the account can sometimes do, but nobody else can.
+- Do not treat a filled required field as proof of qualification. A required field stops a blank save; it does not stop a name typed to get past the gate. Where the stakes are real (champion, economic buyer), pair the field with evidence or a native signal like `num_associated_contacts` — see 1.2 and 3.4.
+- Do not build a layer of process before the team that needs it exists. SAL, weighted routing, and territory-aware round-robin are all correct eventually and wrong on day one for a small team — add each one when the role split or the specialization that justifies it actually shows up, not in anticipation of it.

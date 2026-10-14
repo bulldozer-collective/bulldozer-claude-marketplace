@@ -1,7 +1,9 @@
 ---
-name: bulldozer-app-creator
-description: Build, update or remove a "Bulldozer App" — a custom app with a screen, its own data, its own files and long-running work, published at its own address.
-when-to-use: |
+name: |-
+  bulldozer-app-creator
+description: |-
+  Build, update or remove a "Bulldozer App" — a custom app with a screen, its own data, its own files and long-running work, published at its own address.
+when-to-use: |-
   Use whenever the user wants a "tool", an "app", an "application", a "mini-app", a "web app", a
   "dashboard", a "widget", or anything similar — and equally when they want to change or delete one
   they already have. Always ask first whether they want to create a "Bulldozer App"; if yes, follow
@@ -21,9 +23,10 @@ allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__bdzGetHosting
   - mcp__plugin_bulldozer_bulldozer__bdzDeleteHosting
   - mcp__plugin_bulldozer_bulldozer__bdzRequestFridgeCode
-effort: medium
+effort: |-
+  medium
 metadata:
-  forge: disabled
+  "forge": "disabled"
 ---
 
 # Bulldozer App

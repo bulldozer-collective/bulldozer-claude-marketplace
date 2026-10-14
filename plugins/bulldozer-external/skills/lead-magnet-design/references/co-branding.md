@@ -4,8 +4,9 @@
 > fonderie technologique, école, média). Le partenaire n'est pas un client Bulldozer OS : sa charte ne
 > vient pas de l'API, elle vient de **son** site.
 >
-> Ce n'est **pas** de l'ABM 1-to-1 tiré de l'actualité d'un compte cible — ça, c'est `abm-newsjacking`.
-> Ici, deux marques assument ensemble un contenu de fond.
+> Ce n'est **pas** un livre blanc cobrandé produit en série à partir de l'actualité d'un compte cible
+> nommé (usage ABM 1-to-1) — ici, deux marques assument ensemble un contenu de fond, une fois, pas une
+> mécanique répétée par compte.
 
 ## La règle : partager un territoire, pas juxtaposer deux logos
 

@@ -104,13 +104,27 @@ def check_html(html: str, name: str) -> list[Finding]:
 
     # A4 — propriétés non supportées par WeasyPrint
     for prop in ("width:max-content", "height:max-content", "width:fit-content",
-                 "position:sticky", "aspect-ratio:"):
+                 "position:sticky"):
         if prop.replace(" ", "") in clean.replace(" ", ""):
             out.append(Finding(
                 "propriete_non_supportee", "mineur", name,
                 f"`{prop}` n'est pas supportée par WeasyPrint : la règle est ignorée "
                 f"silencieusement et le bloc prend toute la largeur",
                 "utiliser display:inline-block, ou fixer une largeur explicite"))
+
+    # A4bis — aspect-ratio : échoue autrement que les quatre propriétés ci-dessus.
+    # Ce n'est pas une largeur qui déborde, c'est la hauteur qui n'est jamais calculée
+    # depuis le ratio (un bloc vide retombe à height:0 ; un <img> ignore la valeur CSS
+    # et ne garde que le ratio intrinsèque du fichier). La parade « fixer une largeur
+    # explicite » ne répare donc rien ici — vérifié par rendu réel sur WeasyPrint 70.0.
+    if "aspect-ratio:" in clean.replace(" ", ""):
+        out.append(Finding(
+            "aspect_ratio_hauteur_nulle", "mineur", name,
+            "`aspect-ratio` n'est pas supportée par WeasyPrint : sur un bloc vide la "
+            "hauteur calculée reste à 0 (pas un débordement de largeur), et sur une "
+            "image elle retombe sur le ratio intrinsèque du fichier, pas sur la valeur CSS",
+            "calculer et fixer height explicitement depuis le ratio voulu — "
+            "fixer la largeur ne corrige rien"))
 
     # A5 — espace fine insécable absente des sous-ensembles latins courants
     if " " in html:
@@ -382,6 +396,16 @@ def selftest():
                  '<rect x="40" y="0" width="600" height="4"/></svg>')
     expect(check_svg(svg_inset, "inset.svg"), "encre_non_calee_gauche", True,
            "encre en retrait détectée")
+
+    expect(check_html('<style>@page{size:A4}:root{--a:#FFFFFF}'
+                      '.x{width:fit-content}</style>', "t"),
+           "propriete_non_supportee", True, "width:fit-content détectée")
+    expect(check_html('<style>@page{size:A4}:root{--a:#FFFFFF}'
+                      '.x{aspect-ratio:2/1}</style>', "t"),
+           "propriete_non_supportee", False, "aspect-ratio exclue du constat générique")
+    expect(check_html('<style>@page{size:A4}:root{--a:#FFFFFF}'
+                      '.x{aspect-ratio:2/1}</style>', "t"),
+           "aspect_ratio_hauteur_nulle", True, "aspect-ratio détectée avec son propre constat")
 
     print("\nselftest :", "OK" if ok else "ÉCHEC")
     return 0 if ok else 1

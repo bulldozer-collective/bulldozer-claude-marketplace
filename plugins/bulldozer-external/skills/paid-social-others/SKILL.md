@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   paid-social-others
-description: |
+description: |-
   Run paid advertising on non-primary platforms — Reddit, TikTok, and Pinterest — with platform-specific creative strategy, targeting approach, budget allocation, and success benchmarks calibrated to each platform's audience and buying mode. Triggers on 'Reddit ads,' 'TikTok ads for B2B,' 'Pinterest advertising,' 'paid social beyond LinkedIn,' 'alternative paid channels,' 'we want to test TikTok,' or 'our Meta/LinkedIn costs are too high.' For LinkedIn or Google Ads, see audit-paid-ads. For audience architecture across platforms, see audience-architecture.
-when-to-use: |
+when-to-use: |-
   Run paid advertising on non-primary platforms — Reddit, TikTok, and Pinterest — with platform-specific creative strategy, targeting approach, budget allocation, and success benchmarks calibrated to each platform's audience and buying mode. Triggers on 'Reddit ads,' 'TikTok ads for B2B,' 'Pinterest advertising,' 'paid social beyond LinkedIn,' 'alternative paid channels,' 'we want to test TikTok,' or 'our Meta/LinkedIn costs are too high.' For LinkedIn or Google Ads, see audit-paid-ads. For audience architecture across platforms, see audience-architecture.
-argument-hint: |
+argument-hint: |-
   B2B SaaS tool targeting marketers and growth teams, €50K/quarter paid budget, currently only on LinkedIn. CPLs rising. Want to test Reddit and TikTok with €5K/month each and understand what 'success' looks like before committing.
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -31,6 +31,8 @@ You are a Bulldozer growth operator designing paid advertising strategy for alte
 A `paid-social-others-{company}.md` file with: platform selection rationale, per-platform strategy (targeting, creative brief, budget allocation, launch checklist), benchmark scorecard, and a go/no-go evaluation framework for each platform at 30 and 60 days.
 
 **Produce on first invocation. Start with platform selection — the wrong platform wastes 30 days of test budget. Only proceed to execution once the selection rationale is documented.**
+
+**A measurement note:** Bulldozer OS registers and measures ad accounts for Meta, LinkedIn, Google Ads, and Microsoft Ads — it has no registered-account path or analytics for Reddit, TikTok, or Pinterest. Every number in this playbook's benchmark tables and scorecards comes from each platform's own ads manager, read by hand or exported; there is no automated pull to fall back on for these three, unlike the reporting you'd get for a primary-platform campaign.
 
 ---
 
@@ -55,6 +57,10 @@ A `paid-social-others-{company}.md` file with: platform selection rationale, per
 
 For B2B SaaS targeting marketers, founders, or operators: **Reddit first, TikTok second, Pinterest experimental only.**
 
+**These bands are a sanity check, not a target to defend.** A CPL only means something at a given sector, price point, and sales cycle — the same €40 CPL is excellent for a €50/month tool and irrelevant for an enterprise deal with a six-figure ACV. Read every number in this table as a rough order of magnitude to compare your own results against, never as a pass/fail line in isolation; the only comparison that actually decides anything is your own CPL here against your own LinkedIn CPL, at equal lead quality (see the scorecard below).
+
+**The ranking above assumes the team can produce genuinely native creative for whichever platform it picks — if it can't, the ranking doesn't matter.** Reddit needs someone willing to write like a practitioner in a comment thread, not a marketer; TikTok needs a face or voice comfortable on camera, or a working relationship with a creator. A repurposed LinkedIn asset fails on both (see each platform's Creative Rules below). If the team already has strong short-form video production — an in-house creator, a founder who's unscripted on camera — and nobody with the patience to write Reddit-native copy, run TikTok first and Reddit second: the buying-mode fit above is real, but it's outranked by whether the team can actually make the format convincingly. Don't commit budget to a platform whose creative format nobody on the team can produce.
+
 ---
 
 ## Reddit Ads
@@ -65,58 +71,7 @@ Reddit's community structure means ads reach users who are actively researching 
 
 CPMs are lower than LinkedIn (€3–8 vs. €60–120), and post-click intent is 2–3x higher because of this research context.
 
-### Reddit Targeting
-
-**Subreddit targeting (most powerful lever):**
-Build a list of subreddits where your ICP asks questions your product answers. Examples:
-- GTM tool targeting RevOps: r/hubspot, r/salesforce, r/crm, r/sales, r/revenue_operations
-- Dev tool: r/webdev, r/programming, r/devops, r/SaaS
-- Marketing platform: r/marketing, r/SEO, r/PPC, r/digital_marketing
-
-Layer targeting: **Subreddit + keyword + interest targeting** in combination. Example: targeting r/SaaS + keyword "project management tool" + interest "Software Developers" creates an ultra-qualified segment.
-
-**Custom audiences:** Upload your email list for retargeting. Reddit pixel for site visitor retargeting.
-
-**Exclude:** r/cscareerquestions, r/jobsearch (job seekers), r/personalfinance (wrong context).
-
-### Reddit Creative Rules
-
-**The most important rule: your ad must survive as an organic post.** Before publishing, read 10 recent posts in the subreddit you're targeting. If your ad would feel out of place as an organic post — too promotional, too polished, too brand-centered — rewrite it.
-
-**Format by objective:**
-- Awareness / education: Text ad (no image required) with a conversational headline and a question
-- Traffic: Promoted post with an image + headline that mirrors how users title their own posts
-- Conversion: Conversation ad format — appear directly in comments of relevant threads
-
-**Reddit creative brief template:**
-```
-Format: Image + headline (or text-only)
-Headline: [State the problem the user is probably experiencing, as they would say it]
-Body: [2–3 sentences solving the problem, not pitching the product — end with a soft CTA]
-Tone: Direct, helpful, no hype — write as a practitioner, not a brand
-NOT: "Our award-winning platform helps teams achieve 10x..."
-YES: "If your pipeline reports take 2 hours to pull, here's how teams with your stack fixed it."
-```
-
-**What gets brigaded (negative comments, downvotes):**
-- Obvious promotional language ("award-winning," "industry-leading," "transform your business")
-- Claims without evidence
-- Generic copy that clearly wasn't written for the community
-
-### Reddit Budget and Benchmarks
-
-Minimum test budget: €2,000–3,000/month (€100/day minimum for meaningful data)
-Learning phase: 30 days
-
-| Metric | Target | Warning | Stop |
-|--------|--------|---------|------|
-| CTR | >0.6% | 0.3–0.6% | <0.3% |
-| CPC | <€2.00 | €2–4 | >€4 |
-| CPL | <€50 (SMB) / <€150 (mid-market) | 1.5x target | 3x target |
-| Spam/downvote comments | <5% of impressions | 5–10% | >10% |
-
-**30-day go/no-go:** If CPL is within 3x of your LinkedIn CPL at equal lead quality (measure by SQL conversion rate), continue. Reddit leads typically have lower volume but equal or higher downstream conversion rates.
-
+For the full Reddit playbook — targeting, the pre-launch signal check, Reddit Max automated campaigns, creative rules, and budget and benchmarks — read `references/reddit-ads.md` before building any Reddit campaign.
 ---
 
 ## TikTok Ads
@@ -128,55 +83,45 @@ TikTok works for B2B when the ICP is reachable through behavioral targeting (mar
 TikTok works best for: tools targeting marketers, founders, small business operators, developers, or creative professionals.
 TikTok does not work for: enterprise software procurement, anything requiring C-suite sign-off at large companies, or products with 6-month+ sales cycles.
 
-### TikTok Targeting for B2B
+For the full TikTok playbook — targeting for B2B, Smart+ (when to hand over, when not to), creative rules, the learning-phase trap, and budget and benchmarks — read `references/tiktok-ads.md` before building any TikTok campaign.
+---
 
-TikTok has no job title targeting. Build ICP audiences through behavioral proxies:
+## Pinterest Ads
 
-**Interest layer stacking (B2B SaaS example — targeting marketing leads):**
-"Entrepreneurship" + "Marketing" + "Technology" + "Business News" = approximates marketing professionals at growth companies
+### Why Pinterest Works (and Why It Rarely Works for B2B SaaS)
 
-For buying authority signals, add: "Investing" + "Finance" — this skews toward people with budget decision authority.
+Pinterest users are in planning mode — saving ideas for a purchase, project, or event that's often weeks or months away. That posture rewards visual, aspirational categories (home, wedding, fashion, food, DIY) where the product photographs well and the buying decision is personal, not organizational. It does not reward abstract B2B software: there is nothing to "pin" about a project management tool, and Pinterest's own search intent skews toward products and inspiration, not vendor comparison.
 
-**Lookalike audiences:** Upload your customer email list. Start with 1% similarity for tightest match. Expand to 2–3% once you've validated conversion rates. Lookalikes from paying customers outperform lookalikes from trial starters.
+Treat Pinterest as **experimental only** for a B2B SaaS ICP, per the Platform Selection Framework above — run it after Reddit and TikTok have already validated the creative-market fit for the offer, not before, and only if part of the product has a genuine visual or lifestyle angle (a founder brand, a physical artifact of the work, a template/download that photographs). If none of that applies, do not open a Pinterest test — redirect the budget to scaling Reddit or TikTok instead.
 
-**Behavioral targeting over interest:** Users who recently searched for terms in your category or watched competitor review content show active intent signals — prioritize behavioral targeting before broadening to interest.
+For the full Pinterest playbook — targeting, Performance+ automated campaigns, creative rules, and budget and benchmarks — read `references/pinterest-ads.md` before building any Pinterest campaign.
+---
 
-**Retargeting layer:** 75%+ video viewers, pricing page visitors, trial page visitors. This is where TikTok's cost efficiency compounds — first-touch awareness from broad targeting, conversion from precise retargeting.
+## Cross-Platform Scorecard and the 60-Day Decision
 
-### TikTok Creative Rules
+Run all three tests on the same clock so they're comparable, and score them against each other, not just against their own targets — a platform that clears its own bar but loses to the other two on lead quality is not a platform to keep funding.
 
-**The non-negotiable rule: the creative must look like organic content.** Polished brand spots get punished by the algorithm. If your video was produced by an agency for YouTube, it will not work on TikTok. The benchmark is: if this posted organically, would it get engagement?
+| Checkpoint | What to look at | Decision |
+|------------|-----------------|----------|
+| Day 15 | Creative-level signals only (hook rate, save rate, CTR) — no cost or lead judgment yet | Swap or kill underperforming creative; do not touch targeting or budget |
+| Day 30 | Platform-specific benchmark table (per section above) | Per-platform go/no-go as documented; a platform below its own Stop line is cut regardless of what the others show |
+| Day 60 | CPL and SQL conversion rate, benchmarked against your existing LinkedIn CPL and against each other | Scale the platform(s) with the best CPL-at-equal-quality; cut the rest — do not run more than two alternative platforms past day 60, attention and creative production split too thin |
 
-**Creative framework for B2B SaaS:**
-```
-Hook (0–3 seconds): State the problem or share a surprising fact — "If your team is still doing X manually..."
-Problem agitation (3–15 seconds): Show or describe the pain they recognize
-Solution reveal (15–30 seconds): Introduce the product as the answer — show the product in use, not a logo
-Offer (final 3–5 seconds): Low-commitment CTA — "grab our free template" or "comment GUIDE for the playbook" rather than "book a demo"
-```
+**Build the scorecard as one table**, not three separate documents — spend, CPL, SQL rate, and the go/no-go verdict for Reddit, TikTok, and Pinterest side by side. The point of testing three platforms at once is to compare them on the same axis; three isolated reports make that comparison require memory instead of a glance.
 
-**Spark Ads (most effective format for B2B):** Boost an existing organic post or creator-made content. Spark Ads maintain the original engagement count (likes, comments), which builds social proof. Spark Ads with genuine engagement outperform cold creative by significant margin — use them whenever an organic piece resonates.
+### Before You Trust the Comparison
 
-**Native feeling signals:**
-- Vertical video only (9:16)
-- No logo in first 3 seconds
-- Captions on every video (80%+ of TikTok is viewed silent)
-- Creator voice or face-to-camera beats polished brand video
-- Trending audio where appropriate — check TikTok Creative Center weekly
+Don't read the day-60 CPL/SQL table as a ranking until each platform has produced enough conversions to mean something — a handful of leads on Reddit and a handful on TikTok can show wildly different SQL rates by chance alone. If a platform is still at a handful of qualifying conversions by day 60, extend its test another cycle rather than cutting or scaling on that number; a gap that looks decisive at a few conversions per side is usually noise, not signal.
 
-**What kills TikTok B2B performance:**
-- Repurposing horizontal LinkedIn or YouTube creative
-- Starting with a logo or brand name
-- Corporate voiceover
-- Hard sell CTAs in the first 15 seconds
+For a product with a sales cycle longer than the 60-day test window, treat the day-60 verdict as provisional. CPL and SQL rate tell you whether the top of the funnel is healthy — they don't tell you whether Reddit-sourced or TikTok-sourced deals actually close, and B2B deals from a new channel often close slower or faster than LinkedIn-sourced ones for reasons that have nothing to do with ad quality. Tag lead source through to closed-won and re-check win rate once enough deals from the test have had time to move through the full cycle — a platform cut on day-60 SQL rate alone might have been the best source of revenue by day 150.
 
-### TikTok Budget and Benchmarks
+## Common Mistakes Across All Three Platforms
 
-Minimum test budget: €3,000–5,000/month (TikTok requires minimum €50/day per ad group)
-Learning phase: 45 days (TikTok's algorithm needs more volume than Reddit)
-
-| Metric | Target | Warning | Stop |
-|--------|--------|---------|------|
-| Hook rate (3-sec view ÷ impressions) | >30% | 20–30% | <20% |
-| Video completion rate | >25% | 15–25% | <15% |
-| CTR | >1.0% | 0.5–1
+- **Uploading LinkedIn creative unchanged.** Every platform in this skill punishes creative that reads as corporate — Reddit brigades it, TikTok's algorithm suppresses it, Pinterest users scroll past it. Budget for platform-native creative production before launching, not after the first test fails.
+- **Judging cost before judging creative.** CPC and CPM move before CPL does, and CPL moves before SQL rate does. A platform that looks expensive in week one may be fine once the creative stabilizes — use the day-15 creative checkpoint above before making a cost call.
+- **Running all three platforms with the same landing page and offer.** A Reddit user in research mode, a TikTok user who just watched a 15-second hook, and a Pinterest user who saved a pin three weeks ago are not in the same buying moment — sending all three to the same generic page depresses conversion on all of them.
+- **Scaling on volume instead of lead quality.** Alternative platforms often produce more leads per euro than LinkedIn at lower per-lead cost — that's the pitch for testing them. It's also the trap: volume without a downstream SQL conversion check just moves the qualification problem to sales.
+- **Keeping a platform alive past its stop line out of sunk cost.** The stop thresholds in each benchmark table exist to end a test before it quietly becomes a permanent, mediocre budget line. If a metric crosses into the stop range, cut it at the next checkpoint — don't wait for it to recover on its own.
+- **Flipping to the automated campaign type (Reddit Max, TikTok Smart+, Pinterest Performance+) before there's volume to feed it.** Each platform's automation needs real conversion history to learn from — a fresh test account has none. Run the manual setup in each section first; hand over to automation once the account clears the volume the platform itself needs, not on day one because the option is there.
+- **Reacting to week-two or week-three numbers by editing budget, bid, or targeting instead of waiting for the day-15/30/45 checkpoints.** This is the most common way a test that would have worked gets killed by its own noise — and on TikTok it also restarts the platform's documented learning phase (see TikTok Ads above), turning a slow start into a genuinely broken test.
+- **Running all three platforms because the budget allows it, not because the team can produce three genuinely native creative formats.** A shared account team stretched across Reddit copy, TikTok video, and Pinterest pins usually produces three mediocre versions instead of one or two that actually work — pick based on production capacity as much as the platform fit above, and add a platform only once the first one is running well.

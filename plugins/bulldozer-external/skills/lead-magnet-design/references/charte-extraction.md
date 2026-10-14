@@ -3,9 +3,6 @@
 > Objectif : que le document ressemble au client, pas à un template. Tout se dérive de **7 tokens**
 > extraits du **CSS de production** du site client. Jamais une couleur au jugé, jamais une police de
 > substitution sans vérification.
->
-> Ce protocole s'appuie sur les briques existantes — ne pas les réécrire :
-> `emetteur-brand-kit` (charte, assets et preuves du client) et `logo-resolver` (logo en fichier réel).
 
 ## Les 7 tokens
 
@@ -27,11 +24,20 @@
 
 Tokens dérivés (calculés, jamais choisis) : `--accent-hover` (accent éclairci ~12 %), `--accent-soft`
 (accent très désaturé, pour les fonds d'encadré), `--accent-ink` (couleur du texte **posé sur** l'accent),
-`--texte-secondaire`, `--filet`.
+`--accent-texte` (accent ajusté pour servir DE couleur de texte sur `--fond`), `--texte-secondaire`,
+`--filet`.
 
 > ⭐ `--accent-ink` est le token qu'on oublie et qui casse le document. Accent clair (lime `#DDFF56`) →
 > texte foncé. Accent foncé (violet `#7A00E6`) → texte blanc. Partout où un bloc a l'accent en fond
 > (carte KPI, bandeau, surlignage), le texte prend `--accent-ink`, et le logo prend sa variante adaptée.
+
+> ⭐ `--accent-texte` est le symétrique côté texte courant, et il se casse dans l'autre sens : `--accent`
+> brut, mesuré comme couleur de texte sur `--fond`, tombe sous 4,5:1 (WCAG 1.4.3 Contrast Minimum) plus
+> souvent qu'on ne le pense — un accent clair ou pastel surtout. Ne pas le remplacer par une autre
+> couleur : ajuster la **luminosité de la même teinte** jusqu'au seuil, calculé (formule de luminance
+> relative WCAG), jamais à l'œil. Au-dessus de 18 pt (ou 14 pt gras) le seuil descend à 3:1 et l'accent
+> brut suffit presque toujours — `--accent-texte` sert surtout aux libellés, légendes et attributions en
+> corps courant, pas aux chiffres KPI ni aux titres.
 
 ## Ordre de fiabilité des sources
 
@@ -203,13 +209,17 @@ Priorité stricte :
 
 1. **Fichier projet OS** (`bdzListProjectFiles` / `bdzGetProjectFile`).
 2. **Site de production** du client — SVG inline capturé, fichier de la page presse, `og:image` HD.
-3. **Échelle `logo-resolver`** : officiel → rehost → banque (Clearbit/Brandfetch) → recréation SVG
-   fidèle, en visant le **logotype complet**, pas l'icône carrée.
+3. **Banque de logos, en dernier recours** : Brandfetch (Logo API / Brand API) ou Logo.dev — pas
+   Clearbit, dont l'API logo gratuite a été fermée fin 2025 (rachat HubSpot, migration vers Breeze
+   Intelligence). Si la banque échoue aussi : recréation SVG fidèle, en visant le **logotype complet**,
+   pas l'icône carrée.
 
 Règles :
 
-- **Variantes fond clair ET fond sombre** (`logo-resolver` → `scripts/normalize_logo.py`) : beaucoup de
-  SVG portent leur `fill` sur chaque `path`, changer le `fill` du `<svg>` ne fait rien.
+- **Variantes fond clair ET fond sombre** : beaucoup de SVG portent leur `fill` sur chaque `path` plutôt
+  que sur la racine — changer le `fill` du `<svg>` seul ne fait rien. Il faut réécrire `fill` sur chaque
+  `<path>`/`<circle>`/etc. du fichier (script ou recherche-remplace ciblé), pas seulement sur la balise
+  `<svg>`.
 - **Jamais rogné** : marge de sécurité ≥ 4 % du bord, en couverture comme en pied de page.
 - **Jamais généré par IA**, jamais aplati en JPEG s'il est transparent (halo gris).
 - Le **niveau atteint est consigné** — une icône seule utilisée faute de logotype se signale, elle ne se
@@ -274,6 +284,7 @@ livrable du même client.
 [ ] les 7 tokens ont chacun une valeur ET une source datée
 [ ] --casse relevé sur le text-transform CALCULÉ, pas sur le markup
 [ ] --accent-ink calculé et appliqué partout où l'accent est en fond
+[ ] --accent-texte dérivé si l'accent brut sert de couleur de texte à corps courant sous 18 pt/14 pt gras
 [ ] polices cherchées en local (~/Library/Fonts) avant tout fallback
 [ ] polices trouvées : sous-settées woff2 et embarquées en data URI
 [ ] polices vérifiées comme disponibles, ou fallback explicite consigné

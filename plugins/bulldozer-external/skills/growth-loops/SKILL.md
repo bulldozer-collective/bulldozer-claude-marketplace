@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   growth-loops
-description: |
+description: |-
   Define the North Star Metric and map growth loops that compound user acquisition and retention. Triggers on 'north star metric,' 'growth loops,' 'define our key metric,' 'growth flywheel,' or 'retention loop.' For paid acquisition strategy, see paid-strategy. For referral loops specifically, see referral-program.
-when-to-use: |
+when-to-use: |-
   Define the North Star Metric and map growth loops that compound user acquisition and retention. Triggers on 'north star metric,' 'growth loops,' 'define our key metric,' 'growth flywheel,' or 'retention loop.' For paid acquisition strategy, see paid-strategy. For referral loops specifically, see referral-program.
-argument-hint: |
+argument-hint: |-
   B2B project management SaaS, PLG motion, 500 teams, want to find our NSM and growth loops
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -83,6 +83,8 @@ Expansion leads to revenue. The NSM should predict both retention and expansion.
 
 Example: "Teams who complete a project and invite a collaborator within their first 14 days"
 
+**Don't validate the aha moment by correlation alone.** An action that correlates with retention among your existing users can be a symptom of engagement rather than a cause — the accounts already retaining are the ones most likely to have found time to do it. The only real proof is an experiment: push more new users toward the candidate action and check whether their actual retention moves, not just whether they complete the action. Watch for a second trap: if only a small minority of signups ever reach the candidate action, it isn't a usable aha moment even when it correlates strongly with retention — it's filtering for people already convinced, not something onboarding can actually push the rest toward. Pick an earlier, more reachable candidate instead.
+
 ---
 
 ## Growth Loop Architecture
@@ -96,6 +98,8 @@ A growth loop is a self-reinforcing system where an output becomes an input to t
 ```
 
 Every company has 2–3 primary loops. Map them all before choosing where to invest.
+
+**A loop only compounds what's already there.** If accounts aren't retaining, an acquisition or content loop just pours more users into a bucket that's leaking — it won't read as "growth" for long, because acquisition cost keeps climbing to replace the churn, and the team burns a quarter concluding "the loop doesn't work" when the loop was never the problem. Before mapping loops, check the direction of retention with whatever signal is already available (even a rough one — is usage in week 4 flat or dropping across the last few cohorts). If it's dropping, the highest-leverage move is fixing the Retention Loop below, not picking a lever from the matrix that assumes it's already healthy.
 
 ### The Four Core Loop Types
 
@@ -111,6 +115,8 @@ Metric: viral coefficient K = (invitations per user) × (conversion rate of invi
 - K > 1: exponential growth
 - K 0.5–1: meaningful support for other channels
 - K < 0.5: loop exists but needs other acquisition
+
+K > 1 is rare in practice outside consumer social products — treat it as a diagnostic ceiling, not a target to chase by bolting on more invite prompts. In a mixed self-serve/sales-assisted B2B motion, K itself can mislead: seats often expand because a champion rolls the product out to teammates during onboarding or a sales-assisted deal, not because an end user forwarded an invite link. Where that's the real mechanism, measure it as the Monetization Loop below (seats added per account), not as virality — forcing a K coefficient onto an expansion that isn't viral just produces a number nobody can act on.
 
 **2. Retention Loop (Habit Formation)**
 
@@ -216,18 +222,24 @@ Score = (Impact × 2 + Speed) / Effort
 
 **Bulldozer rule**: Pick the single highest-scoring lever and go all-in for 8 weeks before evaluating the next one. Splitting attention across 5 levers simultaneously is the most common growth failure mode.
 
+That 8-week window needs its own stop rule, or it turns into an excuse to keep funding a lever that was never going to work. At the 4-week midpoint, check the loop metric itself, not the NSM: no movement at all, past normal noise, means something in the mechanism is broken — the trigger doesn't fire, the action has friction nobody removed, the output never reaches the next user — and the fix is to re-instrument or redesign that step, not to keep waiting out the clock. A metric moving the right way but short of target at week 8 is a different case entirely: that's "not there yet," and killing it on a calendar deadline throws away a lever that was working.
+
+**Don't score a lever whose "Impact" column is a guess.** A loop diagram with no real trigger rate, action rate, or output rate behind its arrows is a hypothesis, not a growth loop — and this matrix is worthless if it's scored on assumed numbers dressed up as data. Instrument at least the weakest-looking arrow before scoring levers against each other, not after picking a favorite.
+
 ---
 
 ## 90-Day Action Plan
 
 **Weeks 1–2: Measure**
-- Instrument the NSM in your analytics (if not already tracked)
-- Build a cohort analysis: what behaviors in week 1 predict 90-day retention?
+- Instrument the NSM in your analytics (if not already tracked). If the project runs on Bulldozer OS: check `bdzListGoogleAnalyticsReportTemplates` before building anything — the project may already carry a template close to what the NSM needs, and duplicate templates are common when nobody checks first. Where none fits, `bdzCreateGoogleAnalyticsReportTemplate` builds one from the GA4 dimensions/metrics behind the NSM's core action — reference the metric as `conversions`, the name Bulldozer OS's own curated GA4 catalog uses for a non-Google-Ads conversion event (Google's own product has called this a "key event" since March 2024, but that's not the field name this tool expects).
+- If the core action lives behind a CMS form rather than a GA4 event (a signup, an invite, a waitlist join), `bdzListCmsForms` + `bdzListCmsFormSubmissions` give the real per-form submission count instead of guessing from traffic.
+- If the NSM needs to reconcile usage with revenue (expansion, upgrades, seats added) and the CRM connected is HubSpot, `query_crm_data` on the DEAL object pulls closed-won/expansion revenue to check the NSM's "leads revenue" criterion against real pipeline — the OS supplies the underlying events and revenue records, it does not compute the NSM formula for you.
+- Build a cohort analysis: what behaviors in week 1 predict 90-day retention? Know the limit before promising this: Bulldozer OS's curated GA4 dimension catalog has no per-user cohort dimension — only `newVsReturning`, a flat new-vs-returning split — and `bdzAggregateGoogleAnalyticsReport` rolls metrics up across properties/sites, not across a cohort over time. Past that flag, this analysis runs outside the OS: the product's own event data, or a dedicated analytics tool, not a GA4 report template.
 - Map your current loop performance (what's the K coefficient? what's the expansion rate?)
 
 **Weeks 3–6: Prioritize and Execute**
 - Identify the bottleneck in your highest-leverage loop
-- Run one focused experiment targeting that bottleneck
+- Run one focused experiment targeting that bottleneck. Read it like any A/B test, not like a demo: 95% significance, 80% power, and a minimum two-week run to cover a full weekly cycle. Reading it early because the trend looks good is how noise gets mistaken for a result you then build the next 8 weeks on.
 - Track weekly: NSM trend + loop metric
 
 **Weeks 7–12: Compound**
@@ -244,3 +256,4 @@ Score = (Impact × 2 + Speed) / Effort
 - **Choosing an easily-gamed metric**: "Monthly logins" can be inflated with email notifications. Choose a metric that represents actual value consumption.
 - **Having multiple NSMs**: One NSM, 3–5 diagnostic sub-metrics. Teams that track 12 "north star" metrics track none of them.
 - **Picking an aspirational metric you can't yet measure**: If you don't have the data to calculate it today, pick a proxy you can measure now and plan to migrate to the ideal metric in 6 months.
+- **Treating the NSM as permanent**: A metric chosen for last year's product and segment can quietly stop predicting anything. Re-check that it still predicts retention and revenue roughly every 6 months, especially after a pricing change, a new segment, or a major feature shift — not just when growth stalls and someone starts asking why.

@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   cold-calling
-description: |
+description: |-
   Write cold call scripts, objection responses, and phone cadence structures for B2B SDR and AE outbound. Triggers on 'cold calling,' 'phone prospecting,' 'call script,' 'SDR calls,' or 'outbound phone.' For cold email outreach, see cold-email. For deal qualification frameworks, see pipeline-deal-review.
-when-to-use: |
+when-to-use: |-
   Write cold call scripts, objection responses, and phone cadence structures for B2B SDR and AE outbound. Triggers on 'cold calling,' 'phone prospecting,' 'call script,' 'SDR calls,' or 'outbound phone.' For cold email outreach, see cold-email. For deal qualification frameworks, see pipeline-deal-review.
-argument-hint: |
+argument-hint: |-
   Targeting VP Sales at mid-market SaaS, selling revenue forecasting software, SDR team of 3
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -36,9 +36,13 @@ A `cold-call-playbook-{target-persona}.md` file with: opener script (permission-
 
 ## Cold Calling Principles
 
-### The First 7 Seconds
+### The First Few Seconds
 
-Prospects decide whether to engage within 7 seconds. Lead with relevance, not your name and company. Your opener should make them think "this might be worth 30 more seconds."
+Prospects decide whether to keep listening or hang up within the first several seconds of the call — recent write-ups on cold-call data put the window somewhere around 8–15 seconds, though none of them is an audited study, so treat it as an order of magnitude, not a stopwatch. Lead with relevance, not your name and company. Your opener should make them think "this might be worth 30 more seconds."
+
+### The Trigger Must Be Real
+
+A filter isn't a trigger. "VP Sales at 100–500 person SaaS companies" tells you who to call; it doesn't tell you why to call them *today*. Opener 3 below only earns its "Why it works" claim when the observation is genuinely recent — a funding round, a launch, a hire, something that just happened. In Bulldozer OS, that trigger can come from a real signal instead of manual research: `bdzListSignalTypes` lists what signal types the project can detect, and `bdzListSignals` returns the ones already running. The account list to work from should be a lead list already reviewed to `ACCEPTED` (`bdzListLeadListLeads`, filterable by review state), not every account a firmographic filter matched.
 
 ### Disarm, Don't Pitch
 
@@ -51,6 +55,10 @@ Every call has one goal: qualify interest and book a next step. You're not selli
 ### Volume Is Not Strategy
 
 30 calls/day with bad scripts = wasted hours. 15 calls/day with context, relevance, and real talk tracks = pipeline.
+
+### The Cadence Doesn't Get a Free Rerun
+
+A cadence that finishes with zero live conversations isn't proof the account needs another pass — it's proof the trigger was weak or missing to begin with. Don't relaunch the same account into a second full cadence just because a rep has open capacity; that's busywork wearing the shape of a strategy. Either a new signal has genuinely appeared since the first pass (a fresh entry in `bdzListSignals`, a job change, a funding round, real engagement on a LinkedIn post) or the account goes back to be re-qualified against the ICP — not straight back onto a dialer.
 
 ---
 
@@ -199,7 +207,19 @@ A structured phone cadence works alongside email. Total sequence: 12–15 touche
 | 12 | Email (resource) | Useful piece of content |
 | 15 | Email (breakup) | Final touch |
 
-**Best call times** (data-backed): Tuesday, Wednesday, Thursday 8–9am or 4–5pm in their timezone. Avoid Monday mornings and Friday afternoons.
+**Best call times**: several 2026 sales-data write-ups (not a single audited study) converge on Tuesday–Thursday as the strongest days, with two windows standing out — mid-morning (roughly 10–11:30am) and early-to-mid afternoon (roughly 2–3:30pm) — plus late afternoon (4–5pm), all in the prospect's timezone. Avoid Monday mornings and Friday afternoons. Treat this as a starting point to test against your own call data, not a fixed rule.
+
+---
+
+## Compliance & Number Reputation
+
+Two constraints sit outside the script itself, and either one can shut a cadence down if ignored.
+
+**Calling hours are a legal limit, not a best-practice suggestion.** In the US, the TCPA restricts calls to 8am–9pm in the *recipient's* local time zone, not the caller's — and this applies to a decision-maker's mobile number even in a B2B context, since the TCPA treats wireless numbers as residential and the federal B2B exemption realistically only covers a published business landline. Some states cut the window further — Florida and Oklahoma, for example, stop at 8pm local (trackers disagree by an hour; treat 8pm as the better-supported reading). Build the cadence around the recipient's time zone and check current rules for the state or country before assuming the federal window applies everywhere.
+
+**Caller ID reputation behaves like domain reputation in cold email.** Carriers score a number on dial volume, answer rate, call duration, and complaint signals, and can label it "Spam Likely" on the recipient's phone without the caller having broken any rule — once flagged, connect rates drop sharply and take time to recover. Keep per-number daily volume in a normal range, rotate numbers instead of hammering one, and register numbers with a carrier "branded calling" program where available so the company name displays before pickup. Exact recovery timelines and lift percentages vary too much across sources to state as fact — treat any specific number you read on this as directional, not a guarantee.
+
+**Dialer choice, local-presence numbers, and AI voice agents carry their own compliance exposure on top** — *Duguid* and the FTC's abandoned-call cap for predictive/parallel dialers, the reputation risk of a rented local-presence pool, and the FCC's 2024 ruling treating an AI-generated voice as a TCPA "artificial voice" (prior written consent, plus California's own AB 2905 disclosure duty). Detail: `references/compliance-and-number-reputation.md`. Operating rules: see Rules, below.
 
 ---
 
@@ -216,3 +236,27 @@ A structured phone cadence works alongside email. Total sequence: 12–15 touche
 **Signs a call is going well**: Prospect asks a clarifying question, prospect talks about their current situation, prospect suggests a follow-up time.
 
 **Signs a call is going poorly**: Prospect gives one-word answers, sounds distracted, prospect asks "what company are you calling from again?"
+
+---
+
+## Common Mistakes
+
+- **Reading an opener word-for-word.** These frameworks are the shape of a call, not a teleprompter — a rep who recites one verbatim sounds like it, and the prospect notices before the second sentence.
+- **Calling "research-based" (Opener 3) when the observation isn't actually recent.** A funding round from 18 months ago or a job change nobody acted on isn't a trigger — it just borrows the *sound* of one.
+- **Renting a rotating pool of local-presence numbers to lift answer rates.** It works for a few weeks, then the whole block gets flagged and every number the team owns inherits the hit.
+- **Turning on a predictive or parallel dialer for cold outbound to raise dial volume, without a legal review.** The productivity gain is real; so is the abandoned-call exposure it creates.
+- **Relaunching a cold account into a second full cadence because a rep has open capacity.** Capacity isn't a trigger — without a new signal, it's the same lottery a second time.
+- **Accepting "send me an email" as a stopping point.** That email goes unread without a discovery answer to make it relevant — see the objection script above.
+- **Cosmetic personalization** — swapping in the prospect's name and company on an otherwise generic opener. Prospects hear the same call everyone else is getting; it isn't personalization, it's a mail-merge with a voice.
+- **Promising a connect rate or a meetings-booked number as if it were guaranteed.** Every benchmark in this document is directional, sourced from non-audited aggregates — cite it as a starting point to test against your own call data, never as a number a rep is on the hook for.
+
+## Rules
+
+- **A power dialer is the default for cold B2B calling; a predictive or parallel dialer is a legal decision, not a manager's toggle** — both fall outside the federal ATDS definition after *Duguid*, but only the predictive/parallel pattern carries the FTC's abandoned-call-rate exposure and the state-by-state autodialer laws that are stricter than the federal standard.
+- **Local-presence numbers are bought or leased directly from the originating carrier, never rented from a rotating third-party pool.** A short-term pickup lift isn't worth a spam-flagged number block.
+- **No account gets a second full cadence without a new, genuine trigger.** A completed cadence with zero live conversations is a targeting signal, not a reason to try again with the same list.
+- **The opener frameworks are a shape, not a script to recite.** If a rep can't say it in their own words, they haven't understood who they're calling or why.
+- **Every "send me an email" gets one discovery question first.** No exceptions — the email doesn't get read without it.
+- **The recipient's time zone and local calling-hour law set the window, not the caller's schedule or the "best call times" data.** Best-time data optimizes pickup inside a legal window; it doesn't define the window.
+- **An AI voice agent replacing a human SDR needs consent captured before the first call, not a disclosure line in the opener** — the FCC's 2024 ruling puts AI-generated voice calls in the same TCPA bucket as prerecorded robocalls, with its own written-consent requirement; don't assume the human-SDR checklist above already covers it.
+- **No promised response rate, ever.** Every number in this playbook is a directional benchmark from non-audited sources, not a commitment a rep is measured against.

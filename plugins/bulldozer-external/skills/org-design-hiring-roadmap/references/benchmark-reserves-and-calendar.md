@@ -1,0 +1,22 @@
+# Benchmark Reserves and Quarterly Hiring Calendar Template
+
+## Step 1: Bottleneck Diagnosis — reserve on the 80% retention floor
+
+*Reserve, rewritten 2026-10-12: a broader, more named source set doesn't support the "drifting down toward 80%" story this reserve carried before. SaaS Capital's own annual benchmark (bootstrapped, $3–20M ARR) puts 2026 median GRR at 91%, flat versus the prior year, 90th percentile at 100%. SaaS Rise's broader private-B2B figure is 88% median (92% for vertical SaaS). SaaS Hero frames 85–95% as the current target band, 85–88% median for private SaaS generally. The three don't converge on one number — different segments, different survey populations — but all three sit well above 80%, and the one source with a named, repeated annual methodology (SaaS Capital) reports flat, not declining. Direct reads of saas-capital.com, saasrise.com and saashero.net all failed — same network block logged on this file since 2026-08-28, so this stays WebSearch-synthesis, not a first-party read. The 80% floor itself still works as a "below this, the bottleneck is real" trigger — it sits clearly under every median cited here — but don't tell a client the market at large is sliding toward that line; this pass's evidence doesn't back that framing.*
+
+## Step 3: Headcount Model by ARR — reserve on the ARR-per-employee benchmarks
+
+*Reserve: named US studies (ICONIQ Growth "Compass," High Alpha SaaS Benchmarks, SaaS Capital) still read above this table. Re-checked 2026-10-05: the same 2026 Compass band breakdown (≈$130K/employee under $25M ARR, ≈$172K at $25–100M ARR, ≈$249K above $100M ARR, 2026 cohort 20–25% more efficient than 2017–2019 at matching bands) comes back unchanged and now cross-confirmed by a second independent aggregator (stealthagents.com) in addition to the ones already logged — no source has revised these figures since the 2026-09-25 pass. Still no direct read of the source itself: the ICONIQ page, SaaStr's coverage of it, and this pass's two new attempts (onlycfo.io, stealthagents.com) all returned the same access block already logged on other sources in this file. The earliest band ($130K) sits closer to this table's Series A row than the ~€170–230K blended figure a previous pass cited, which likely averaged in later-stage companies. Still not reconciled by a direct read of the source, and still USD against this table's EUR — treat this table as a conservative floor, re-anchor against the client's own peer set, and note the gap is narrower at Series A than previously stated.*
+
+## Step 6: Quarterly Hiring Calendar — reserve and template
+
+*Reserve: a named cabinet study backs this — The Bridge Group's "AE Models, Motions & Metrics: 2026 Research Report," its 10th biennial AE study, 158 B2B companies surveyed. Its own pages (including a 2026-specific report URL found for the first time this pass, bridgegroupinc.com/research/2026-ae-models-motions-metrics) still return an access block on direct fetch in this environment — read through aggregators only, same limit logged on this skill since 2026-08-28. Re-checked 2026-10-05: one aggregator now attributes a sharper blended number directly to this report — 6.2 months to full productivity across all segments, "the highest in study history" — which tightens (and confirms the direction of) the 6–6.7 months this file already carried. The same search also returned, for the first time, an aggregator naming "9–12 months" as the enterprise-specific figure in direct connection with this report, rather than as an unattributed blog number — the first attribution this file has seen for that exact range, though still not a first-party read. Kept the existing 9–12 months figure (now somewhat better attributed) rather than swapping in the blended number, since the two measure different things: the ramp-lengthening trend itself is backed by a real cabinet source, not just convergent blogs, and is getting worse each edition, not stabilizing.*
+
+**Quarterly hiring calendar template:**
+
+| Quarter | Role | Revenue need it addresses | Hire date needed by | Notes |
+|---------|------|--------------------------|--------------------|----|
+| Q1 | SDR #2 | Pipeline volume gap vs. Q2 target | Jan 15 | Current pipeline coverage 1.9x |
+| Q1 | RevOps | Forecasting + CRM accuracy | Feb 1 | Manual tracking breaking at current team size |
+| Q2 | AE #3 | Q3 revenue capacity | Apr 1 | 3-month ramp means Q3 contribution |
+| Q3 | Head of Sales | Q4 scale + manager layer | Jul 1 | First management hire — requires 2 AEs at quota |

@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   signal-based-outbound
-description: |
+description: |-
   Build a signal-based outbound system — identify buying signals, score and tier them, write signal-specific message angles, and launch sequences timed to signal decay windows. Triggers on 'signal-based outbound,' 'trigger-based outreach,' 'buying signals,' 'intent-based prospecting,' 'outreach based on signals,' or 'when to reach out to a prospect.' For LinkedIn sequences specifically, see outbound-linkedin. For cold email, see cold-email.
-when-to-use: |
+when-to-use: |-
   Build a signal-based outbound system — identify buying signals, score and tier them, write signal-specific message angles, and launch sequences timed to signal decay windows. Triggers on 'signal-based outbound,' 'trigger-based outreach,' 'buying signals,' 'intent-based prospecting,' 'outreach based on signals,' or 'when to reach out to a prospect.' For LinkedIn sequences specifically, see outbound-linkedin. For cold email, see cold-email.
-argument-hint: |
+argument-hint: |-
   B2B SaaS selling sales coaching software — want to trigger outreach on new VP Sales hires, funding rounds, and job postings for SDR roles
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -28,7 +28,7 @@ You are a Bulldozer sales operator building a signal-based outbound system. Your
 
 ## Output
 
-A `signal-playbook-{company}.md` file with: signal universe (types, sources, decay windows), a scoring matrix, tier routing rules, message angle per signal type, and sequence structure per tier. Ready to operationalize in whatever outreach tool the team uses.
+A `signal-playbook-{company}.md` file with: signal universe (types, sources, decay windows), a scoring matrix, tier routing rules, message angle per signal type, and sequence structure per tier. Ready to operationalize in Bulldozer OS's native signal and Lemlist tooling (see "Running This in Bulldozer OS" below), or in whatever other outreach stack the team already runs.
 
 **Produce on first invocation. Recommend the 3 highest-precision signals to start — don't overwhelm with 12 signal types at once.**
 
@@ -50,6 +50,8 @@ Every B2B buying signal falls into one of seven categories. Different categories
 
 **Decay** means the signal's predictive power drops as time passes. A funding round 60 days old has already been worked by every competitor. A new VP hire 14 days in is still in orientation. Act within the window or don't act at all.
 
+To map these categories onto Bulldozer OS's own signal catalog (`bdzListSignalTypes`), read `references/bulldozer-os-signals.md`.
+
 ---
 
 ## Starting Signal Stack (for teams with no existing signal motion)
@@ -61,12 +63,15 @@ Don't track 7 signal types simultaneously. Start with 3 that cover both precisio
 2. **Job posting match** — LinkedIn Jobs keyword alert for the tools you replace or pain you solve
 3. **Funding event** — Crunchbase free email alerts on your top 200 ICP accounts
 
-These three cost <€500/month combined and generate measurable signal-to-meeting conversion above 5% in most B2B verticals. Add intent data only after this motion is producing pipeline — otherwise you're paying for signals without the infrastructure to act on them.
+There's no audited industry number for what a "signal-based" motion converts at, so don't quote one — track your own signal-to-meeting rate against your existing cold-outbound baseline for the first month and use that as your reference point, not a vendor-quoted benchmark. Add intent data only after this motion is producing pipeline — otherwise you're paying for signals without the infrastructure to act on them.
+
+**Where I change my mind after that first month.** If the signal motion isn't beating the cold-outbound baseline by then, the near-always culprit is triage or routing, not the choice of signal — a real signal poorly filtered or routed late converts no better than a cold list. Fix false-positive triage and Tier 1 SLA adherence before adding a second signal type or a paid intent source. Adding more signal volume on top of a motion that isn't converting just buys more noise at a higher price.
 
 **Add later:**
-- First-party intent (requires website visitor identification tool: Warmly, Clearbit, RB2B)
-- Tech stack change (BuiltWith or Datanyze, useful for competitive displacement)
+- First-party intent (requires website visitor identification tool: Warmly, RB2B, or HubSpot Breeze Intelligence — the product formerly sold standalone as Clearbit, folded into HubSpot in 2024)
+- Tech stack change (BuiltWith, or Datanyze — now ZoomInfo's entry-level tier rather than an independent product, useful for competitive displacement)
 
+To run sourcing, tiering and sequencing natively in Bulldozer OS (signals as an OS object priced per lead, the LinkedIn post path for content engagement, tiering in the lead `note`, the Lemlist sequence), read `references/bulldozer-os-signals.md` (section: Running This in Bulldozer OS).
 ---
 
 ## Signal Scoring Matrix
@@ -93,11 +98,13 @@ Score every incoming signal on two dimensions:
 
 **Stack signals before acting.** A single weak signal = Tier 3. Two medium signals from the same account in 7 days = Tier 1. Stacking is the single biggest lever on precision.
 
+**The stacking bar rises with what you're about to spend.** A single cheap, high-volume signal (a post like, a followed-company alert) is fine to route straight into an automated Tier 2/3 sequence — the cost of being wrong is one ignored email. It is not fine to justify a same-day rep-led Tier 1 call, a hand-written executive outreach, or turning on one of the OS's 12-credit/lead company-level signal types (tech adoption, tech displacement, AI adoption) on a single weak read. The higher the commitment — rep time, a bespoke message, or the OS's own per-lead credit cost — the more independent signals you should require before acting, not just a higher combined score from the same source. Convergent 2026 practitioner guidance points the same direction without agreeing on an exact number, so treat it as a principle, not a formula: require more than one signal, from more than one source, before the expensive or high-touch plays.
+
 ---
 
 ## False-Positive Triage
 
-**Throw away 30–60% of raw signal volume.** If you're acting on more than 70% of raw signals, your filters are too loose and your signal-to-meeting rate will be low.
+**Expect to throw away most of your raw signal volume — there's no audited industry figure for how much, so don't quote one.** If you find yourself acting on nearly everything a signal source produces, that's the tell your filters are too loose, not a sign your targeting improved.
 
 Common false positives by signal type:
 
@@ -108,41 +115,15 @@ Common false positives by signal type:
 
 **Filter rule:** Before routing a signal, ask — does this signal imply a change in buying readiness, or does it just imply the account is active? Activity ≠ buying signal.
 
+**The trap that doesn't show up in a triage table: two "signals" that are really one event.** A job posting for a role and a funding announcement three days later at the same account often aren't two independent facts — they're one expansion event reported by two different sources. Before counting that as a stack (see above), check whether the second signal is a plausible *consequence* of the first rather than an unrelated confirmation. Routing on a double-counted event is worse than routing on the single signal, because the score looks more confident than it is.
+
 ---
 
 ## Message Angle Per Signal Type
 
 The message angle must be unique to the signal type. A funding announcement angle is not the same as a job posting angle. These are different templates, not different personalization tokens on the same template.
 
-### Funding announcement
-**Window:** Act within 3–7 days of announcement  
-**Angle:** Budget to deploy, headcount to hire, systems to build  
-**Opening frame:** "Companies at your stage typically use the 90 days post-raise to [build/fix/scale X]. We've worked with [3 companies at similar stage] through that exact transition."
-
-### New executive hire (VP+)
-**Window:** Act 14–21 days post-start date (not day 1 — too early signals surveillance)  
-**Angle:** New leader evaluates vendors in the first 90 days. Position as a peer resource, not a sales call  
-**Opening frame:** "New [role] typically spend their first quarter auditing [function] and making a few decisive bets. We've helped [peer company] get [specific outcome] — curious what's top of the list for you."
-
-### Tech stack change (competitor dropped)
-**Window:** Act within 7–10 days of detection  
-**Angle:** Gap in the stack creates procurement urgency  
-**Opening frame:** "Noticed [Company] recently moved off [Competitor]. A lot of teams we work with made that same switch and then needed to [fill capability gap]. We help with that specific transition."
-
-### Job posting match
-**Window:** Act within 7–14 days of posting  
-**Angle:** The job posting reveals the problem — reflect it back  
-**Opening frame:** "Saw you're hiring a [Role] — the JD mentions [specific requirement from posting]. That's usually a signal that [underlying problem] has become a priority. We've built that for a few companies at your stage."
-
-### G2 comparison / competitor mention
-**Window:** Act within 24–48 hours — this is the highest-precision, shortest-decay signal  
-**Angle:** They're actively evaluating. Position your differentiation, not your feature list  
-**Opening frame:** "Saw [Company] is researching [category/competitor]. We often talk to teams at this stage in the evaluation — happy to share how we compare on [the dimension that matters most for their use case]."
-
-### First-party intent (pricing page / demo page)
-**Window:** Same day. Within 4 hours is the standard for Tier 1  
-**Angle:** They came to you. Don't pretend you don't know  
-**Opening frame:** "Saw [Company] has been spending time on our [pricing/demo] page — figured it made sense to reach out directly rather than wait. [One sentence on their likely situation based on their vertical/stage.] Happy to answer any questions directly."
+For the window, angle and opening frame of each signal type (funding, new executive hire, tech stack change, job posting, G2 comparison / competitor mention, first-party intent) and the compliance note on first-party intent, read `references/message-angles.md`. One angle per signal type.
 
 ---
 
@@ -175,12 +156,18 @@ Nurture only. No direct outreach until a Tier 1/2 signal fires from the same acc
 
 ## Operationalization Checklist
 
-Before running any signal-based motion:
+Before running any signal-based motion, go through the checklist in `references/operationalization-checklist.md`.
 
-- [ ] Signal sources are connected and alerting (Crunchbase, LinkedIn Sales Navigator saved searches, BuiltWith)
-- [ ] False-positive triage rules are documented and enforced — not everything that looks like a signal is a signal
-- [ ] Each signal type has an assigned decay window and tier
-- [ ] Tier 1 SLA is defined and achievable: who routes it and in how long?
-- [ ] Each signal type has a unique message angle — not just personalization tokens on a generic template
-- [ ] Sequence steps are loaded in the outreach tool before signals start firing
-- [ ] CRM tracks signal type p
+---
+
+## Rules
+
+- **Fit plus signal, not fit alone.** ICP fit tells you who to watch. A signal tells you when to write. A list built on fit only, without a named event, is not signal-based outbound — it's a list with a deadline attached to make it feel urgent.
+- **No signal, no send.** If the account can't be pointed to a specific, dated event, it goes back to nurture. A stale or invented signal is worse than no outreach at all — the prospect can tell.
+- **The decay window is a hard stop, not a guideline.** A signal worked after its window has closed converts at nurture rates while consuming Tier 1 rep time. Route it to Tier 3 instead of running it late.
+- **One message angle per signal type, one ask per message.** The angle comes from what the signal means for that person right now — a funding round is not a job posting. Stacking multiple asks in one message ("interested in a demo, or should I share a case study, or can I get 15 minutes") is the fastest way to get zero replies.
+- **Stack before you escalate, never invent a stack.** Two real signals from the same account inside their windows earn Tier 1 routing. One signal repeated in different wording is not a second signal.
+- **Silence is the default outcome — build the exit before the sequence.** Most accounts, at every tier, will not respond. A sequence without a defined last touch and a clean route back to nurture leaves reps chasing dead accounts and lists rotting with contacts who were never re-qualified.
+- **Don't buy signal sources faster than you can act on them.** A Tier 1 SLA that nobody can hit turns high-precision signals into the same pile as everything else. Fix routing and response time before adding a fourth signal type.
+- **The stacking bar scales with the commitment, not just the score.** A weak signal can justify an automated, low-cost touch. It cannot justify rep time, a hand-written message, or an expensive company-level signal type on its own — those need more than one independent signal, regardless of how a single source's score reads.
+- **If the first month doesn't beat baseline, the fix is triage and routing, not a new signal.** Adding signal types on top of a motion that isn't converting buys more noise at a higher price. Diagnose before you expand.

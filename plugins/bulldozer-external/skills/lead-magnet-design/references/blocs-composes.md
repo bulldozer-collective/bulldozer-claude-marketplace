@@ -80,7 +80,7 @@ des deux colonnes.
   faire ». La forme dit le changement de régime.
 - **Une seule fois par document.** Deux bandes de ce type et l'effet retombe.
 - ⚠ Le conteneur à deux colonnes est en `display:table`, **jamais en flex** — voir
-  `pannes-et-parades.md`.
+  `references/pannes-et-parades.md`.
 
 ## 4. Page de données pleine page — pour LE fait central
 

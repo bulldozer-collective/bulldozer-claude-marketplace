@@ -1,7 +1,9 @@
 ---
-name: bulldozer-hosting
-description: Host a static HTML page, zipped static site, or image (png/jpeg/svg) on Bulldozer — a private, project-scoped S3 upload read back through short-lived presigned URLs
-when-to-use: |
+name: |-
+  bulldozer-hosting
+description: |-
+  Host a static HTML page, zipped static site, or image (png/jpeg/svg) on Bulldozer — a private, project-scoped S3 upload read back through short-lived presigned URLs
+when-to-use: |-
   Use when the user wants to durably host / publish / "put online" a static HTML page, a zipped static site, or an image (png/jpeg/svg) and get a link to view it, from a URL or a file they uploaded to the fridge. NOT for throwaway/scratch file drops (use the fridge) or generated project assets (use studio)
 user-invocable: false
 allowed-tools:
@@ -14,9 +16,10 @@ allowed-tools:
   - mcp__plugin_bulldozer_bulldozer__bdzRequestFridgeCode
   - mcp__plugin_bulldozer_bulldozer__bdzAddHostingShare
   - mcp__plugin_bulldozer_bulldozer__bdzRemoveHostingShare
-effort: low
+effort: |-
+  low
 metadata:
-  forge: disabled
+  "forge": "disabled"
 ---
 
 # Bulldozer Hosting

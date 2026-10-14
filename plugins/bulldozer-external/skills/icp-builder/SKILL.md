@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   icp-builder
-description: |
+description: |-
   Build or refine an Ideal Customer Profile from closed-won CRM data — covering firmographics, technographics, buying triggers, and negative ICP — and produce a tiered target account list. Triggers on 'ICP,' 'ideal customer profile,' 'who should we target,' 'build our ICP,' 'refine our ICP,' 'target account list,' or 'we're selling to everyone.' For signal-based targeting, see signal-based-outbound. For full ABM activation, see account-based-marketing.
-when-to-use: |
+when-to-use: |-
   Build or refine an Ideal Customer Profile from closed-won CRM data — covering firmographics, technographics, buying triggers, and negative ICP — and produce a tiered target account list. Triggers on 'ICP,' 'ideal customer profile,' 'who should we target,' 'build our ICP,' 'refine our ICP,' 'target account list,' or 'we're selling to everyone.' For signal-based targeting, see signal-based-outbound. For full ABM activation, see account-based-marketing.
-argument-hint: |
+argument-hint: |-
   HubSpot export of 80 closed-won deals last 18 months — need to find the ICP pattern and build a Tier 1 target list of 200 accounts
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -24,7 +24,9 @@ You are a Bulldozer strategist building or refining an Ideal Customer Profile. Y
 
 ## Input
 
-`$ARGUMENTS` — CRM export or closed-won deal data, company context, current ICP hypothesis (if any). If not provided, read any available context files (deal exports, CRM files, customer lists). Ask once if no data whatsoever is available.
+`$ARGUMENTS` — CRM export or closed-won deal data, company context, current ICP hypothesis (if any). If not provided, read any available context files (deal exports, CRM files, customer lists); if the project's CRM is connected as HubSpot, query it directly (see Step 1) before asking for an export. Ask once if no data whatsoever is available.
+
+**No closed-won deals yet (pre-revenue or early-stage):** `bdzCreateProjectIcpAutoFill` triggers an async AI-driven pass (web search + Anthropic analysis) that generates ICP, anti-persona, prescriber, and blind-spot profiles from public company context — poll `bdzGetProjectIcpAutoFill` for completion, judge its age from `startedAt` not `createdAt`. Use it only as a starting hypothesis to fill Step 3 until real closed-won data exists — it doesn't substitute for Step 1's mining or the Step 6 validation once deals start closing, and re-triggering replaces the auto-generated profiles it made last time (any profile created by hand is left alone).
 
 ## Output
 
@@ -49,43 +51,12 @@ A real ICP answers:
 
 ## Step 1: Mine Closed-Won Data
 
-Pull closed-won deals from the last 18–24 months. Minimum sample: 20 deals. Ideal: 50+.
-
-For each deal, tag:
-
-**Firmographic:**
-- Industry vertical (be specific — "SaaS" is not useful, "B2B sales enablement SaaS" is)
-- Employee count at time of purchase
-- Revenue/ARR band at time of purchase
-- Geography / HQ region
-- Funding stage (bootstrap, seed, Series A/B/C, PE-backed, public)
-- Growth rate if available (hiring velocity as a proxy)
-
-**Technographic:**
-- CRM in use (Salesforce, HubSpot, Pipedrive, other)
-- Marketing stack (HubSpot, Marketo, Pardot)
-- Outbound tools (Outreach, Salesloft, Apollo, Lemlist)
-- Data tools (Clay, ZoomInfo, Clearbit)
-- Key integrations that made your product relevant or irrelevant
-
-**Deal shape:**
-- ACV
-- Sales cycle length (days from first touch to close)
-- Number of stakeholders involved (buying committee size)
-- Inbound vs. outbound source
-- Champion role/title
-- Economic buyer role/title
-
-**Outcome:**
-- Retention status today (churned, active, expanding)
-- Expansion ARR if any
-- Advocacy (case study, referral, NPS)
-
+For the full procedure to pull closed-won deals (querying HubSpot directly when it is connected, the cautions on win/loss reasons, and the firmographic, technographic, deal-shape and outcome fields to extract), read `references/mine-closed-won-data.md`. Do this before defining any ICP dimension.
 ---
 
 ## Step 2: Find the Pattern
 
-70–80% of your best closed-won deals share 3–5 common traits. Find them.
+A small, repeatable handful of traits — not a long list — is what separates your best closed-won deals from the rest. Find them.
 
 **Build a pivot table or cross-tab:**
 - Row: industry vertical
@@ -94,11 +65,13 @@ For each deal, tag:
 
 **Look for the cells where ACV, retention, and expansion all peak simultaneously.** Those cells are Tier 1 ICP. Everything else is Tier 2 or below.
 
+**If the cross-tab produces two peak cells far apart instead of one, don't average them into a single filter.** A self-serve SMB cluster and a sales-led enterprise cluster can both convert and retain well while looking nothing alike on deal shape (ACV, cycle length, committee size). Practitioner convergence (GTM/RevOps blogs, no named study behind it) has a name for the failure mode of blending them: sometimes called the "Average Customer Profile" trap — a filter built from the midpoint of two real segments describes an account that doesn't exist in the data. Marketing ends up chasing a mid-market ghost, and sales works accounts that fit neither motion. If the pattern is genuinely bimodal, write two ICPs from here forward — same method applied twice, not one blended document.
+
 **Filter for your best customers, not your biggest:**
 - Best = highest LTV, lowest CAC, fastest onboarding, highest NPS, most referrals
 - Biggest deal that churned in 6 months is anti-ICP data, not ICP data
 
-**The 3–5 traits that consistently emerge as ICP predictors in B2B SaaS:**
+**The traits that consistently emerge as ICP predictors in B2B SaaS:**
 1. Industry vertical (often the strongest single predictor)
 2. Employee count band at purchase (not current — at time of purchase)
 3. Presence of a specific role (champion role title — the one who drove the deal)
@@ -120,6 +93,8 @@ Specific ranges, not broad labels.
 | Funding stage | [peak] | [adjacent] | [excludes] |
 | Geography | [peak] | [adjacent] | [excludes] |
 
+Treat this table as a menu, not a gate. The scoring rubric in Step 5 exists precisely so that missing Tier 1 on one row — say, funding stage — doesn't disqualify an account that hits Tier 1 on three others. A firmographic filter that requires every row to match simultaneously reliably over-narrows: stack five AND conditions and the qualifying list often shrinks to a handful of accounts, not a workable target market. Narrow with the scoring weights in Step 5, not with a harder table here.
+
 ### Dimension 2: Technographic
 What tools in their stack predict a successful sale?
 
@@ -133,7 +108,7 @@ How do they buy? What signals precede a purchase?
 
 - What content do they engage with before first contact?
 - What is the typical journey from first touch to close? (inbound from what source, outbound from what trigger)
-- What is the buying committee structure? Who is champion, who is economic buyer, who blocks?
+- What is the buying committee structure? A standard B2B committee runs closer to five roles than two — economic buyer, champion, end user, technical evaluator (security/integration), and procurement/legal (contract terms and compliance, distinct from the technical evaluator) — map which of these showed up on your closed-won deals and which were absent or silent.
 - What objections consistently appear and what resolves them?
 
 Source: talk to the last 5–10 customers. Ask: what was the specific problem that made you look for a solution, what alternatives did you evaluate, and what proof convinced you we were the right choice. Their language is more valuable than any internal document.
@@ -150,69 +125,45 @@ Cluster closed-won deals by the trigger that initiated the buying process:
 
 If 60%+ of your closed-won deals share the same situational trigger, that trigger is core to your signal-based targeting. It tells you when to reach out, not just who to reach out to.
 
+**Once you know the trigger, Bulldozer OS can watch for it going forward instead of you re-discovering it deal by deal.** `bdzListSignalTypes` lists the 32 available signal types with their config parameters — headcount growth maps to a company-growth signal, hiring-driven triggers to the job-offer family, departures to an employee-departure signal — and `bdzCreateSignal` activates one against a lead list. Credits per lead are not uniform across the 32 types: the spread between the cheapest (passive social engagement) and the most expensive (technology/AI adoption) runs roughly 24x, so check `bdzListSignalTypes` and pick deliberately rather than assuming any signal costs the same as another. For situational triggers the catalogue doesn't cover as a ready-made signal, `signal-based-outbound` covers the manual scanning path.
+
 ---
 
 ## Step 4: Build the Negative ICP
 
-A negative ICP — who NOT to sell to — is often as valuable as the positive ICP. It protects sales cycle time and reduces churn.
-
-Build negative ICP from:
-- Churned customers: what do the churned accounts have in common?
-- Long closed-lost patterns: what profile consistently loses to competitors or loses to "no decision"?
-- Low-ACV, high-effort deals: accounts that take as long to close as your best deals but at 20% of the ACV
-
-**Common negative ICP patterns:**
-- Too small: no dedicated budget owner, no real pain, will churn when founder runs out of time
-- Too large: procurement process, legal review, 9-month sales cycle — company isn't built for it
-- Wrong tech maturity: expects a feature that doesn't exist, or has outgrown the product immediately post-sale
-- Wrong industry: vertical-specific compliance or workflow requirements the product can't meet
-- Wrong champion: no one with budget authority supports the deal — champion is enthusiastic but powerless
-
+For how to build the negative ICP (who NOT to sell to), read `references/negative-icp-and-scoring.md`.
 ---
 
 ## Step 5: Scoring Rubric (6 Dimensions)
 
-Create a 100-point scoring model for every prospect. Assign weights based on your closed-won correlation analysis.
-
-| Dimension | Weight | High-score criteria |
-|-----------|--------|---------------------|
-| Firmographic fit | 30% | Matches Tier 1 on industry + employee band + funding stage |
-| Technographic overlap | 20% | Has the 2–3 stack indicators that correlate with closed-won |
-| Buying trigger (situational) | 15% | Active situational trigger present (hire, funding, growth pain) |
-| Intent signals | 15% | Engaging with your content, pricing page, or competitor content |
-| Economic outcome fit | 10% | Predicted ACV matches your model, implementation timeline realistic |
-| Negative ICP filter | 10% | Penalize for anti-ICP attributes (wrong size, wrong tech maturity) |
-
-Score thresholds:
-- 75–100: Tier 1 — prioritize immediately, rep-led, full ABM treatment
-- 50–74: Tier 2 — automated sequences, monitor for signal upgrade
-- <50: Tier 3 — nurture only, not worth rep time
-
+For the 100-point, 6-dimension scoring rubric and its weights, read `references/negative-icp-and-scoring.md`.
 ---
 
 ## Step 6: Build the Target Account List
 
-From the ICP definition and scoring model, generate the target account list:
-
-**Tier 1 (top 100–300 accounts):** Tight ICP fit + active signals. These get full ABM treatment — personalized outreach, direct content, rep ownership.
-
-**Tier 2 (300–1,000 accounts):** Strong ICP fit but no active signal. Monitored — route to Tier 1 when a signal fires. Eligible for automated sequences.
-
-**Tier 3 (1,000–10,000 accounts):** Broad ICP fit. Programmatic nurture only. Upgrade to Tier 2 when they show engagement.
-
-**Sources for list building:**
-- LinkedIn Sales Navigator (firmographic + technographic filters)
-- Apollo (firmographic + email enrichment)
-- BuiltWith (technographic filtering by tech stack)
-- Crunchbase (funding stage + headcount growth)
-- Clay (enrichment + scoring automation)
-
+For how to generate the target account list from the ICP definition and scoring model, read `references/account-list-and-validation.md`.
 ---
 
 ## ICP Validation Test
 
-Before declaring the ICP final, run this test:
+For the validation test to run before declaring the ICP final, read `references/account-list-and-validation.md`.
+---
 
-1. Apply the ICP filter to your current open pipeline. Do the highest-scoring accounts convert at a higher rate than the rest?
-2. Apply the ICP filter to the last quarter's closed-lost deals. Do low-scoring accounts appear disproportionately in closed-lost?
-3. Ask 3 sales reps: "Does this ICP definition describe the deals you find easiest to close?" If the answer is no — the ICP was built from data but doesn't match lived sales experience. R
+## Common Mistakes
+
+- **Building the ICP from a target-market slide instead of closed-won data.** "Who we want to sell to" and "who actually buys, stays, and expands" are frequently different lists. Start from Step 1, not from a positioning deck.
+- **Treating the firmographic dimension as the whole ICP.** Two accounts with identical employee count and industry can have opposite outcomes if one has an active situational trigger and a real champion and the other doesn't. Firmographics filter; the other three dimensions decide.
+- **Skipping the negative ICP because it feels like extra work.** The negative ICP is what stops sales from chasing a big logo that will churn in two quarters. It's not optional — it's half the targeting filter.
+- **Letting one outsized deal define the "peak" cell.** A single enterprise logo can pull Step 2's pivot table toward a segment that isn't repeatable. Weight the pattern by revenue-and-retention across deals, not by chasing the single biggest ACV — and when a deal closed through an off-pattern channel (a founder's personal network, a one-off pricing exception), set it aside from the pattern-finding pass entirely rather than let it dilute the average. It can still earn a line in the write-up as an anecdote; it isn't pattern data.
+- **Publishing the ICP once and never re-testing it.** The three checks in this section aren't a one-time gate — they're the maintenance loop. Skipping them is how a team keeps outbounding into a segment that stopped converting two quarters ago.
+
+---
+
+## Rules
+
+- **The ICP comes from closed-won data, not from who marketing wishes would buy.** If a claim in the ICP definition can't be traced to a pattern in Step 1's data, it doesn't belong in the document.
+- **An upmarket ambition is a hypothesis, not an ICP.** When leadership wants to move upmarket, that target is worth tracking — but it belongs in a separate, explicitly-labeled strategic hypothesis, checked against real closing data every quarter, not folded into Dimensions 1–4. This document describes who closes today; blending in who you wish closed hands sales a filter neither team can act on with confidence.
+- **A positive ICP without a negative ICP is half a filter.** Ship both, always — the negative ICP is what protects sales cycle time from accounts that look right but won't close or won't stay.
+- **Score every account — don't tier by firmographics alone.** The scoring rubric in Step 5 exists because firmographic fit without an active trigger or intent signal is a list, not a priority order.
+- **The situational trigger tells sales when to call, not just who to call.** An ICP that stops at firmographic and technographic dimensions hands sales a database, not a targeting system.
+- **Re-validate every quarter.** An ICP is a snapshot of what worked last time. Treat it as perishable, not permanent.

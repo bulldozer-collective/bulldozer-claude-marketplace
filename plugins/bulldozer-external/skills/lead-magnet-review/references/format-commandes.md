@@ -74,6 +74,12 @@ court-circuite la skill qui porte le ton de voix du client, et ça brouille la t
 
 Exception : citer la phrase fautive entre guillemets pour la localiser. Localiser n'est pas réécrire.
 
+Deuxième exception, plus étroite : un seul mot, un chiffre ou une date manifestement faux (coquille,
+inversion, année qui ne correspond à rien dans le manifeste) peut être donné directement — « remplacer
+"2024" par "2025" » n'a pas de ton de voix à préserver, contrairement à une phrase ou un paragraphe.
+Dès que la correction dépasse un mot isolé, elle redevient une correction de fond décrite, pas un texte
+de remplacement.
+
 ## Compteur de boucle
 
 Chaque rapport porte son numéro (`review-1.md`, `review-2.md`). **La boucle autonome s'arrête à 2.** Le
@@ -93,5 +99,5 @@ tard.
 
 > Cas vécu : un titre orphelin et une absence d'images ont traversé deux reviews sans être vus, et ont
 > été signalés par l'opérateur. Les deux étaient dans la grille depuis le début. La borne de 2 n'était
-> pas le problème — l'inspection l'était (voir « ce que le script ne voit pas » dans
-> `grille-review.md` : une planche contact à 72 dpi ne montre pas un titre isolé).
+> pas le problème — l'inspection l'était : une planche contact à 72 dpi ne montre pas un titre isolé
+> en bas de page, il faut rasteriser à ≥ 90 dpi les pages signalées pour les regarder une par une.

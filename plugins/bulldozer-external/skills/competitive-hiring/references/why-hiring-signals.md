@@ -1,0 +1,9 @@
+# Why Hiring Signals Are Underused Intelligence
+
+Most CI programs focus on product announcements, pricing pages, and G2 reviews — information competitors control and sanitize. Job postings are different:
+
+**They are commitments, not aspirations — with a real exception.** Posting a role usually signals internal budget approval, which is why a single posting still isn't proof: "ghost jobs" — listings kept live with no active intent to fill, for candidate-pipeline building, to signal growth to investors, or simply because a closed req was never taken down — are a documented, dated phenomenon, not a fringe worry. Greenhouse's own platform data, reported by the Wall Street Journal in April 2025, put 18-22% of postings on its ATS as ghost jobs per quarter — a range still holding in 2026 reporting on the same Greenhouse data (~19% for Q2 2026); a March 2025 LiveCareer survey of 918 HR professionals found 93% admitting to posting them regularly or occasionally. This is exactly why the 3-role threshold below isn't just a noise filter — it's the defense against reading a single fictional posting as a strategic bet. Unlike a blog post that describes a strategic direction, a *pattern* of job postings represents actual organizational investment; one posting, read alone, might not.
+
+**They are leading indicators, not lagging ones.** Product announcements come after the product is built. Job postings come before the team that builds it is hired. The average gap between a key hire and its resulting product launch: 6-12 months for engineers, 3-6 months for GTM roles. You are reading the roadmap before it exists.
+
+**They reveal intent without PR polish.** The specific skills required in a job description reveal the technical bets being made. "Experience with FHIR standards" reveals healthcare vertical expansion. "Experience with Apache Kafka" reveals a platform architectural shift. These signals don't appear in press releases.

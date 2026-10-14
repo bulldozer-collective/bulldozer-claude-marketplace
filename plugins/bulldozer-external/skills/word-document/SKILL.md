@@ -1,18 +1,18 @@
 ---
-name: |
+name: |-
   word-document
-description: |
+description: |-
   Generate a formatted Word (.docx) document — proposals, statements of work, contracts, client reports, or internal documentation. Triggers on 'create a Word doc,' 'generate a .docx,' 'write a proposal,' 'draft an SOW,' 'make a contract,' or 'client documentation.' For PDF output, see pdf-report. For presentations, see slides-deck.
-when-to-use: |
+when-to-use: |-
   Generate a formatted Word (.docx) document — proposals, statements of work, contracts, client reports, or internal documentation. Triggers on 'create a Word doc,' 'generate a .docx,' 'write a proposal,' 'draft an SOW,' 'make a contract,' or 'client documentation.' For PDF output, see pdf-report. For presentations, see slides-deck.
-argument-hint: |
+argument-hint: |-
   Statement of work for a 3-month GTM engagement with Acme — deliverables, timeline, pricing, payment terms
 allowed-tools:
   - Bash
   - Read
   - Write
   - Edit
-effort: |
+effort: |-
   high
 ---
 
@@ -39,10 +39,23 @@ You are a Bulldozer operator producing a professional Word document. Use paragra
 ## Library: python-docx
 
 ```bash
-pip install python-docx
+python3 -c "import docx" 2>/dev/null || pip install python-docx
 ```
 
-python-docx handles paragraph styles, tables, headers/footers, sections, and inline formatting. It produces `.docx` compatible with Word 2010+ and Google Docs.
+Check first, install only if missing. A runtime that already has python-docx pre-installed (or has no outbound network at all) shouldn't pay a network round trip on every single invocation — and in a fully offline runtime, the check-first form is the only one that doesn't fail before the script even starts.
+
+python-docx handles paragraph styles, tables, headers/footers, sections, and inline formatting. It produces `.docx` compatible with Word 2010+ and Google Docs. Current stable release is still 1.2.0 (June 2025) — reconfirmed on 2026-10-12 directly against the PyPI release record, no version bump since it was first checked for this skill; nothing in this skill depends on anything past 1.2.0. The project itself is slow but not abandoned: 380 open issues and 159 open pull requests on the upstream repo as of 2026-10-12, same dormant-but-standard profile already tracked for python-pptx on the sibling `slides-deck` skill — not a reason to look elsewhere. The full template was re-run against this same version on 2026-10-06 and still produces a `.docx` that reopens cleanly, with the language override, the repeating table headers, and the table caption all present in the real output XML — not just in the script that's supposed to write them. `add_image` specifically was re-verified on 2026-10-12 with an actual embedded image (the demo template itself has none): the produced `document.xml` carries the real alt text in `descr="…"`, confirming the helper below, not just the mechanism it's based on.
+
+**What python-docx does *not* expose** (confirmed by writing and inspecting real output, not by reading the docs):
+
+- Repeating a table header row on every page (`w:tblHeader`) and preventing a row from splitting across a page break (`w:cantSplit`) have no high-level API — `TableRow` only exposes `cells`, `height`, and `height_rule`. Both require writing the raw OOXML element into the row's `trPr` via `OxmlElement`, same low-level technique the template uses below for header-cell shading. If a document has any table that can plausibly run past one page (a deliverables list, a timeline, a pricing table with many lines), skip this and the header repeats nowhere — the reader loses the column labels on page 2.
+- Image alt text. `InlineShape` has no `.alt_text` or `.descr` property — confirmed by inspecting its full public API. The alt text lives in `<wp:docPr descr="…">`, one level below what python-docx exposes; reachable only via `picture._inline.docPr.set("descr", "…")`. Skip this on any image that carries information (a chart, a screenshot, a diagram) and the document fails WCAG 1.1.1 for a sighted-only reason no proofreading catches — a screen reader announces nothing where the image is.
+- Table alt text (Title/Description). Same gap as the image above, one level up: `Table` has no `.alt_text`, `.title`, or `.description` property at all — confirmed by inspecting its full public API (`add_column`, `add_row`, `alignment`, `autofit`, `cell`, `columns`, `part`, `row_cells`, `rows`, `style`, `table`, `table_direction`, nothing else). Word exposes this under Table Properties → **Alt Text** tab, one field for Title, one for Description; the two map directly to the raw OOXML elements `w:tblCaption` and `w:tblDescription`, both children of `w:tblPr` — confirmed by writing both with `OxmlElement`, saving, unzipping, and reading them back from `word/document.xml`. The underlying python-docx feature request (`python-openxml/python-docx` issue #921) has sat open for years, same story as the TOC. Skip this on a deliverables or pricing table and a screen reader announces only "table" before reading raw cells — no sense of what the table is *for* until the reader has already parsed every cell.
+- The document's language, for pronunciation. `doc.core_properties.language` looks like the fix — it isn't one. Confirmed by execution: setting it to `"fr-FR"`, saving, and unzipping only ever changes `<dc:language>` in `docProps/core.xml`, a Dublin Core metadata field nothing reads to choose a voice. What a screen reader actually uses is `word/styles.xml`'s `w:docDefaults/w:rPrDefault/w:rPr/w:lang`, which stayed hardcoded at `en-US` in the same test regardless of what `core_properties.language` said. No public API reaches it — not on `Document`, not on `Styles`, not even a `.language_id` on `Font` (`Run.font`'s full public API has no such attribute in 1.2.0) — only walking `doc.styles.element` down to that `w:lang` element and setting it does. Skip this on a French (or any non-English) document and a screen reader reads every sentence in an English voice, wrong pronunciation throughout, not a missing label on one paragraph — WCAG SC 3.1.1 Language of Page (Level A) exists for exactly this failure mode.
+- A table of contents. Not a partial gap — no support at all (open since python-docx issue #723, still unresolved as of this writing — reconfirmed against the current release, 1.2.0, still the latest as of this writing). A TOC is a raw `SIMPLE`/`fldChar` field sequence, and even written correctly it opens **empty**: Word only populates it once someone updates fields (`Ctrl+A` then `F9`, or right-click → Update Field). A generated document is never opened by the tool that made it — so a TOC nobody is told to update ships broken by default. See *Table of Contents* below for when this is worth the caveat and when it isn't.
+- Page numbers in a footer. No `add_page_number` method on `Header`/`Footer` — only `add_paragraph`/`add_table`, same gap as the table above. The mechanism is the *same* raw field-code trick as the TOC (`w:fldChar` begin/`w:instrText`/`w:fldChar` end), but a `PAGE` field is nothing like a TOC field once opened: Word recalculates it on every open, no manual update required — confirmed by writing, saving, unzipping, and reading back a produced `.docx` with `PAGE`/`NUMPAGES` fields in the footer. Unlike the TOC, this one carries no caveat and no reason to make it opt-in — every document longer than a cover page should have one.
+
+If `pip install` fails because this environment has no outbound network access, don't retry silently or fall back to hand-built XML — say so and ask whether python-docx is already available in the runtime.
 
 ---
 
@@ -78,222 +91,92 @@ Cover + Sections + Appendix. No cover page needed for internal docs.
 
 ## Python Template
 
-```python
-from docx import Document
-from docx.shared import Pt, Cm, RGBColor, Inches
-from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
-from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
-from docx.oxml.ns import qn
-from docx.oxml import OxmlElement
-from datetime import date
+The full python-docx template (document metadata, margins, style and table helpers, footer page numbers, signature block, image and accessibility helpers, and the document body skeleton) is in `references/python-template.md`. Read it in full before writing any `generate-{slug}.py`, and start every script from it.
 
-doc = Document()
+---
 
-# ── Page margins ──────────────────────────────────────────────────────────────
-for section in doc.sections:
-    section.top_margin    = Cm(2.5)
-    section.bottom_margin = Cm(2.5)
-    section.left_margin   = Cm(2.8)
-    section.right_margin  = Cm(2.8)
+## Table of Contents — only when asked, and only with a caveat
 
-# ── Core style helpers ────────────────────────────────────────────────────────
-DARK    = RGBColor(0x0F, 0x17, 0x2A)  # slate-900
-ACCENT  = RGBColor(0x63, 0x66, 0xF1)  # indigo
-MUTED   = RGBColor(0x64, 0x74, 0x8B)  # slate-500
-BODY    = RGBColor(0x1E, 0x29, 0x3B)  # slate-800
+Default to **no TOC**. python-docx has no native support for one (confirmed: no `add_toc`
+method anywhere on `Document`, and the open python-docx issue tracking this request has
+sat unresolved for years) — the only way to add one is a raw field-code sequence, and even
+built correctly it renders **empty** until a human opens the file in Word and updates fields
+(`Ctrl+A` → `F9`, or right-click the field → Update Field). A generated document is handed
+straight to the recipient, never opened by the tool that made it — so an unrequested TOC
+ships as a blank box with the word "Contents" above it, which reads as more broken than no
+TOC at all.
 
-def styled_para(doc, text, style="Normal", bold=False, size=11, color=None,
-                align=WD_ALIGN_PARAGRAPH.LEFT, space_before=0, space_after=6):
-    p = doc.add_paragraph(style=style)
-    run = p.add_run(text)
-    run.bold = bold
-    run.font.size = Pt(size)
-    run.font.color.rgb = color or BODY
-    p.alignment = align
-    p.paragraph_format.space_before = Pt(space_before)
-    p.paragraph_format.space_after = Pt(space_after)
-    return p
+If the client explicitly asks for one — a long report with several numbered findings, a
+multi-phase SOW someone will navigate rather than read start to end — add the field code and
+say so out loud in the summary: *"Contents table added — right-click it and choose Update
+Field once the document is open, or Word will show it empty."* Never claim it will "just
+work" on open. A 2–3 section brief doesn't need one regardless of length; a TOC exists to let
+someone skip around, not to look complete.
 
-def heading(doc, text, level=1):
-    """Heading 1 = section title, Heading 2 = subsection"""
-    sizes = {1: 16, 2: 13, 3: 11}
-    colors = {1: DARK, 2: DARK, 3: BODY}
-    p = doc.add_paragraph()
-    run = p.add_run(text)
-    run.bold = True
-    run.font.size = Pt(sizes.get(level, 11))
-    run.font.color.rgb = colors.get(level, BODY)
-    p.paragraph_format.space_before = Pt(18 if level == 1 else 12)
-    p.paragraph_format.space_after = Pt(6)
-    # Heading 1 gets a colored top border
-    if level == 1:
-        pPr = p._p.get_or_add_pPr()
-        pBdr = OxmlElement("w:pBdr")
-        top = OxmlElement("w:top")
-        top.set(qn("w:val"), "single")
-        top.set(qn("w:sz"), "12")
-        top.set(qn("w:color"), "6366F1")
-        pBdr.append(top)
-        pPr.append(pBdr)
-    return p
+## Fonts — nothing you specify is guaranteed to render
 
-def bullet(doc, text, level=0):
-    p = doc.add_paragraph(style="List Bullet")
-    run = p.add_run(text)
-    run.font.size = Pt(10.5)
-    run.font.color.rgb = BODY
-    p.paragraph_format.left_indent = Cm(0.5 * (level + 1))
-    p.paragraph_format.space_after = Pt(3)
-    return p
-
-def add_table(doc, headers, rows, col_widths=None):
-    """headers: list[str], rows: list[list], col_widths: list[Cm] or None"""
-    table = doc.add_table(rows=1 + len(rows), cols=len(headers))
-    table.style = "Table Grid"
-    table.alignment = WD_TABLE_ALIGNMENT.CENTER
-
-    # Header row
-    hdr = table.rows[0]
-    hdr.height = Cm(0.9)
-    for i, h in enumerate(headers):
-        cell = hdr.cells[i]
-        cell.text = h
-        cell.paragraphs[0].runs[0].bold = True
-        cell.paragraphs[0].runs[0].font.size = Pt(10)
-        cell.paragraphs[0].runs[0].font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
-        tc = cell._tc
-        tcPr = tc.get_or_add_tcPr()
-        shd = OxmlElement("w:shd")
-        shd.set(qn("w:fill"), "0F172A")
-        shd.set(qn("w:color"), "auto")
-        shd.set(qn("w:val"), "clear")
-        tcPr.append(shd)
-        cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
-
-    # Data rows
-    for r_idx, row_data in enumerate(rows, 1):
-        row = table.rows[r_idx]
-        for c_idx, val in enumerate(row_data):
-            cell = row.cells[c_idx]
-            cell.text = str(val)
-            cell.paragraphs[0].runs[0].font.size = Pt(10)
-            cell.paragraphs[0].runs[0].font.color.rgb = BODY
-
-    # Column widths
-    if col_widths:
-        for i, w in enumerate(col_widths):
-            for row in table.rows:
-                row.cells[i].width = w
-
-    doc.add_paragraph()  # spacing after table
-    return table
-
-def page_break(doc):
-    doc.add_page_break()
-
-def add_signature_block(doc, parties):
-    """parties: [{"name": "Acme Inc.", "title": "CEO"}]"""
-    heading(doc, "Signatures", level=2)
-    table = doc.add_table(rows=3, cols=len(parties) * 2)
-    for i, party in enumerate(parties):
-        col = i * 2
-        table.cell(0, col).text = party["name"]
-        table.cell(1, col).text = party.get("title", "")
-        table.cell(2, col).text = "Date: _______________"
-        table.cell(0, col + 1).text = "Signature: _______________________________"
-
-# ── Document body ─────────────────────────────────────────────────────────────
-
-# Cover page
-styled_para(doc, "STATEMENT OF WORK", bold=True, size=9, color=ACCENT,
-            align=WD_ALIGN_PARAGRAPH.CENTER, space_before=60)
-styled_para(doc, "GTM Engagement — Acme Inc.", bold=True, size=22, color=DARK,
-            align=WD_ALIGN_PARAGRAPH.CENTER, space_before=12, space_after=8)
-styled_para(doc, f"Prepared by Bulldozer  ·  {date.today().strftime('%B %d, %Y')}",
-            size=10, color=MUTED, align=WD_ALIGN_PARAGRAPH.CENTER, space_after=4)
-styled_para(doc, "Confidential", size=9, color=MUTED,
-            align=WD_ALIGN_PARAGRAPH.CENTER)
-page_break(doc)
-
-# Executive Summary
-heading(doc, "Executive Summary")
-styled_para(doc, "This statement of work defines the scope, deliverables, timeline, "
-            "and commercial terms for the GTM engagement between Bulldozer and Acme Inc.")
-for item in [
-    "3-month engagement covering ICP refinement, outbound build, and pipeline activation",
-    "Fixed-fee structure with milestone-based payment",
-    "Weekly check-ins and monthly reporting included",
-]:
-    bullet(doc, item)
-
-# Scope
-heading(doc, "Scope of Work")
-heading(doc, "Deliverables", level=2)
-add_table(doc,
-    headers=["#", "Deliverable", "Description", "Acceptance Criteria"],
-    rows=[
-        ["1", "ICP Definition", "Researched ICP with firmographic and behavioral profiles", "Signed off by client"],
-        ["2", "Outbound Sequence", "5-email cadence per segment", "Delivered in Lemlist"],
-        ["3", "Pipeline Report", "Monthly Excel dashboard", "Shared each month-end"],
-    ],
-    col_widths=[Cm(1.2), Cm(4), Cm(6), Cm(5)]
-)
-
-# Timeline
-heading(doc, "Timeline")
-add_table(doc,
-    headers=["Phase", "Start", "End", "Milestones"],
-    rows=[
-        ["Phase 1: Discovery", "Week 1", "Week 2", "ICP, positioning brief"],
-        ["Phase 2: Build", "Week 3", "Week 8", "Sequences live, first sends"],
-        ["Phase 3: Optimize", "Week 9", "Week 12", "Reporting, handoff"],
-    ],
-    col_widths=[Cm(4), Cm(3), Cm(3), Cm(6.5)]
-)
-
-# Pricing
-heading(doc, "Pricing and Payment")
-add_table(doc,
-    headers=["Item", "Amount", "Due"],
-    rows=[
-        ["Phase 1 — Discovery", "€4,000", "On signature"],
-        ["Phase 2 — Build", "€8,000", "Start of Phase 2"],
-        ["Phase 3 — Optimize", "€4,000", "Start of Phase 3"],
-        ["Total", "€16,000", ""],
-    ],
-    col_widths=[Cm(7), Cm(4), Cm(5.5)]
-)
-
-# Signatures
-page_break(doc)
-add_signature_block(doc, [
-    {"name": "Bulldozer", "title": "Managing Director"},
-    {"name": "Acme Inc.", "title": "CEO"},
-])
-
-# Save
-doc.save("output.docx")
-print("Saved output.docx")
-```
+`run.font.name` sets a font **name string**, not an embedded font — python-docx has no font
+embedding API, and even Word's own embedding feature (File → Options → Save → Embed fonts) is
+never triggered by anything this skill does. Every font named in this template (`Calibri`,
+Word's own default) is safe because it ships with Word and renders identically in Google Docs'
+web view. Naming an actual brand typeface here doesn't fail loudly — it fails silently: the
+reader's machine substitutes its own fallback, the document opens looking like nothing was
+designed at all, and there's no error to catch it. If a brand font is genuinely required,
+that's a PDF job (`pdf-report`, which can embed via WeasyPrint) — not this skill. Don't try to
+route around it with a font name and a hope.
 
 ---
 
 ## Style Rules
 
-- **Always use paragraph styles** — never manually bold/size every paragraph; define helpers at top and reuse
-- **Heading 1** for top-level sections (visible in Word's Navigation pane)
-- **No empty paragraphs** for spacing — use `space_before` / `space_after` on paragraph format
-- **Tables**: always set `table.style = "Table Grid"` so borders show in Google Docs too
-- **Page breaks**: use `doc.add_page_break()`, never multiple `\n`
+The detailed style rules are in `references/style-and-quality.md` (section "Style Rules"). Read them before building the document.
 
 ---
 
 ## Quality Checklist
 
-- [ ] Document opens in Word and Google Docs without layout shifts
-- [ ] All tables have a styled header row
-- [ ] Consistent font sizes (body 10.5pt, h1 16pt, h2 13pt)
-- [ ] Page margins set (2.5cm top/bottom, 2.8cm sides)
-- [ ] Cover page ends with page break
-- [ ] Signature blocks have enough blank space for actual signatures
-- [ ] No raw Python errors — run and confirm `.docx` is created
+The pre-delivery checklist is in `references/style-and-quality.md` (section "Quality Checklist"). Run through it before calling the document done.
+
+---
+
+## Common Mistakes
+
+The list of known pitfalls (colors, language, tables, accessibility) is in `references/style-and-quality.md` (section "Common Mistakes"). Read it when a document looks wrong or before delivering.
+
+---
+
+## Rules
+
+- **One document, one Python script.** Regenerate from the script on every revision — never
+  hand-edit the `.docx` and lose the ability to reproduce it.
+- **Every color used on text passes 4.5:1 against its background.** Check the actual pair used,
+  not just the darkest color on the page — a light card or shaded cell changes the background.
+- **A table with more than a handful of rows repeats its header row.** If you can't tell whether
+  a table will span a page, treat it as if it will.
+- **Every table a client is meant to read gets a Title, not just its images.** The Title is what
+  a screen reader announces before the cells — treat a table without one the same as an image
+  without alt text, not as an optional extra.
+- **Run the script and open the file before calling the document done.** A script that completes
+  without a Python traceback is not the same as a `.docx` that opens cleanly.
+- **Don't invent a python-docx API.** `TableRow` has no `.tblHeader` or `.cant_split` property,
+  `InlineShape` has no `.alt_text`, `Table` has no `.alt_text`/`.title`, `Document` has no
+  `.add_toc`, `Font` has no `.language_id` — when the library has no high-level method for
+  something, it's raw OXML (`OxmlElement`, `docPr.set(...)`) or it doesn't happen. Check the
+  object's real public API before promising a feature it doesn't have.
+- **A property that writes metadata isn't the same as a property that changes behavior.**
+  `core_properties.language` is real and does something — it just doesn't do the thing its name
+  suggests. Verify what a setter actually touches (unzip the output, don't trust the name) before
+  relying on it for anything beyond the metadata field itself.
+- **Word is for what will be edited; PDF is for what won't.** The tell isn't document type, it's
+  what happens next: a proposal the client will redline, a contract they'll counter-sign in, an
+  internal doc a teammate will extend — that's this skill. A report meant to be read once and
+  not touched, where layout has to survive exactly as designed — that's `pdf-report`. Building a
+  Word doc and then fighting to make it *look* uneditable (locked styles, a hand-rolled TOC, a
+  font nobody has) is a sign the output format was the wrong call, not that the document needs
+  more polish.
+- **A table of contents is opt-in, not a length threshold.** Default to none; add one only when
+  asked, and only with the caveat that it opens empty until updated once in Word.
+- **A footer page number is on by default, not opt-in.** It uses the identical raw field-code
+  mechanism as the TOC above, but a `PAGE`/`NUMPAGES` field recalculates itself every time Word
+  opens the file — there's no empty-on-open failure mode to gate behind a caveat, so don't treat
+  it like the TOC.

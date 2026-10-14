@@ -1,11 +1,11 @@
 ---
-name: |
+name: |-
   design-kit
-description: |
+description: |-
   Produce a structured design kit — token system (color, typography, spacing, elevation), component inventory, design file architecture, naming conventions, changelog protocol, and handoff specification. Triggers on 'design kit,' 'design system,' 'component library,' 'Figma setup,' 'brand design tokens,' 'we need a design system,' 'inconsistent UI,' or 'how do we organize Figma.' For brand identity and positioning, see brand-platform. For website design requirements, see website-brief.
-when-to-use: |
+when-to-use: |-
   Produce a structured design kit — token system (color, typography, spacing, elevation), component inventory, design file architecture, naming conventions, changelog protocol, and handoff specification. Triggers on 'design kit,' 'design system,' 'component library,' 'Figma setup,' 'brand design tokens,' 'we need a design system,' 'inconsistent UI,' or 'how do we organize Figma.' For brand identity and positioning, see brand-platform. For website design requirements, see website-brief.
-argument-hint: |
+argument-hint: |-
   Series A SaaS product, 2 designers + 5 engineers. Figma is used but chaotic — 4 different button styles, no shared colors, designers duplicate components manually. Need a proper design kit before onboarding 2 more engineers.
 disable-model-invocation: false
 user-invocable: true
@@ -40,138 +40,25 @@ A `design-kit-{company}.md` file with: token system definition (color, typograph
 
 ### Color Tokens
 
-**Two-tier color system:**
-
-**Tier 1: Primitive colors (raw values)**
-Named by value, not use. These are the color palette's raw material.
-
-```
-color/gray/50: #F9FAFB
-color/gray/100: #F3F4F6
-color/gray/200: #E5E7EB
-...
-color/gray/900: #111827
-
-color/blue/50: #EFF6FF
-...
-color/blue/600: #2563EB (primary brand blue)
-...
-color/blue/900: #1E3A8A
-```
-
-**Tier 2: Semantic tokens (use-based)**
-Named by what they do, not what they look like. These are what components reference.
-
-```
-color/text/primary: → gray/900
-color/text/secondary: → gray/500
-color/text/disabled: → gray/300
-color/text/inverse: → white
-
-color/background/default: → white
-color/background/subtle: → gray/50
-color/background/overlay: → gray/900 at 60% opacity
-
-color/interactive/primary: → blue/600
-color/interactive/primary-hover: → blue/700
-color/interactive/primary-disabled: → blue/300
-
-color/feedback/success: → green/600
-color/feedback/warning: → amber/500
-color/feedback/error: → red/600
-color/feedback/info: → blue/600
-
-color/border/default: → gray/200
-color/border/strong: → gray/400
-color/border/focus: → blue/600
-```
+For the two-tier color system with the full primitive and semantic token lists, read `references/token-reference.md`.
 
 **Rule: Components always reference semantic tokens, never primitive tokens.** If a component references `blue/600` directly instead of `color/interactive/primary`, the component won't update when the brand refreshes the primary color. Reference semantic; define semantic as primitive.
 
+### Implementing tokens in Figma: Variables, not just Styles
+
+For the Figma Variables vs. Styles guidance (collection architecture, code interoperability, sequencing), read `references/token-reference.md`.
+
 ### Typography Tokens
 
-```
-font/family/sans: [your typeface] — stack: "[Font]", system-ui, sans-serif
-font/family/mono: [your mono] — stack: "[MonoFont]", Courier, monospace
-
-font/size/xs: 12px
-font/size/sm: 14px
-font/size/base: 16px
-font/size/lg: 18px
-font/size/xl: 20px
-font/size/2xl: 24px
-font/size/3xl: 30px
-font/size/4xl: 36px
-font/size/5xl: 48px
-
-font/weight/regular: 400
-font/weight/medium: 500
-font/weight/semibold: 600
-font/weight/bold: 700
-
-line-height/tight: 1.2 (for headings)
-line-height/normal: 1.5 (for body text)
-line-height/relaxed: 1.75 (for long-form content)
-```
-
-**Pre-defined text styles (combinations of size + weight + line-height):**
-```
-text-style/heading/h1: 5xl / bold / tight
-text-style/heading/h2: 4xl / bold / tight
-text-style/heading/h3: 3xl / semibold / tight
-text-style/heading/h4: 2xl / semibold / normal
-text-style/body/large: lg / regular / relaxed
-text-style/body/base: base / regular / relaxed
-text-style/body/small: sm / regular / normal
-text-style/label/base: sm / medium / normal
-text-style/caption: xs / regular / normal
-```
+For the typography token scale and pre-defined text styles, read `references/token-reference.md`.
 
 ### Spacing and Layout Tokens
 
-```
-spacing/1: 4px
-spacing/2: 8px
-spacing/3: 12px
-spacing/4: 16px
-spacing/5: 20px
-spacing/6: 24px
-spacing/8: 32px
-spacing/10: 40px
-spacing/12: 48px
-spacing/16: 64px
-spacing/20: 80px
-spacing/24: 96px
-```
-
-**Grid tokens:**
-```
-layout/column-count: 12
-layout/gutter: spacing/6 (24px on desktop)
-layout/margin/sm: spacing/4 (16px on mobile)
-layout/margin/md: spacing/8 (32px on tablet)
-layout/margin/lg: spacing/12 (48px on desktop)
-layout/max-width/content: 1280px
-```
+For the spacing scale and grid tokens, read `references/token-reference.md`.
 
 ### Border Radius and Elevation
 
-```
-radius/none: 0px
-radius/sm: 4px
-radius/base: 6px
-radius/md: 8px
-radius/lg: 12px
-radius/xl: 16px
-radius/full: 9999px (pills)
-
-elevation/0: no shadow
-elevation/1: 0 1px 2px rgba(0,0,0,0.05)
-elevation/2: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06)
-elevation/3: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06)
-elevation/4: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05)
-elevation/5: 0 20px 25px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.04)
-```
+For the radius and elevation scales, read `references/token-reference.md`.
 
 ---
 
@@ -209,35 +96,13 @@ elevation/5: 0 20px 25px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.04)
 - Progress bars and indicators
 - Charts (if applicable — often left to charting library)
 
+**Build the states a real screen needs, not every state the list above allows for.** The state list attached to each component (default, hover, active, disabled, loading) is the full menu of what a component *can* need — not a checklist to clear before it ships. A small ghost button that never disables doesn't need a designed disabled state on day one; add it the first time a real screen calls for it, and log the addition as MINOR (Step 6), not as a gap in v1.0.0. Designing all five states for every variant of every Tier 1 component before anything ships is exactly the kind of work that stalls a design system project in month one instead of getting something usable in front of the team in week one.
+
 ---
 
 ## Step 3: Figma Library Architecture
 
-**File structure:**
-
-```
-📁 Design System (Library file)
-  ├── 📄 _Cover (cover page with version + changelog summary)
-  ├── 📄 Tokens (color primitives, semantic tokens, typography, spacing, elevation, radius)
-  ├── 📄 Icons (all icons as components, organized by category)
-  ├── 📄 Tier 1 Components (Foundation)
-  ├── 📄 Tier 2 Components (Layout)
-  ├── 📄 Tier 3 Components (Feedback)
-  ├── 📄 Tier 4 Components (Data Display)
-  └── 📄 Patterns (composite patterns: forms, empty states, onboarding flows)
-
-📁 Product Files (consume the library)
-  ├── 📄 [Feature Area 1]
-  ├── 📄 [Feature Area 2]
-  └── 📄 ...
-```
-
-**Library publishing:** Publish the Design System file as a shared library. All product files enable this library. When a component updates in the library, product files receive an update notification and choose to accept.
-
-**Separate libraries for scale:** When the design system grows beyond 200 components, split into:
-- Foundation library (tokens, base components)
-- Product library (product-specific patterns that compose foundation components)
-- Marketing library (landing page components, separate from product UI)
+For the library file structure, publishing and the foundation/product/marketing library split, read `references/figma-library-and-naming.md`.
 
 ---
 
@@ -247,22 +112,13 @@ elevation/5: 0 20px 25px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.04)
 
 **Pattern: `[Category] / [Component] / [Variant] / [State]`**
 
-Examples:
-- `Button / Primary / Large / Default`
-- `Button / Primary / Large / Hover`
-- `Button / Primary / Large / Disabled`
-- `Input / Text / Default / Default`
-- `Input / Text / Default / Error`
-- `Badge / Status / Success`
-- `Badge / Status / Warning`
-- `Icon / Navigation / Home`
-- `Icon / Actions / Plus`
-
 **Rules:**
 - Title Case for every segment
 - No abbreviations unless they're universal (e.g., "CTA" is OK, "btn" is not)
 - Variant names match code prop names: `Primary` in Figma = `variant="primary"` in code
 - State names match CSS/code states: `Hover`, `Active`, `Disabled`, `Focus`
+
+For naming examples, what the pattern actually names (one component set, not one layer per state) and the Slot property type, read `references/figma-library-and-naming.md`.
 
 ---
 
@@ -274,21 +130,59 @@ Examples:
 1. **Usage documentation:** When to use this component, when NOT to use it, common mistakes
 2. **Prop table:** Every configurable prop with its type, default value, and accepted values
 3. **Token references:** Which tokens this component uses (maps to CSS variables / design tokens in code)
-4. **Accessibility requirements:** ARIA roles, keyboard navigation, focus behavior, color contrast compliance (WCAG 2.1 AA minimum)
+4. **Accessibility requirements:** ARIA roles, keyboard navigation, focus behavior, color contrast (WCAG 2.2 AA — the most complete published reference today; it's additive over 2.1 AA, not a replacement, so anything already meeting 2.1 AA still needs the criteria 2.2 added, including target size). For any interactive component (button, checkbox, radio, toggle), also record its minimum hit area: WCAG 2.2's SC 2.5.8 sets **24×24 CSS px** as the AA floor (with a spacing exception), not 44×44 — that larger figure is Apple's own HIG guidance or the optional AAA tier, useful as a stretch target but not the compliance minimum. State both in the spec so nobody downsizes a "sm" button below the real floor while chasing a stricter number that was never required. For any component that can stay visible on top of other content (Modal/Dialog, Drawer/Sidebar, Toast/Notification — Tiers 2–3, Step 2), record which side of WCAG 2.2's SC 2.4.11 Focus Not Obscured (Minimum) it lands on: a Modal built to trap keyboard focus inside itself already satisfies it by construction, but a Drawer or Toast that stays open without trapping focus does not — if it can sit over a focusable element in the page behind it while that element still has focus, that's a real failure, not an edge case to write up later.
 5. **Do/Don't examples:** Side-by-side correct and incorrect usage
 
-**Handoff format (add to component description in Figma or link to external doc):**
-```
-Component: Button
-Usage: Use for primary actions. One primary button per view — use secondary or ghost for additional actions.
-Do NOT use: As a navigation element (use Link instead); more than 1 primary button per modal
-Props: variant (primary|secondary|ghost|danger), size (sm|base|lg), disabled (bool), loading (bool), icon (left|right|none)
-Tokens: color/interactive/primary, font/size/sm, spacing/3, radius/base
-Accessibility: role=button, aria-disabled when disabled, aria-busy when loading, keyboard: Enter/Space to activate
-```
+For contrast measurement against the real pairing and the per-component handoff format with a Button example, read `references/handoff-format.md`.
 
 ---
 
 ## Step 6: Changelog and Maintenance Protocol
 
-**A design system without 
+**A design system without a changelog decays quietly.** Components get edited in place, nobody can say which product files are still on the old version, and "did this button always look like this?" turns into a recurring Slack thread instead of a two-line answer.
+
+For versioning rules, the changelog format, the deprecation protocol, governance (who can change what) and update cadence, read `references/changelog-and-governance.md`.
+
+---
+
+## Step 7: Build Sequence
+
+**Bring the six steps together in an order that produces something usable at every stage, not only at the end.** A design system that's only adoptable once fully built never gets adopted — the team has already built its own workarounds by then.
+
+**Phase 1 — Foundation**
+- Tokens (Step 1): color, typography, spacing, radius, elevation. Nothing else can be built correctly without these existing first.
+- Figma file structure (Step 3): create the Design System file with its full page structure, even with empty pages — the structure is the commitment, not a detail to add later.
+- Naming convention (Step 4) agreed and written down before the first component exists. Renaming twenty components after the fact costs far more than a naming discussion up front.
+
+**Phase 2 — Tier 1 components**
+- Button, Input, Checkbox, Radio, Toggle, Badge, Avatar, Icon system, built with full state coverage (Step 2) and published as the library's first version — v1.0.0 under the Step 6 protocol.
+- Handoff spec (Step 5) written per component as it's built, not retrofitted once the library has grown too large to document from memory.
+
+**Phase 3 — Tier 2 and Tier 3**
+- Layout components (Card, Modal, Navigation, Tabs), then feedback components (Alert, Toast, Tooltip).
+- Rebuild one real product screen using only library components. This is the actual test of the system so far: if the screen needs even one one-off custom element, a Tier 1 or Tier 2 gap was missed, not a Tier 4 one.
+
+**Ongoing**
+- Tier 4 (data display) components get built when the product needs them, not speculatively. A date picker built before any feature calls for one is usually rebuilt anyway once the real requirement shows up.
+- Changelog and governance (Step 6) apply from v1.0.0 onward — retrofitting a versioning discipline onto a library that's already sprawling is a much larger job than starting with it.
+
+**Starting from an existing informal system:** don't start from a blank file. Inventory what's already there — every button variant currently used across product files — and use that inventory to decide which existing pattern becomes the canonical Tier 1 component. Migrating four existing button styles into one canonical component, with a deprecation path (Step 6), is faster than designing a fifth version nobody asked for. If a Figma connector is available in this environment, use it to read the existing file's structure and components before inventorying by eye — but check what that connector account can actually do first: read access (listing libraries, pulling a node's structure) works regardless of the connected account's Figma seat, while creating or editing the library file itself requires an editor seat on that account, not just a working connector. Don't assume the write path is open; confirm it.
+
+**Don't hold v1.0.0 for a perfect reconciliation of every historical variant.** When the existing system has several divergent versions of the same component, pick the one closest to where the product is actually heading, ship it as the canonical Tier 1 component, and route the others through the Step 6 deprecation protocol as usage turns up in the inventory. Chasing one merged version that satisfies every legacy variant before publishing anything delays the one thing that actually proves the system: rebuilding a real screen with it.
+
+---
+
+## Common Mistakes
+
+For the list of common mistakes to check a kit against before delivery, read `references/common-mistakes.md`.
+
+---
+
+## Rules
+
+- **Tokens before components, always.** A component built against a hardcoded color value has to be found and fixed by hand when the brand changes; one built against a semantic token updates on its own.
+- **Reference semantic tokens inside a component, never primitives.** This single rule decides whether a rebrand takes an afternoon or two weeks of hunting through files.
+- **Build in Tier order, not in the order a screen happens to need components.** A request for a date picker in week one doesn't make Tier 1 optional — Tier 4 without Tier 1 underneath it collapses on the second component built.
+- **Never delete a component — deprecate it.** Removing one without a deprecation window breaks whatever product file was still referencing it, silently and without warning.
+- **The library only proves itself on a real screen.** A token and component system that hasn't rebuilt one actual product screen end-to-end is a specification, not a working system yet.
+- **Publish in batches, not on every edit.** Every publish interrupts every designer's file with an update notification — spend that interruption deliberately, not by habit.
