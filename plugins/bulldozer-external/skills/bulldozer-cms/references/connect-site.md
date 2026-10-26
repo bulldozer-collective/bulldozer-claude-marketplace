@@ -19,9 +19,20 @@
    `bdzSearchCmsSites` with the same fields only checks the credential without connecting.
 3. Keep `site.id`. `externalId` is the normalised `host[/path]`.
 
-Common 400s: `http://` URL, a port other than 443, a URL with a query, a host resolving to a private address.
-A 409 right away on a valid password usually means the host strips the `Authorization` header (some cheap shared
-hostings, security plugins): the user must fix it on their side.
+Connecting is also a diagnosis: if the site refuses, the tool answers **400 with a message that names the fix**.
+Relay that message to the user as is — do not guess another cause. The cases it covers:
+
+| Message says | Fix on the user's side |
+|---|---|
+| no REST API answers at `…/wp-json/` | wrong URL, or a plugin / the host disabled the REST API |
+| application passwords are not available / disabled | re-enable them in the security plugin (Wordfence, Solid Security…) or ask the host; WordPress must also detect HTTPS |
+| WordPress received no credential … `.htaccess` | the host strips the `Authorization` header: add the quoted `SetEnvIf` line to `.htaccess` (or ask the host) |
+| rejected the application password | they pasted the login password, or a password of another user |
+| no user with this username | wrong username |
+| lacks `edit_pages`, … | connect with an Editor or Administrator account |
+
+Other 400s are about the URL itself: `http://`, a port other than 443, a query string, a private address.
+Run `bdzSearchCmsSites` with the same fields to re-test after the user's fix without connecting.
 
 ## Reconnect (409 on a connected site)
 

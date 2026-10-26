@@ -107,7 +107,7 @@ A 501 means the provider has no equivalent: say so plainly and, if relevant, tel
 
 | Status | Meaning | Action |
 |---|---|---|
-| 400 | invalid input; the message names the field | fix and retry |
+| 400 | invalid input; the message names the field. On a WordPress connection, the message names the fix to apply on the site | fix and retry; relay WordPress connection messages as is |
 | 403 | Webflow plan lacks the feature (Enterprise, Analyze) | tell the user; no retry |
 | 404 | unknown `siteId` / page / item / collection | re-list |
 | 409 | credential revoked or too weak (scope, WordPress role) — or a duplicate slug / attachment | reconnect via [connect-site](references/connect-site.md), or change the slug |
