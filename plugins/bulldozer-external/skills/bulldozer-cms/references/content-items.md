@@ -42,6 +42,20 @@ Give the user the item `id` and its content; on WordPress the draft is visible i
 `bdzDeleteCmsItem` — Webflow: deletes the staged item. WordPress: moves it to the trash (restorable in wp-admin).
 Confirm with the user first.
 
+## Multilingual sites
+
+**Webflow** — an item has the **same id in every language**; each tool targets one language through `cmsLocaleId`.
+
+1. `bdzGetCmsSite(siteId)` → `locales[]`: take the `cmsLocaleId` of the wanted language (match `tag` / `displayName`).
+   Not `localeId` — that one is for pages and assets.
+2. Pass the **same** `cmsLocaleId` to `bdzListCmsItems`, then `bdzUpdateCmsItem` (merge the `fieldData` read in that
+   language), then `bdzPublishCmsItems`.
+3. Omitting `cmsLocaleId` always means the **primary** language: an update without it overwrites the primary
+   version, not the one you read. `bdzDeleteCmsItem` with a locale removes that language only.
+
+**WordPress** — no locales (`locales` is empty). With Polylang / WPML each translation is a separate item with its
+own id: find it with `bdzListCmsItems` and address it by that id. Sending `cmsLocaleId` is a 400.
+
 ## Webflow only: new collection / field
 
 `bdzCreateCmsCollection` / `bdzCreateCmsCollectionField` — **irreversible** (no delete via API). Confirm the
