@@ -15,6 +15,10 @@
 #
 set -uo pipefail
 
+# git passe le nom du remote en $1 : on n'annonce que les push vers origin.
+# Lance a la main sans argument, on considere que c'est origin.
+[[ "${1:-origin}" == "origin" ]] || exit 0
+
 REPO="$(git rev-parse --show-toplevel)"
 MANIFEST="plugins/bulldozer-external/.claude-plugin/plugin.json"
 SKILLS_DIR="plugins/bulldozer-external/skills"
