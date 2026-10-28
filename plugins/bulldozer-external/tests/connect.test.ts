@@ -61,3 +61,22 @@ test('prefers its own server to one Desktop names by id', async ($, on) => {
   for (let i = 0; i < 2000; i++) await Promise.resolve()
   expect([...new Set(servers)]).toEqual(['plugin_bulldozer_bulldozer'])
 })
+
+test('shows the text of a failure the server sends as plain text', async ($, on) => {
+  const statuses: string[] = []
+  on('tool.list', async () => ({ value: [{ name: 'mcp__plugin_bulldozer_bulldozer__bdzListUserProjectMemberships', description: '', mcp: true }] }))
+  onCalls(on, async () => ({ result: null, text: 'Error: session expired, sign in again' }))
+  on('fs.exists', async () => ({ value: true }))
+  on('fs.read', async () => ({ value: '{"customerId":"c1","projectId":"p1"}' }))
+  on('session.surfaces', async () => ({ value: ['desktop'] }))
+  on('ui.open', async () => ({ value: { isPlaced: true } }))
+  on('session.start', async ($: any, e: any) => e)
+  on('command.register', async () => ({ value: {} }))
+  on('ui.status', async ($: any, e: any) => { statuses.push(e.text); return { value: undefined } })
+  on('clock.now', async () => ({ value: 0 }))
+  on('clock.after', async ($: any, e: any) => { e.fn?.(); return { value: {} } })
+  on('clock.every', () => new Promise(() => {}))
+  await $.session.start({ cwd: '/tmp', source: 'startup' } as any)
+  for (let i = 0; i < 4000; i++) await Promise.resolve()
+  expect(statuses.at(-1)).toContain('session expired, sign in again')
+})

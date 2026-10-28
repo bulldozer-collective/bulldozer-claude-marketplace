@@ -5,4 +5,4 @@ metadata:
   forge: disabled
 ---
 
-Dernière version disponible du plugin Bulldozer : **1.8.1**
+Dernière version disponible du plugin Bulldozer : **1.8.2**

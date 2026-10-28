@@ -190,7 +190,15 @@ async function call($: $, tool: string, args: Json = {}): Promise<Json> {
     throw new Error(`${tool}: ${text.slice(0, 200)}`)
   }
 
-  return (result.structuredContent as Json | undefined) ?? JSON.parse(text || '{}')
+  if (result.structuredContent) {
+    return result.structuredContent as Json
+  }
+  // Some failures come back as plain text ("Error: …") without isError: show that text, not a parse error.
+  try {
+    return JSON.parse(text || '{}')
+  } catch {
+    throw new Error(`${tool}: ${text.slice(0, 200)}`)
+  }
 }
 
 // A list arrives either bare under its key or as a ResponsePage under it.
