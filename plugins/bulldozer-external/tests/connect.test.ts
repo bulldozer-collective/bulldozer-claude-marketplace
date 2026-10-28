@@ -40,3 +40,24 @@ test('uses its own connection once connected', async ($, on) => {
   console.log('SERVERS', [...new Set(servers)].join(','))
   expect(servers[0]).toBe('plugin_bulldozer_bulldozer')
 })
+
+test('prefers its own server to one Desktop names by id', async ($, on) => {
+  const servers: string[] = []
+  on('tool.list', async () => ({ value: [{ name: 'mcp__38277b6f-b0fb-4908-b7b9-305c747db1da__bdzListUserProjectMemberships', description: '', mcp: true }] }))
+  on('mcp.connect', async () => ({ value: { isConnected: true, server: 'plugin:bulldozer:bulldozer' } }))
+  onCalls(on, async ($: any, e: any) => {
+    servers.push(e.tool.split('__')[1])
+    const body = e.tool.endsWith('__bdzListUserProjectMemberships') ? { memberships: [{ customerId: 'c1', userId: 'u1', project: { id: 'p1', name: 'P' }, company: { id: 'co', name: 'C', logoUrl: null } }] } : {}
+    return { result: body, text: JSON.stringify(body) }
+  })
+  on('fs.exists', async () => ({ value: true }))
+  on('fs.read', async () => ({ value: '{"customerId":"c1","projectId":"p1"}' }))
+  on('session.surfaces', async () => ({ value: [] }))
+  on('session.start', async ($: any, e: any) => e)
+  on('command.register', async () => ({ value: {} }))
+  on('ui.status', async () => ({ value: undefined }))
+  on('clock.now', async () => ({ value: 0 }))
+  await $.session.start({ cwd: '/tmp', source: 'startup' } as any)
+  for (let i = 0; i < 2000; i++) await Promise.resolve()
+  expect([...new Set(servers)]).toEqual(['plugin_bulldozer_bulldozer'])
+})

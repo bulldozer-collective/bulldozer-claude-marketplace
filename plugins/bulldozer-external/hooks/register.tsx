@@ -134,26 +134,32 @@ let connectProblem: string | null = null
 
 const toolSpelling = (name: string) => name.replace(/[^\w-]/g, '_')
 
-// $.mcp.call only reaches tools in the list the mod sees. The bulldozer plugin's server may be absent from it
-// (not connected yet, or run by Desktop outside the mod's reach): the mod then connects its own copy.
+// $.mcp.call only reaches tools in the list the mod sees. A server named after Bulldozer comes first: the user's
+// own `bulldozer`, this plugin's, or the claude.ai connector (the session hides the others at the same URL).
+// Desktop may name servers by id instead: the plugin's own server is then asked for by its key, and any other
+// server serving Bulldozer tools is the last resort (a claude.ai connector there may face the auto mode classifier).
 async function discoverServer($: $): Promise<boolean> {
-  const servers = new Set<string>()
+  const servers: string[] = []
   for (const t of await $.tool.list()) {
     const match = t.mcp ? BULLDOZER_TOOL.exec(t.name) : null
-    if (match?.[1]) {
-      servers.add(match[1])
+    if (match?.[1] && !servers.includes(match[1])) {
+      servers.push(match[1])
     }
   }
-  const own = `plugin_${toolSpelling($.plugin.name)}_${OWN_SERVER_KEY}`
-  const other = [...servers].find(name => name !== own)
-  if (other ?? servers.has(own)) {
-    server = other ?? own
+  const named = servers.find(name => /bulldozer/i.test(name))
+  if (named) {
+    server = named
     connectProblem = null
     return true
   }
   const connected = await $.mcp.connect(OWN_SERVER_KEY)
   if (connected.isConnected) {
     server = connected.server
+    connectProblem = null
+    return true
+  }
+  if (servers[0]) {
+    server = servers[0]
     connectProblem = null
     return true
   }
