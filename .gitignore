@@ -2,4 +2,5 @@ PROJECT_CONTEXT_INIT.md
 .claude
 __pycache__/
 .slack-release.env
+.slack-release.env.off
 plugins/bulldozer-mod/.claude-plugin/types/
