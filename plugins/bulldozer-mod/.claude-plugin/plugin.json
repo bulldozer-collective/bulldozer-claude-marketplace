@@ -1,0 +1,9 @@
+{
+  "name": "bulldozer-mod",
+  "description": "Projet Bulldozer actif, sélecteurs de projet et d'ad accounts, confirmation des écritures Ads",
+  "version": "0.1.0",
+  "author": {
+    "name": "Bulldozer"
+  },
+  "types": "./types/index.d.ts"
+}

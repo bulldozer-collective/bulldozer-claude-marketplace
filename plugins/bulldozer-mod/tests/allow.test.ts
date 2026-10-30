@@ -36,15 +36,15 @@ test('offers to allow the reads while a rule is missing and merges the missing o
   await $.session.start({ cwd: '/tmp', source: 'startup' } as any)
   for (let i = 0; i < 2000; i++) await Promise.resolve()
 
-  const ui = await $.ui.mount({ plugin: 'bulldozer', surface: 'desktop', component: 'Pane', requestId: 'bdz-project', props: {} as any })
+  const ui = await $.ui.mount({ plugin: 'bulldozer-mod', surface: 'desktop', component: 'Pane', requestId: 'bdz-project', props: {} as any })
   const buttons = (await ui.findAll({ type: 'Button' } as any)).map((b: any) => b.props.label)
   expect(buttons).toContain('Autoriser les lectures du panneau')
 
-  await $.ui.press({ plugin: 'bulldozer', key: 'allow-reads' } as any)
+  await $.ui.press({ plugin: 'bulldozer-mod', key: 'allow-reads' } as any)
   const confirm = (await ui.findAll({ type: 'Button' } as any)).map((b: any) => b.props.label)
   expect(confirm).toContain('Oui, autoriser')
   expect(writes.length).toBe(0)
-  await $.ui.press({ plugin: 'bulldozer', key: 'allow-reads-yes' } as any)
+  await $.ui.press({ plugin: 'bulldozer-mod', key: 'allow-reads-yes' } as any)
   for (let i = 0; i < 2000; i++) await Promise.resolve()
   const written = writes.find(w => w.path === '/home/x/.claude/settings.json')
   expect(written).toBeTruthy()

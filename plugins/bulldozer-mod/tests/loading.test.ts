@@ -21,10 +21,10 @@ test('shows the animated splash while ↻ reloads, then the content', async ($, 
   on('clock.now', async () => ({ value: 0 }))
   await $.session.start({ cwd: '/tmp', source: 'startup' } as any)
   for (let i = 0; i < 2000; i++) await Promise.resolve()
-  const ui = await $.ui.mount({ plugin: 'bulldozer', surface: 'desktop', component: 'Pane', requestId: 'bdz-project', props: {} as any })
+  const ui = await $.ui.mount({ plugin: 'bulldozer-mod', surface: 'desktop', component: 'Pane', requestId: 'bdz-project', props: {} as any })
   const texts = async () => (await ui.findAll({ type: 'Svg' } as any)).map((t: any) => t.props.alt)
   isHeld = true
-  const pressed = $.ui.press({ plugin: 'bulldozer', key: 'refresh' } as any)
+  const pressed = $.ui.press({ plugin: 'bulldozer-mod', key: 'refresh' } as any)
   for (let i = 0; i < 200; i++) await Promise.resolve()
   const during = await texts()
   const splash = (await ui.findAll({ type: 'Svg' } as any)).find((s: any) => s.props.alt === 'Bulldozer OS') as any
@@ -53,7 +53,7 @@ test('the splash stays up after the sidebar opens until its timer fires, even wi
   on('clock.after', () => new Promise(resolve => { fire = () => resolve({ value: {} }) }))
   await $.session.start({ cwd: '/tmp', source: 'startup' } as any)
   for (let i = 0; i < 2000; i++) await Promise.resolve()
-  const ui = await $.ui.mount({ plugin: 'bulldozer', surface: 'desktop', component: 'Pane', requestId: 'bdz-project', props: {} as any })
+  const ui = await $.ui.mount({ plugin: 'bulldozer-mod', surface: 'desktop', component: 'Pane', requestId: 'bdz-project', props: {} as any })
   const hasSplash = async () => (await ui.findAll({ type: 'Svg' } as any)).some((s: any) => s.props.alt === 'Bulldozer OS')
   expect(await hasSplash()).toBe(true)
   fire()

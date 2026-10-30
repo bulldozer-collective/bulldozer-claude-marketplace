@@ -108,7 +108,7 @@ export type AdSelection = { META: string | null; LINKEDIN: string | null; GOOGLE
 
 declare module 'claude-code' {
   interface PluginState {
-    'bulldozer': {
+    'bulldozer-mod': {
       memberships: Membership[]
       active: Active | null
       error: string | null

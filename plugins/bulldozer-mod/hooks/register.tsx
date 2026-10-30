@@ -14,32 +14,32 @@ const PROJECT_PANE = 'bdz-project'
 // The objectives in full, opened from the sidebar as a dialog: focused, Escape closes it.
 const OBJECTIVES_PANE = 'bdz-objectives'
 
-const memberships = atom({ plugin: 'bulldozer', key: 'memberships' } as const, [])
-const active = atom({ plugin: 'bulldozer', key: 'active' } as const, null)
-const error = atom({ plugin: 'bulldozer', key: 'error' } as const, null)
+const memberships = atom({ plugin: 'bulldozer-mod', key: 'memberships' } as const, [])
+const active = atom({ plugin: 'bulldozer-mod', key: 'active' } as const, null)
+const error = atom({ plugin: 'bulldozer-mod', key: 'error' } as const, null)
 // The active client's logo as a data: URI, drawn by the Desktop sidebar.
-const clientLogo = atom({ plugin: 'bulldozer', key: 'clientLogo' } as const, null)
-const adAccounts = atom({ plugin: 'bulldozer', key: 'adAccounts' } as const, [])
+const clientLogo = atom({ plugin: 'bulldozer-mod', key: 'clientLogo' } as const, null)
+const adAccounts = atom({ plugin: 'bulldozer-mod', key: 'adAccounts' } as const, [])
 const NO_SELECTION: AdSelection = { META: null, LINKEDIN: null, GOOGLE_ADS: null }
-const adSelection = atom({ plugin: 'bulldozer', key: 'adSelection' } as const, NO_SELECTION)
+const adSelection = atom({ plugin: 'bulldozer-mod', key: 'adSelection' } as const, NO_SELECTION)
 // Targets the user already confirmed this session, as `${projectId}|${platform}|${account}`.
-const confirmedTargets = atom({ plugin: 'bulldozer', key: 'confirmedTargets' } as const, [])
+const confirmedTargets = atom({ plugin: 'bulldozer-mod', key: 'confirmedTargets' } as const, [])
 // Subscription, objectives, connectors and last imports of the active project, for the Desktop sidebar.
-const projectInfo = atom({ plugin: 'bulldozer', key: 'projectInfo' } as const, null)
-const needsPermission = atom({ plugin: 'bulldozer', key: 'needsPermission' } as const, false)
-const isConfirmingAllow = atom({ plugin: 'bulldozer', key: 'isConfirmingAllow' } as const, false)
-const isLoading = atom({ plugin: 'bulldozer', key: 'isLoading' } as const, false)
-const isSplashing = atom({ plugin: 'bulldozer', key: 'isSplashing' } as const, false)
-const isSwitching = atom({ plugin: 'bulldozer', key: 'isSwitching' } as const, false)
-const isSplashShown = atom({ plugin: 'bulldozer', key: 'isSplashShown' } as const, false)
-const activeTab = atom({ plugin: 'bulldozer', key: 'activeTab' } as const, 'projet')
-const perf = atom({ plugin: 'bulldozer', key: 'perf' } as const, null)
-const health = atom({ plugin: 'bulldozer', key: 'health' } as const, null)
-const jobs = atom({ plugin: 'bulldozer', key: 'jobs' } as const, null)
-const hostings = atom({ plugin: 'bulldozer', key: 'hostings' } as const, null)
-const hostingQuery = atom({ plugin: 'bulldozer', key: 'hostingQuery' } as const, null)
-const hostingLinks = atom({ plugin: 'bulldozer', key: 'hostingLinks' } as const, {})
-const writeLog = atom({ plugin: 'bulldozer', key: 'writeLog' } as const, [])
+const projectInfo = atom({ plugin: 'bulldozer-mod', key: 'projectInfo' } as const, null)
+const needsPermission = atom({ plugin: 'bulldozer-mod', key: 'needsPermission' } as const, false)
+const isConfirmingAllow = atom({ plugin: 'bulldozer-mod', key: 'isConfirmingAllow' } as const, false)
+const isLoading = atom({ plugin: 'bulldozer-mod', key: 'isLoading' } as const, false)
+const isSplashing = atom({ plugin: 'bulldozer-mod', key: 'isSplashing' } as const, false)
+const isSwitching = atom({ plugin: 'bulldozer-mod', key: 'isSwitching' } as const, false)
+const isSplashShown = atom({ plugin: 'bulldozer-mod', key: 'isSplashShown' } as const, false)
+const activeTab = atom({ plugin: 'bulldozer-mod', key: 'activeTab' } as const, 'projet')
+const perf = atom({ plugin: 'bulldozer-mod', key: 'perf' } as const, null)
+const health = atom({ plugin: 'bulldozer-mod', key: 'health' } as const, null)
+const jobs = atom({ plugin: 'bulldozer-mod', key: 'jobs' } as const, null)
+const hostings = atom({ plugin: 'bulldozer-mod', key: 'hostings' } as const, null)
+const hostingQuery = atom({ plugin: 'bulldozer-mod', key: 'hostingQuery' } as const, null)
+const hostingLinks = atom({ plugin: 'bulldozer-mod', key: 'hostingLinks' } as const, {})
+const writeLog = atom({ plugin: 'bulldozer-mod', key: 'writeLog' } as const, [])
 
 const OBJECTIVE_LABELS: Record<string, string> = {
   PROJECT_OBJECTIVE_TYPE_COMPANY_PURPOSE: 'Raison d\'être',

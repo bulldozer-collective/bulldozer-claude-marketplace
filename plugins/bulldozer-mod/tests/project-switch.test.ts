@@ -39,14 +39,14 @@ test('a project switch replaces the previous ad accounts with the new project\'s
   on('clock.now', async () => ({ value: 0 }))
   await $.session.start({ cwd: '/tmp', source: 'startup' } as any)
   for (let i = 0; i < 2000; i++) await Promise.resolve()
-  const ui = await $.ui.mount({ plugin: 'bulldozer', surface: 'desktop', component: 'Pane', requestId: 'bdz-project', props: {} as any })
+  const ui = await $.ui.mount({ plugin: 'bulldozer-mod', surface: 'desktop', component: 'Pane', requestId: 'bdz-project', props: {} as any })
   // The Paid tab holds the ad account selectors.
-  await $.ui.press({ plugin: 'bulldozer', key: 'tab-paid' } as any)
+  await $.ui.press({ plugin: 'bulldozer-mod', key: 'tab-paid' } as any)
   for (let i = 0; i < 2000; i++) await Promise.resolve()
   const metaValue = async () => ((await ui.findAll({ type: 'Select' } as any)).find((s: any) => s.props.key === 'ad-META') as any)?.props.value
   expect(await metaValue()).toBe('meta-p1')
 
-  await $.ui.select({ plugin: 'bulldozer', key: 'project', value: 'c2:p2' } as any)
+  await $.ui.select({ plugin: 'bulldozer-mod', key: 'project', value: 'c2:p2' } as any)
   for (let i = 0; i < 2000; i++) await Promise.resolve()
   console.log('CONFIG', JSON.stringify(config))
   expect(config.projectId).toBe('p2')
@@ -57,7 +57,7 @@ test('a project switch replaces the previous ad accounts with the new project\'s
 
   // An id another project left behind is replaced by the account the selector shows.
   config = { ...config, ads: { adAccount: { META: { id: 'meta-p1', name: 'Bulldozer' } } } }
-  await $.ui.press({ plugin: 'bulldozer', key: 'refresh' } as any)
+  await $.ui.press({ plugin: 'bulldozer-mod', key: 'refresh' } as any)
   for (let i = 0; i < 2000; i++) await Promise.resolve()
   expect(await metaValue()).toBe('meta-p2')
   expect(config.ads.adAccount.META).toEqual({ id: 'meta-p2', name: 'Mooncard' })
@@ -88,14 +88,14 @@ test('a project switch shows the splash until the new project is loaded', async 
   on('clock.now', async () => ({ value: 0 }))
   await $.session.start({ cwd: '/tmp', source: 'startup' } as any)
   for (let i = 0; i < 2000; i++) await Promise.resolve()
-  const ui = await $.ui.mount({ plugin: 'bulldozer', surface: 'desktop', component: 'Pane', requestId: 'bdz-project', props: {} as any })
+  const ui = await $.ui.mount({ plugin: 'bulldozer-mod', surface: 'desktop', component: 'Pane', requestId: 'bdz-project', props: {} as any })
   // The Paid tab holds the ad account selectors.
-  await $.ui.press({ plugin: 'bulldozer', key: 'tab-paid' } as any)
+  await $.ui.press({ plugin: 'bulldozer-mod', key: 'tab-paid' } as any)
   for (let i = 0; i < 2000; i++) await Promise.resolve()
   const hasSplash = async () => (await ui.findAll({ type: 'Svg' } as any)).some((s: any) => s.props.alt === 'Bulldozer OS')
   expect(await hasSplash()).toBe(false)
 
-  const selected = $.ui.select({ plugin: 'bulldozer', key: 'project', value: 'c2:p2' } as any)
+  const selected = $.ui.select({ plugin: 'bulldozer-mod', key: 'project', value: 'c2:p2' } as any)
   for (let i = 0; i < 2000; i++) await Promise.resolve()
   expect(await hasSplash()).toBe(true)
   release()

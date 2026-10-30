@@ -10,6 +10,11 @@
       "name": "bulldozer",
       "source": "./plugins/bulldozer-external",
       "description": "Adds MCP servers, skills and agents from Bulldozer"
+    },
+    {
+      "name": "bulldozer-mod",
+      "source": "./plugins/bulldozer-mod",
+      "description": "Projet Bulldozer actif, sélecteurs de projet et d'ad accounts, confirmation des écritures Ads"
     }
   ]
 }

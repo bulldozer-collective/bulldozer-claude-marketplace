@@ -48,9 +48,9 @@ test('the sidebar follows bulldozer.json changed by any tool or outside Claude, 
   on('clock.every', () => new Promise(resolve => { tick = () => resolve({ value: {} }) }))
   await $.session.start({ cwd: '/tmp', source: 'startup' } as any)
   await settle()
-  const ui = await $.ui.mount({ plugin: 'bulldozer', surface: 'desktop', component: 'Pane', requestId: 'bdz-project', props: {} as any })
+  const ui = await $.ui.mount({ plugin: 'bulldozer-mod', surface: 'desktop', component: 'Pane', requestId: 'bdz-project', props: {} as any })
   // The Paid tab holds the ad account selectors.
-  await $.ui.press({ plugin: 'bulldozer', key: 'tab-paid' } as any)
+  await $.ui.press({ plugin: 'bulldozer-mod', key: 'tab-paid' } as any)
   for (let i = 0; i < 2000; i++) await Promise.resolve()
   const selectValue = async (key: string) => ((await ui.findAll({ type: 'Select' } as any)).find((s: any) => s.props.key === key) as any)?.props.value
   expect(await selectValue('ad-META')).toBe('meta-a')
@@ -72,7 +72,7 @@ test('the sidebar follows bulldozer.json changed by any tool or outside Claude, 
   const before = accountLists
   tick()
   await settle()
-  await $.ui.select({ plugin: 'bulldozer', key: 'ad-META', value: 'meta-p2' } as any)
+  await $.ui.select({ plugin: 'bulldozer-mod', key: 'ad-META', value: 'meta-p2' } as any)
   tick()
   await settle()
   expect(accountLists).toBe(before)
