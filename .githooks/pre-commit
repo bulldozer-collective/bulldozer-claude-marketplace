@@ -10,7 +10,7 @@ version=$(git show ":$manifest" | python3 -c 'import json,sys; print(json.load(s
 line="Dernière version disponible du plugin Bulldozer : **$version**"
 
 if [ -f "$server_yml" ]; then
-  sed -i "/Use the skill \`bulldozer-version\`/s/\*\*[0-9.]*\*\*/**$version**/" "$server_yml"
+  sed -i "/[Uu]se the skill \`bulldozer-version\`/s/\*\*[0-9.]*\*\*/**$version**/" "$server_yml"
 fi
 
 grep -qxF "$line" "$skill" && exit 0
