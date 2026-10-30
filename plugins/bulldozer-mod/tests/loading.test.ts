@@ -42,8 +42,8 @@ test('the splash stays up after the sidebar opens until its timer fires, even wi
   let fire: () => void = () => {}
   on('tool.list', async () => ({ value: [{ name: 'mcp__plugin_bulldozer_bulldozer__bdzListUserProjectMemberships', description: '', mcp: true }] }))
   onCalls(on, async () => ({ result: {}, text: '{}' }))
-  on('fs.exists', async () => ({ value: false }))
-  on('fs.read', async () => ({ value: '<svg xmlns="http://www.w3.org/2000/svg"/>' }))
+  on('fs.exists', async ($: any, e: any) => ({ value: String(e.path).endsWith('bulldozer.json') }))
+  on('fs.read', async ($: any, e: any) => ({ value: String(e.path).endsWith('.svg') ? '<svg xmlns="http://www.w3.org/2000/svg"/>' : '{}' }))
   on('session.surfaces', async () => ({ value: ['desktop'] }))
   on('session.start', async ($: any, e: any) => e)
   on('command.register', async () => ({ value: {} }))

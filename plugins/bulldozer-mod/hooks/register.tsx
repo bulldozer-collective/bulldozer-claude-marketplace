@@ -229,7 +229,12 @@ const CONFIG_POLL_MS = 2000
 async function syncConfig($: $) {
   const text = await readConfigText($).catch(() => undefined)
   if (text !== undefined && text !== lastConfigText) {
+    const isCreated = lastConfigText === null && text !== null
     await loadActive($)
+    // A project chosen in a folder that had none: the Desktop sidebar opens now.
+    if (isCreated && (await $.session.surfaces()).includes('desktop')) {
+      await openSidebar($)
+    }
   }
 }
 
@@ -1287,7 +1292,7 @@ function statusText(m: Membership | undefined, err: string | null): string {
     return err
   }
   if (!m) {
-    return 'aucun projet — /bdz-project'
+    return 'aucun projet — /bulldozer-mod'
   }
   // The engine prefixes the line with the plugin's name: "bulldozer: Projet … du client …".
   return `Projet ${m.projectName} du client ${m.companyName}`
@@ -1631,8 +1636,9 @@ async function syncSplash($: $) {
 }
 
 // Desktop raises both session.start and session.attach: a second call while the splash plays would restart it.
+// Only a folder with a bulldozer.json opens it by itself; /bulldozer-mod opens the pane anywhere.
 async function openSidebar($: $) {
-  if (await read($, isSplashing)) {
+  if ((await read($, isSplashing)) || !(await $.fs.exists(CONFIG))) {
     return
   }
   await update($, isSplashing, () => true)
@@ -1706,7 +1712,7 @@ async function refreshAll($: $) {
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
-    await $.command.register({ name: 'bdz-project', description: 'Choisir le projet Bulldozer actif' })
+    await $.command.register({ name: 'bulldozer-mod', description: 'Choisir le projet Bulldozer actif' })
     void refreshAll($).catch(() => undefined)
     // Changes from outside Claude (an editor, another session, git). Not a watchPaths file watch: the built-in
     // security module skips a mod's classic.SessionStart, so the engine never watches the file for it.
@@ -1777,7 +1783,7 @@ export const register: Register = on => {
     return ran
   })
 
-  on('command.run', { command: 'bdz-project' }, async $ => {
+  on('command.run', { command: 'bulldozer-mod' }, async $ => {
     const placed = await $.ui.open({ id: PROJECT_PANE, title: 'Projet Bulldozer', focus: true, closeOnEscape: true })
 
     return { text: placed.isPlaced ? 'Sélecteur de projet ouvert.' : `Panneau non affiché : ${placed.reason}` }
